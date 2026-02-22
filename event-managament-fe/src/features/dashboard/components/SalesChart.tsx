@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { ChartDataPoint, ChartFilter } from "../types";
 
 interface SalesChartProps {
@@ -10,7 +10,7 @@ interface SalesChartProps {
   loading?: boolean;
 }
 
-const FILTERS: ChartFilter[] = ["daily", "monthly", "yearly"];
+const FILTERS: ChartFilter[] = ["weekly", "monthly", "yearly"];
 
 const SalesChart: React.FC<SalesChartProps> = ({ 
   data, 
@@ -18,9 +18,20 @@ const SalesChart: React.FC<SalesChartProps> = ({
   onFilterChange, 
   loading = false 
 }) => {
+  // Find the initially highlighted point from backend, or default to the last one
+  const initialActive = data.find(d => d.isHighlight) || data[data.length - 1];
+  const [activePoint, setActivePoint] = useState<ChartDataPoint | null>(null);
+
+  // Update active point when data changes (e.g. filter change)
+  useEffect(() => {
+    if (data.length > 0) {
+      setActivePoint(data.find(d => d.isHighlight) || data[data.length - 1]);
+    }
+  }, [data]);
+
   return (
-    <div className="lg:col-span-2 bg-white dark:bg-[#221019] p-4 md:p-6 rounded-[24px] md:rounded-[32px] border border-[#f4f0f2] dark:border-[#3a1d2e] shadow-sm">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 md:mb-6 gap-3 md:gap-4">
+    <div className="lg:col-span-2 bg-white dark:bg-[#221019] p-4 md:p-6 rounded-[24px] md:rounded-[32px] border border-[#f4f0f2] dark:border-[#3a1d2e] shadow-sm flex flex-col h-full min-h-0 overflow-hidden">
+      <div className="shrink-0 flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 md:mb-4 gap-3 md:gap-4">
         <div>
           <h3 className="text-base md:text-lg font-bold text-[#181114] dark:text-white">Sales Overview</h3>
           <p className="text-xs md:text-sm text-[#896175]">Transaction volume over time</p>
@@ -42,50 +53,63 @@ const SalesChart: React.FC<SalesChartProps> = ({
         </div>
       </div>
 
-      <div className="h-[180px] md:h-[300px] w-full flex items-end justify-between gap-1 md:gap-2 px-1 md:px-2 pb-2 relative">
-        {/* Grid Lines */}
-        <div className="absolute inset-0 flex flex-col justify-between pointer-events-none z-0">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="w-full h-px bg-gray-100 dark:bg-gray-800 border-dashed"></div>
-          ))}
-        </div>
-
-        {/* Loading Overlay */}
-        {loading && (
-          <div className="absolute inset-0 bg-white/50 dark:bg-[#221019]/50 flex items-center justify-center z-20">
-            <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#ee2b8c] border-t-transparent"></div>
+      <div className="flex-1 flex flex-col w-full min-h-[260px] lg:min-h-0 mt-4">
+        {/* Chart Area */}
+        <div className="flex-1 w-full relative">
+          {/* Grid Lines */}
+          <div className="absolute inset-0 flex flex-col justify-between pointer-events-none z-0">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="w-full h-px bg-gray-100 dark:bg-gray-800 border-dashed"></div>
+            ))}
           </div>
-        )}
 
-        {/* Bars */}
-        <div className="relative z-10 w-full h-full flex items-end justify-between gap-1 md:gap-2 pt-6">
-          {data.map((item, index) => (
-            <div
-              key={`${item.label}-${index}`}
-              className={`flex-1 min-w-0 rounded-t-md md:rounded-t-lg relative group transition-all cursor-pointer ${
-                item.isHighlight
-                  ? "bg-gradient-to-t from-[#ee2b8c] to-[#8b5cf6] shadow-lg shadow-[#ee2b8c]/20"
-                  : index % 2 === 0
-                  ? "bg-[#ee2b8c]/10 hover:bg-[#ee2b8c]/20"
-                  : "bg-[#8b5cf6]/10 hover:bg-[#8b5cf6]/20"
-              }`}
-              style={{ height: item.height }}
-            >
-              <div className="absolute -top-6 md:-top-8 left-1/2 -translate-x-1/2 bg-black text-white text-[9px] md:text-xs px-1.5 md:px-2 py-0.5 md:py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20">
-                {item.isHighlight ? "Current" : `IDR ${item.value}M`}
-              </div>
+          {/* Loading Overlay */}
+          {loading && (
+            <div className="absolute inset-0 bg-white/50 dark:bg-[#221019]/50 flex items-center justify-center z-20">
+              <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#ee2b8c] border-t-transparent"></div>
             </div>
+          )}
+
+          {/* Bars */}
+          <div className="absolute inset-0 z-10 w-full h-full flex items-end justify-between gap-2 md:gap-4 pt-12 text-center" onMouseLeave={() => {
+            // Restore to actual current period when mouse leaves chart area
+            const current = data.find(d => d.isHighlight);
+            if (current) setActivePoint(current);
+          }}>
+            {data.map((item, index) => {
+              const isCurrentlyActive = activePoint?.label === item.label;
+              return (
+              <div
+                key={`${item.label}-${index}`}
+                onMouseEnter={() => setActivePoint(item)}
+                onClick={() => setActivePoint(item)}
+                className={`flex-1 min-w-0 rounded-t-[12px] md:rounded-t-[20px] relative group transition-all cursor-pointer ${
+                  isCurrentlyActive
+                    ? "bg-gradient-to-t from-[#ee2b8c] to-[#8b5cf6] shadow-lg shadow-[#ee2b8c]/20"
+                    : index % 2 === 0
+                    ? "bg-[#ee2b8c]/10 hover:bg-[#ee2b8c]/20"
+                    : "bg-[#8b5cf6]/10 hover:bg-[#8b5cf6]/20"
+                }`}
+                style={{ height: item.height }}
+              >
+                <div 
+                  className={`absolute -top-6 md:-top-8 left-1/2 -translate-x-1/2 bg-black text-white text-[9px] md:text-xs px-1.5 md:px-2 py-0.5 md:py-1 rounded shadow-md whitespace-nowrap z-20 transition-opacity duration-200 ${isCurrentlyActive ? "opacity-100" : "opacity-0"}`}
+                >
+                  IDR {item.value}M
+                </div>
+              </div>
+            )})}
+          </div>
+        </div>
+
+        {/* Labels */}
+        <div className="shrink-0 flex justify-between text-[8px] md:text-xs text-[#896175] mt-4 font-medium px-1 md:px-2">
+          {data.map((item, index) => (
+            <span key={`label-${item.label}-${index}`} className="truncate flex-1 text-center min-w-0">
+              {item.label}
+            </span>
           ))}
         </div>
-      </div>
-
-      {/* Labels */}
-      <div className="flex justify-between text-[8px] md:text-xs text-[#896175] mt-2 font-medium px-1 md:px-2">
-        {data.map((item, index) => (
-          <span key={`label-${item.label}-${index}`} className="truncate flex-1 text-center min-w-0">
-            {item.label}
-          </span>
-        ))}
       </div>
     </div>
   );

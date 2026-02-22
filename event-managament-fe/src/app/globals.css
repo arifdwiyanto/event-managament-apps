@@ -175,3 +175,26 @@ body {
 .custom-horizontal-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #FF00E5; /* Neon Magenta on hover */
 }
+
+/* Custom Vertical Scrollbar for generic components (light/dark supported) */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1; /* slate-300 for light mode */
+  border-radius: 10px;
+  border: none;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8; /* slate-400 */
+}
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #3f3f46; /* zinc-700 for modern dark mode */
+  border: none;
+}
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #52525b; /* zinc-600 */
+}

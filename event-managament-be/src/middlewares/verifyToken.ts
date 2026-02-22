@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 interface TokenPayload {
   id: string;
   roles: string[];
+  organizerId?: string;
 }
 
 declare global {

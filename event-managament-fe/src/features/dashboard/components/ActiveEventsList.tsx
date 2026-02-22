@@ -34,15 +34,15 @@ const ActiveEventsList: React.FC<ActiveEventsListProps> = ({ events, loading = f
   const canCreate = role === "OWNER" || role === "ADMIN";
 
   return (
-    <div className="bg-white dark:bg-[#221019] p-4 md:p-6 rounded-[24px] md:rounded-[32px] border border-[#f4f0f2] dark:border-[#3a1d2e] shadow-sm flex flex-col h-full">
-      <div className="flex items-center justify-between mb-4 md:mb-6">
+    <div className="bg-white dark:bg-[#221019] p-4 md:p-6 rounded-[24px] md:rounded-[32px] border border-[#f4f0f2] dark:border-[#3a1d2e] shadow-sm flex flex-col h-full min-h-0 overflow-hidden">
+      <div className="flex items-center justify-between mb-4 md:mb-6 shrink-0">
         <h3 className="text-base md:text-lg font-bold text-[#181114] dark:text-white">Active Events</h3>
         <Link href="/dashboard/events" className="text-[10px] md:text-xs font-bold text-[#ee2b8c] hover:underline">
           View All
         </Link>
       </div>
 
-      <div className="flex-1 flex flex-col gap-2 md:gap-4 overflow-y-auto pr-1">
+      <div className="flex-1 flex flex-col gap-2 md:gap-3 overflow-y-auto pr-1 min-h-0 custom-scrollbar">
         {loading ? (
           [...Array(3)].map((_, i) => (
             <div key={i} className="flex items-center gap-2.5 md:gap-4 p-2 md:p-3 rounded-lg md:rounded-xl bg-[#f8f6f7] dark:bg-[#2a1621] animate-pulse h-16" />
@@ -51,10 +51,10 @@ const ActiveEventsList: React.FC<ActiveEventsListProps> = ({ events, loading = f
           events.map((event) => (
             <div
               key={event.id}
-              className="flex items-center gap-2.5 md:gap-4 p-2 md:p-3 rounded-lg md:rounded-xl bg-[#f8f6f7] dark:bg-[#2a1621] border border-transparent hover:border-[#e6dbe0] dark:hover:border-[#3a1d2e] transition-colors group cursor-pointer"
+              className="flex items-center gap-2.5 md:gap-3 p-2 rounded-lg md:rounded-xl bg-[#f8f6f7] dark:bg-[#2a1621] border border-transparent hover:border-[#e6dbe0] dark:hover:border-[#3a1d2e] transition-colors group cursor-pointer"
             >
               {/* Image */}
-              <div className="size-10 md:size-12 rounded-lg bg-gray-200 dark:bg-gray-700 shrink-0 flex items-center justify-center overflow-hidden">
+              <div className="size-10 md:size-10 rounded-lg bg-gray-200 dark:bg-gray-700 shrink-0 flex items-center justify-center overflow-hidden">
                 {event.image ? (
                   <img
                     src={event.image}
@@ -73,7 +73,7 @@ const ActiveEventsList: React.FC<ActiveEventsListProps> = ({ events, loading = f
                 <h4 className="text-xs md:text-sm font-bold text-[#181114] dark:text-white truncate">
                   {event.title}
                 </h4>
-                <p className="text-[10px] md:text-xs text-[#896175] mt-0.5">
+                <p className="text-[10px] md:text-xs text-[#896175] mt-0.5 truncate">
                   {event.date} • {event.location}
                 </p>
               </div>

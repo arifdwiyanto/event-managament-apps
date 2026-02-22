@@ -136,7 +136,7 @@ const ReferralCard: React.FC<ReferralCardProps> = ({ signups, code }) => {
       <div className="relative z-10">
         <div className="flex justify-between items-start gap-2 mb-2 md:mb-4">
           <div className="min-w-0 flex-1">
-            <p className="text-[10px] md:text-sm font-medium text-white/70 mb-0.5 md:mb-1 truncate" title="Referral Signups">Referral Signups</p>
+            <p className="text-[10px] md:text-sm font-medium text-white/70 mb-0.5 md:mb-1 truncate" title="Total Team Members">Total Team Members</p>
             <h3 className="text-sm md:text-2xl font-black text-white truncate" title={signups.toString()}>{signups.toLocaleString()}</h3>
           </div>
           <div className="size-7 md:size-10 shrink-0 rounded-full bg-white/10 flex items-center justify-center text-white backdrop-blur-sm group-hover:rotate-12 transition-transform">
@@ -145,7 +145,7 @@ const ReferralCard: React.FC<ReferralCardProps> = ({ signups, code }) => {
         </div>
         <div className="mt-3 md:mt-4 pt-3 md:pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-2">
           <span className="text-[10px] md:text-xs font-medium text-white/80">
-            Code: <span className="font-bold text-white tracking-widest bg-white/20 px-1.5 md:px-2 py-0.5 md:py-1 rounded ml-1 text-[10px] md:text-xs">{code}</span>
+            Org: <span className="font-bold text-white tracking-widest bg-white/20 px-1.5 md:px-2 py-0.5 md:py-1 rounded ml-1 text-[10px] md:text-xs">{code}</span>
           </span>
           <button 
             onClick={handleCopy}

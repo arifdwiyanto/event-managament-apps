@@ -20,7 +20,7 @@ const DashboardView: React.FC = () => {
   const { isOpen, toggle, close } = useSidebar();
   
   // Data hooks - clean separation of concerns
-  const { data: chartData, filter, setFilter, loading: chartLoading } = useChartData("daily");
+  const { data: chartData, filter, setFilter, loading: chartLoading } = useChartData("weekly");
   const { stats, referral, loading: statsLoading } = useStatsData();
   const { events, loading: eventsLoading } = useActiveEvents();
   const { transactions, loading: transactionsLoading } = useTransactions();
@@ -46,7 +46,7 @@ const DashboardView: React.FC = () => {
             />
 
             {/* Charts & Events Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 lg:h-[440px]">
               <SalesChart 
                 data={chartData} 
                 filter={filter} 

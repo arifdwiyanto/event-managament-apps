@@ -1,40 +1,28 @@
 // Dashboard Data Service
-// Replace dummy data imports with real API calls when ready
-
 import { ChartFilter, ChartDataPoint } from "../types";
-import {
-  chartDataByFilter,
-  statsData,
-  referralData,
-  activeEventsData,
-  transactionsData,
-} from "@/features/data-dummy";
+import apiFetch from "@/services/apiFetch";
 
-// Simulate API delay
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-// API-like functions - replace with real API calls later
 export async function fetchChartData(filter: ChartFilter): Promise<ChartDataPoint[]> {
-  await delay(50);
-  return chartDataByFilter[filter];
+  const response = await apiFetch.get(`/dashboard/chart-data?filter=${filter}`);
+  return response.data;
 }
 
 export async function fetchStats() {
-  await delay(50);
-  return statsData;
+  const response = await apiFetch.get("/dashboard/stats");
+  return response.data;
 }
 
 export async function fetchReferral() {
-  await delay(50);
-  return referralData;
+  const response = await apiFetch.get("/dashboard/team-info");
+  return response.data;
 }
 
 export async function fetchActiveEvents() {
-  await delay(50);
-  return activeEventsData;
+  const response = await apiFetch.get("/dashboard/active-events");
+  return response.data;
 }
 
 export async function fetchTransactions() {
-  await delay(50);
-  return transactionsData;
+  const response = await apiFetch.get("/dashboard/transactions");
+  return response.data;
 }

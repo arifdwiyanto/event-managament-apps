@@ -21,7 +21,6 @@ const navItems = [
   { id: "events", label: "My Events", href: "/dashboard/events", icon: CalendarIcon },
   { id: "transactions", label: "Transactions", href: "/dashboard/transactions", icon: CreditCardIcon },
   { id: "reports", label: "Reports", href: "/dashboard/reports", icon: ChartBarIcon },
-  { id: "profile", label: "Profile", href: "/dashboard/profile", icon: UserCircleIcon },
   { id: "settings", label: "Settings", href: "/dashboard/settings", icon: Cog6ToothIcon },
 ];
 

@@ -18,8 +18,10 @@ export class DashboardRouter {
     this.router.use(verifyToken, requireRole("ORGANIZER"));
 
     this.router.get("/stats", this.dashboardController.getStats);
-    this.router.get("/reports", this.dashboardController.getReports);
-    this.router.get("/attendees", this.dashboardController.getAttendeeStats);
+    this.router.get("/team-info", this.dashboardController.getTeamInfo);
+    this.router.get("/chart-data", this.dashboardController.getChartData);
+    this.router.get("/active-events", this.dashboardController.getActiveEvents);
+    this.router.get("/transactions", this.dashboardController.getTransactions);
   };
 
   public getRouter = (): Router => {

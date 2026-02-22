@@ -1,19 +1,42 @@
 "use client";
 
 import { useStoreLogin } from "@/features/auth/store/useAuthStore";
-import React from "react";
+import React, { useState } from "react";
 import { 
   Bars3Icon, 
   MagnifyingGlassIcon, 
-  BellIcon 
+  BellIcon,
+  ChevronDownIcon,
+  ArrowRightOnRectangleIcon,
+  UserIcon
 } from "@heroicons/react/24/outline";
+import { Menu, MenuItem, IconButton, Divider } from "@mui/material";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface DashboardHeaderProps {
   onMenuClick: () => void;
 }
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({ onMenuClick }) => {
-  const { user } = useStoreLogin();
+  const { user, signOut } = useStoreLogin();
+  const router = useRouter();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+
+  const handleProfileClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = async () => {
+    handleClose();
+    await signOut();
+    router.push("/login");
+  };
 
   const getInitials = (name?: string) => {
     if (!name) return "U";
@@ -65,14 +88,86 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ onMenuClick }) => {
               {user?.name}
             </p>
           </div>
-          <div className="size-8 md:size-10 rounded-full bg-[#ee2b8c] flex items-center justify-center text-white font-bold text-xs md:text-sm overflow-hidden border-2 border-transparent hover:border-white/20 transition-colors">
-            {user?.organizer?.logoUrl ? (
-              <img src={user.organizer.logoUrl} alt="Logo" className="w-full h-full object-cover" />
-            ) : (
-              getInitials(user?.organizer?.name || user?.name)
-            )}
-          </div>
+          
+          <button 
+            onClick={handleProfileClick}
+            className="flex items-center gap-2 group outline-none"
+          >
+            <div className="size-8 md:size-10 rounded-full bg-[#ee2b8c] flex items-center justify-center text-white font-bold text-xs md:text-sm overflow-hidden border-2 border-transparent group-hover:border-[#ee2b8c]/20 transition-all">
+              {user?.organizer?.logoUrl ? (
+                <img src={user.organizer.logoUrl} alt="Logo" className="w-full h-full object-cover" />
+              ) : (
+                getInitials(user?.organizer?.name || user?.name)
+              )}
+            </div>
+            <ChevronDownIcon className={`size-4 text-[#896175] transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+          </button>
         </div>
+
+        {/* Profile Dropdown Menu */}
+        <Menu
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+          onClick={handleClose}
+          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+          PaperProps={{
+            elevation: 0,
+            sx: {
+              overflow: 'visible',
+              borderRadius: '20px',
+              border: '1px solid',
+              borderColor: 'divider',
+              p: 1.5,
+              mt: 1.5,
+              minWidth: 220,
+              boxShadow: '0 10px 40px rgba(0,0,0,0.12)',
+              '.dark &': {
+                bgcolor: '#221019',
+                borderColor: '#3a1d2e',
+                color: 'white'
+              },
+              '& .MuiMenuItem-root': {
+                gap: 1.5,
+                borderRadius: '12px',
+                fontSize: '13px',
+                fontWeight: 600,
+                py: 1.5,
+                '&:hover': {
+                  bgcolor: '#ee2b8c10',
+                  color: '#ee2b8c'
+                }
+              }
+            }
+          }}
+        >
+          <div className="px-4 py-2 mb-2 lg:hidden">
+             <p className="text-xs font-bold text-[#181114] dark:text-white truncate">
+              {user?.organizer?.name}
+            </p>
+            <p className="text-[10px] text-[#896175] truncate">
+              {user?.name}
+            </p>
+          </div>
+          
+          <Link href="/dashboard/profile">
+            <MenuItem onClick={handleClose}>
+              <UserIcon className="size-5" />
+              My Profile
+            </MenuItem>
+          </Link>
+          
+          <Divider className="my-1 border-[#f4f0f2] dark:border-[#3a1d2e]" />
+          
+          <MenuItem 
+            onClick={handleLogout}
+            className="text-red-500 hover:!bg-red-50 dark:hover:!bg-red-500/10"
+          >
+            <ArrowRightOnRectangleIcon className="size-5" />
+            Sign Out
+          </MenuItem>
+        </Menu>
       </div>
     </header>
   );
