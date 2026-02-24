@@ -45,7 +45,7 @@ export const manageEventsService = {
 
       return {
         id: event.id,
-        title: event.title,
+        title: event.name,
         category: (event.category?.name ?? "Event").toUpperCase(),
         status,
         date: formattedDate,
