@@ -16,7 +16,7 @@ function obtainStatus(
 
   if (end < now) return "completed";
   if (totalTickets > 0 && ticketsSold >= totalTickets) return "sold-out";
-  return "live";
+  return "active";
 }
 
 export const manageEventsService = {

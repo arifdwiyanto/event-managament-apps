@@ -16,8 +16,8 @@ interface ManageEventCardProps {
 }
 
 const statusConfig = {
-  live: {
-    label: "Live",
+  active: {
+    label: "Active",
     color: "text-green-500",
     bg: "bg-green-500/10",
     border: "border-green-500/20",
@@ -43,7 +43,7 @@ const statusConfig = {
 };
 
 const ManageEventCard: React.FC<ManageEventCardProps> = ({ event }) => {
-  const status = statusConfig[event.status] ?? statusConfig.live;
+  const status = statusConfig[event.status] ?? statusConfig.active;
 
   const progressPercentage =
     event.totalTickets > 0

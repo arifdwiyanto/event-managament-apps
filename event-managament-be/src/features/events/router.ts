@@ -5,6 +5,7 @@ import { verifyToken } from "../../middlewares/verifyToken.js";
 import { requireOrgRole } from "../../middlewares/requireOrgRole.js";
 import { requireRole } from "../../middlewares/requireRole.js";
 import { TicketsController } from "./controllers/tickets.controller.js";
+import { uploadcloudinaryImage } from "../uploadCloudinary/utils/uploadImage.js";
 
 export class EventsRouter {
   private router: Router;
@@ -49,6 +50,7 @@ export class EventsRouter {
       "/",
       verifyToken,
       requireRole("ORGANIZER"),
+      uploadcloudinaryImage("events").single("image"),
       requireOrgRole(["ADMIN"], "organizer"), // Check body.organizerId
       this.eventsController.create,
     );

@@ -14,7 +14,13 @@ export class EventsController {
     next: NextFunction,
   ): Promise<void> => {
     try {
-      const event = await this.eventsService.create(req.body);
+      const payload = typeof req.body.data === "string"? JSON.parse(req.body.data) : req.body;
+
+      if (req.file) {
+        payload.imageUrl = req.file.path;
+      }
+
+      const event = await this.eventsService.create(payload);
       res.status(201).send(event);
     } catch (error) {
       next(error);
