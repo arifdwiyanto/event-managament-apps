@@ -17,4 +17,16 @@ export const manageEventsRepository = {
     const response = await apiFetch.get(`/events?${params.toString()}`);
     return response.data;
   },
+
+  getCategories: async () => {
+    const response = await apiFetch.get("/events/categories");
+    return response.data;
+  },
+
+  createEvent: async (formData: FormData) => {
+    const response = await apiFetch.post("/events", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return response.data;
+  },
 };

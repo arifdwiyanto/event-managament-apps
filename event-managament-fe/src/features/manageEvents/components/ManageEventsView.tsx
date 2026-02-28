@@ -51,7 +51,7 @@ const ManageEventsView = () => {
   const displayedEvents = useMemo<ManageEventItem[]>(() => {
     const now = new Date();
     return filteredEvents.filter((event) => {
-      if (dateRange === "upcoming") return event.status === "live";
+      if (dateRange === "upcoming") return event.status === "active";
       if (dateRange === "past") return event.status === "completed";
       return true;
     });

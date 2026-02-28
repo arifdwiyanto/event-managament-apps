@@ -11,7 +11,17 @@ export class EventsService {
     if (new Date(data.endDate) <= new Date(data.startDate)) {
       throw new Error("End date must be after start date");
     }
-    return this.eventsRepository.create(data);
+
+    const { ticketTypes, ...restData } = data;
+    const createData: any = { ...restData };
+
+    if (ticketTypes && Array.isArray(ticketTypes)) {
+      createData.ticketTypes = {
+        create: ticketTypes,
+      };
+    }
+
+    return this.eventsRepository.create(createData);
   };
 
   public findAll = async (

@@ -12,7 +12,7 @@ interface ManageEventsFilterProps {
 
 const statusOptions = [
   { id: "all", label: "All Events" },
-  { id: "live", label: "Live" },
+  { id: "active", label: "Active" },
   { id: "draft", label: "Draft" },
   { id: "completed", label: "Completed" },
   { id: "sold-out", label: "Sold Out" },

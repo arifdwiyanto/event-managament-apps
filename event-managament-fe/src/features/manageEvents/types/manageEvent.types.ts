@@ -1,4 +1,4 @@
-export type ManageEventStatus = "live" | "completed" | "sold-out";
+export type ManageEventStatus = "active" | "completed" | "sold-out";
 
 export interface ManageEventTicketType {
   id: string;
@@ -25,6 +25,32 @@ export interface ManageEventsOptions {
   location?: string;
   page?: string;
   limit?: number;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  icon?: string;
+  color?: string;
+}
+
+export interface CreateTicketPayload {
+  name: string;
+  price: number;
+  quota: number;
+  description?: string;
+}
+
+export interface CreateEventPayload {
+  organizerId: string;
+  categoryId: string;
+  name: string;
+  description?: string;
+  location: string;
+  startDate: string;
+  endDate: string;
+  isPaid: boolean;
+  ticketTypes: CreateTicketPayload[];
 }
 
 export interface ManageEventsMeta {
