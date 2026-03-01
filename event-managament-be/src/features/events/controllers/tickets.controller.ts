@@ -14,7 +14,8 @@ export class TicketsController {
     next: NextFunction,
   ): Promise<void> => {
     try {
-      const ticket = await this.ticketsService.create(req.body);
+      const ticketData = { ...req.body, eventId: req.params.eventId };
+      const ticket = await this.ticketsService.create(ticketData);
       res.status(201).send(ticket);
     } catch (error) {
       next(error);

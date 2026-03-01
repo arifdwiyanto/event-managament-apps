@@ -10,6 +10,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 import { ManageEventItem } from "../types/manageEvent.types";
+import Link from "next/link";
 
 interface ManageEventCardProps {
   event: ManageEventItem;
@@ -173,10 +174,12 @@ const ManageEventCard: React.FC<ManageEventCardProps> = ({ event }) => {
                 Archived
               </button>
             ) : (
-              <button className="ml-2 flex items-center gap-2 px-5 py-2.5 bg-foreground text-background dark:bg-white dark:text-black rounded-full text-sm font-bold hover:bg-neon-pink hover:text-white dark:hover:bg-neon-pink transition-colors">
-                <TicketIcon className="w-5 h-5 flex-shrink-0" />
-                Manage Tickets
-              </button>
+              <Link href={`/dashboard/events/${event.id}/tickets`} passHref>
+                <button className="ml-2 flex items-center gap-2 px-5 py-2.5 bg-foreground text-background dark:bg-white dark:text-black rounded-full text-sm font-bold hover:bg-neon-pink hover:text-white dark:hover:bg-neon-pink transition-colors">
+                  <TicketIcon className="w-5 h-5 flex-shrink-0" />
+                  Manage Tickets
+                </button>
+              </Link>
             )}
           </div>
         </div>

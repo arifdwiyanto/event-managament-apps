@@ -29,4 +29,17 @@ export const manageEventsRepository = {
     });
     return response.data;
   },
+
+  getEventById: async (id: string) => {
+    const response = await apiFetch.get(`/events/${id}`);
+    return response.data;
+  },
+
+  createTicketTier: async (
+    eventId: string,
+    data: { name: string; price: number; quota: number; description?: string },
+  ) => {
+    const response = await apiFetch.post(`/events/${eventId}/tickets`, data);
+    return response.data;
+  },
 };
