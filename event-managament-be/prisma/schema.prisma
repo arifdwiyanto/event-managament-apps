@@ -21,13 +21,13 @@ model User {
   updatedAt    DateTime   @updatedAt @map("updated_at")
 
   // Relations
-  organizer         Organizer? // 1 user can own 1 organizer profile (optional)
-  organizerTeams    OrganizerTeam[]
-  referralsSent     Referral[]      @relation("ReferralFrom")
-  referralsReceived Referral[]      @relation("ReferralTo")
-  points            Point[]
-  coupons           UserCoupon[]
-  transactions      Transaction[]
+  organizer              Organizer? // 1 user can own 1 organizer profile (optional)
+  organizerTeams         OrganizerTeam[]
+  referralsSent          Referral[]                       @relation("ReferralFrom")
+  referralsReceived      Referral[]                       @relation("ReferralTo")
+  points                 Point[]
+  coupons                UserCoupon[]
+  transactions           Transaction[]
   reviews                Review[]
   notifications          UserNotification[]
   organizerNotifications OrganizerNotificationRecipient[]
@@ -263,6 +263,7 @@ model Transaction {
   promotionId        String?           @map("promotion_id")
   status             TransactionStatus @default(PENDING)
   paymentMethod      String            @map("payment_method")
+  paymentProofUrl    String?           @map("payment_proof_url")
   transactionDate    DateTime          @default(now()) @map("transaction_date")
 
   user       User              @relation(fields: [userId], references: [id])
@@ -338,10 +339,10 @@ enum TransactionStatus {
 }
 
 model Cart {
-  id        String     @id @default(uuid())
-  userId    String     @unique @map("user_id")
-  createdAt DateTime   @default(now()) @map("created_at")
-  updatedAt DateTime   @updatedAt @map("updated_at")
+  id        String   @id @default(uuid())
+  userId    String   @unique @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   user  User       @relation(fields: [userId], references: [id])
   items CartItem[]
