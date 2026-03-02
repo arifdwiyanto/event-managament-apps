@@ -30,8 +30,16 @@ export class OrdersController {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
 
-      const { page: _p, limit: _l, ...filters } = req.query;
+      const { page: _p, limit: _l, organizerId, ...queryFilters } = req.query;
 
+      let filters: any = { ...queryFilters };
+
+      if (req.user?.roles?.includes("ORGANIZER") && organizerId) {
+        filters.organizerId = organizerId;
+      } else {
+        filters.userId = req.user?.id;
+      }
+      
       const { data, meta } = await this.ordersService.findAll(
         filters,
         page,

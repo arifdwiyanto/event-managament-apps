@@ -4,6 +4,7 @@ import React from "react";
 import { Drawer, IconButton, Typography, Divider, Box, Button } from "@mui/material";
 import { XMarkIcon, ShoppingCartIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { useCartDrawer } from "../hooks/useCartDrawer";
+import { useRouter } from "next/navigation";
 
 interface CartDrawerProps {
   open: boolean;
@@ -18,6 +19,13 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ open, onClose }) => {
     total, 
     sortedItems 
   } = useCartDrawer(open);
+
+  const router = useRouter();
+
+  const handleCheckout = ()=>{
+    onClose();
+    router.push("/checkout");
+  }
 
   return (
     <Drawer
@@ -135,6 +143,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ open, onClose }) => {
               </Typography>
             </div>
             <button
+              onClick={handleCheckout}
               className="w-full py-5 bg-black dark:bg-neon-purple text-white dark:text-white font-black text-sm uppercase tracking-[0.2em] shadow-[6px_6px_0_0_#ee2b8c] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[8px_8px_0_0_#ee2b8c] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all duration-200"
             >
               Checkout Vibe

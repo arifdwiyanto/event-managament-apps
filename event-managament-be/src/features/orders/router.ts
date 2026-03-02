@@ -19,31 +19,40 @@ export class OrdersRouter {
     this.router.use(verifyToken);
 
     // Customer can create/view their own orders
-    this.router.post("/", requireRole("CUSTOMER"), this.ordersController.create);
-    
+    this.router.post(
+      "/",
+      requireRole("CUSTOMER"),
+      this.ordersController.create,
+    );
+
     // Manage Transactions (Requires OWNER, ADMIN)
     // For general list, we might need a separate endpoint or handle inside controller
     // But for single order updates/delete, we can use requireOrgRole if we can map it to an organizer context
-    
+
     this.router.get("/", this.ordersController.findAll);
     this.router.get("/:id", this.ordersController.findOne);
 
     // Update/Delete usually for managing
     this.router.patch(
-      "/:id", 
-      requireRole("ORGANIZER"), 
-      requireOrgRole(["ADMIN"], "order"), 
-      this.ordersController.update
+      "/:id",
+      requireRole("ORGANIZER"),
+      requireOrgRole(["ADMIN"], "order"),
+      this.ordersController.update,
     );
 
     this.router.delete(
-      "/:id", 
-      requireRole("ORGANIZER"), 
-      requireOrgRole(["ADMIN"], "order"), 
-      this.ordersController.delete
+      "/:id",
+      requireRole("ORGANIZER"),
+      requireOrgRole(["ADMIN"], "order"),
+      this.ordersController.delete,
     );
 
-    this.router.post("/:id/payment", requireRole("CUSTOMER"), this.ordersController.processPayment);
+    this.router.post(
+      "/:id/payment",
+      requireRole("ORGANIZER"),
+      requireOrgRole(["ADMIN", "OWNER"], "order"),
+      this.ordersController.processPayment,
+    );
   };
 
   public getRouter = (): Router => {
