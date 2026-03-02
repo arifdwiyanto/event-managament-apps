@@ -73,6 +73,15 @@ class App {
     // Global error handler
     this.app.use(
       (err: any, req: Request, res: Response, next: NextFunction) => {
+        if (err.name === "ZodError") {
+          return res.status(400).json({
+            error: {
+              message: "Validation Error",
+              details: err.errors,
+            },
+          });
+        }
+
         console.error(err.stack);
         res.status(err.status || 500).json({
           error: {

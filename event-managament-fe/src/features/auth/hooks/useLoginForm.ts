@@ -1,8 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { useFormik } from "formik";
-import * as Yup from "yup";
-import { signIn } from "../services/authService";
+import { loginSchema } from "../validations/auth.validation";
 import { useStoreLogin } from "../store/useAuthStore";
 import { useRouter } from "next/navigation";
 
@@ -29,10 +28,7 @@ export const useLoginForm = () => {
       password: "",
       remember: false,
     },
-    validationSchema: Yup.object({
-      email: Yup.string().email("Invalid email address").required("Required"),
-      password: Yup.string().required("Required"),
-    }),
+    validationSchema: loginSchema,
     onSubmit: async (values) => {
       setLoading(true);
       try {
@@ -47,7 +43,6 @@ export const useLoginForm = () => {
             router.push("/");
           }, 2000);
         } else {
-          // Login failed
           setToast({
             open: true,
             message: useStoreLogin.getState().error || "Login Failed, please verify your email and password",
@@ -66,17 +61,21 @@ export const useLoginForm = () => {
       }
     },
   });
+
   useEffect(() => {
     if (accessToken) {
       router.push("/");
     }
-  });
+  }, [accessToken, router]);
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+
   const handleCloseToast = () => {
     setToast((prev) => ({ ...prev, open: false }));
   };
+
   return {
     formik,
     showPassword,

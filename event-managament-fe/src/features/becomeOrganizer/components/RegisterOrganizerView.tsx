@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRegisterOrganizer } from "../hooks/useRegisterOrganizer";
 import {
   PlusCircleIcon,
@@ -11,54 +12,33 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/solid";
 import { Snackbar, Alert, CircularProgress } from "@mui/material";
+import { ImageCropperModal } from "../../imageCropper/components/ImageCropperModal";
+import { MainNavbar, MainFooter } from "../../../components/layouts/home";
 
 const RegisterOrganizerView: React.FC = () => {
   const {
     formik,
     isLoading,
-    teamEmails,
+    teamMembers,
     newEmail,
     setNewEmail,
-    addTeamEmail,
-    removeTeamEmail,
+    newRole,
+    setNewRole,
+    addTeamMember,
+    removeTeamMember,
+    isCropperOpen,
+    setIsCropperOpen,
+    uncroppedLogoSrc,
+    logoPreviewUrl,
+    handleLogoChange,
+    onCropComplete,
     toast,
     handleCloseToast,
   } = useRegisterOrganizer();
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-black font-display">
-      {/* Header */}
-      <header className="h-20 bg-gray-50 dark:bg-black border-b-4 border-gray-200 dark:border-white/10 fixed w-full top-0 z-50 flex items-center justify-between px-6 lg:px-12">
-        <Link href="/" className="flex items-center gap-4">
-          <div className="size-10 text-gray-900 dark:text-white">
-            <svg
-              className="w-full h-full"
-              fill="none"
-              viewBox="0 0 48 48"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z"
-                fill="currentColor"
-              />
-            </svg>
-          </div>
-          <h2 className="text-3xl font-black uppercase tracking-tighter text-gray-900 dark:text-white">
-            Hype
-          </h2>
-        </Link>
-        <nav className="hidden md:flex items-center gap-10">
-          <span className="text-lg font-black uppercase text-[#A855F7] underline decoration-4 underline-offset-4">
-            For Organizers
-          </span>
-          <Link
-            href="/"
-            className="text-lg font-black uppercase text-gray-900 dark:text-white hover:text-[#ee2b8c] dark:hover:text-[#FF00FF] transition-colors"
-          >
-            Home
-          </Link>
-        </nav>
-      </header>
+    <div className="min-h-screen bg-gray-50 dark:bg-black font-display font-body">
+      <MainNavbar />
 
       {/* Main */}
       <main className="pt-32 pb-24 px-6">
@@ -120,21 +100,41 @@ const RegisterOrganizerView: React.FC = () => {
               />
             </div>
 
-            {/* 03. Branding (Logo) — Visual only for now */}
+            {/* 03. Branding (Logo) */}
             <div className="space-y-2">
               <label className="block text-xs font-black uppercase tracking-widest mb-2 text-gray-500 dark:text-white/50">
                 03. Branding (Logo)
               </label>
-              <div className="border-4 border-dashed border-gray-200 dark:border-white/20 bg-white dark:bg-black p-12 text-center group cursor-pointer hover:bg-[#00bcd4]/5 dark:hover:bg-[#00F0FF]/5 transition-colors">
-                <input className="hidden" id="logo-upload" type="file" />
-                <label className="cursor-pointer" htmlFor="logo-upload">
-                  <PhotoIcon className="size-16 mb-4 mx-auto text-gray-300 dark:text-white/30 group-hover:scale-110 transition-transform" />
-                  <p className="font-black uppercase text-xl text-gray-900 dark:text-white">
-                    Drop your heat here
-                  </p>
-                  <p className="text-sm font-bold text-gray-400 dark:text-white/40 uppercase mt-2">
-                    PNG, JPG up to 10MB
-                  </p>
+              <div className="border-4 border-dashed border-gray-200 dark:border-white/20 bg-white dark:bg-black p-12 text-center group cursor-pointer hover:bg-[#00bcd4]/5 dark:hover:bg-[#00F0FF]/5 transition-colors relative">
+                <input 
+                  className="hidden" 
+                  id="logo-upload" 
+                  type="file" 
+                  accept="image/png, image/jpeg, image/jpg"
+                  onChange={handleLogoChange}
+                  disabled={isLoading}
+                />
+                <label className="cursor-pointer flex flex-col items-center justify-center w-full h-full" htmlFor="logo-upload">
+                  {logoPreviewUrl ? (
+                    <div className="relative size-32 rounded-full overflow-hidden border-4 border-[#00bcd4] dark:border-[#00F0FF]">
+                      <Image 
+                        src={logoPreviewUrl} 
+                        alt="Logo Preview" 
+                        fill 
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <>
+                      <PhotoIcon className="size-16 mb-4 mx-auto text-gray-300 dark:text-white/30 group-hover:scale-110 transition-transform" />
+                      <p className="font-black uppercase text-xl text-gray-900 dark:text-white">
+                        Drop your heat here
+                      </p>
+                      <p className="text-sm font-bold text-gray-400 dark:text-white/40 uppercase mt-2">
+                        PNG, JPG up to 10MB
+                      </p>
+                    </>
+                  )}
                 </label>
               </div>
             </div>
@@ -151,9 +151,9 @@ const RegisterOrganizerView: React.FC = () => {
               </div>
 
               {/* List of added emails */}
-              {teamEmails.length > 0 && (
+              {teamMembers.length > 0 && (
                 <div className="space-y-2">
-                  {teamEmails.map((member) => (
+                  {teamMembers.map((member) => (
                     <div
                       key={member.email}
                       className="flex items-center gap-2 bg-white dark:bg-white/5 border-2 border-gray-200 dark:border-white/10 px-4 py-2"
@@ -162,10 +162,13 @@ const RegisterOrganizerView: React.FC = () => {
                       <span className="flex-1 font-bold text-sm text-gray-900 dark:text-white truncate">
                         {member.email}
                       </span>
+                      <span className="px-2 py-1 text-[10px] font-black uppercase tracking-wider bg-gray-200 dark:bg-white/10 text-gray-700 dark:text-white/70">
+                        {member.role}
+                      </span>
                       <button
                         type="button"
-                        onClick={() => removeTeamEmail(member.email)}
-                        className="text-gray-400 hover:text-red-500 transition-colors"
+                        onClick={() => removeTeamMember(member.email)}
+                        className="text-gray-400 hover:text-red-500 transition-colors ml-2"
                       >
                         <XMarkIcon className="size-5" />
                       </button>
@@ -175,7 +178,7 @@ const RegisterOrganizerView: React.FC = () => {
               )}
 
               {/* Add email input */}
-              <div className="flex gap-4">
+              <div className="flex flex-col md:flex-row gap-4">
                 <input
                   className="flex-1 bg-white dark:bg-black border-4 border-gray-200 dark:border-white/20 rounded-none px-4 py-3 text-xl font-bold text-gray-900 dark:text-white focus:ring-0 focus:border-[#ee2b8c] dark:focus:border-[#FF00FF] placeholder:text-gray-300 dark:placeholder:text-white/30 transition-all outline-none"
                   placeholder="teammate@hype.com"
@@ -185,25 +188,32 @@ const RegisterOrganizerView: React.FC = () => {
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       e.preventDefault();
-                      addTeamEmail();
+                      addTeamMember();
                     }
                   }}
                   disabled={isLoading}
                 />
-                <div className="bg-gray-900 dark:bg-white text-[#ADFF2F] dark:text-black px-4 flex items-center border-4 border-gray-200 dark:border-white/20">
-                  <EnvelopeIcon className="size-5 font-black" />
-                </div>
-              </div>
+                
+                <select
+                  value={newRole}
+                  onChange={(e) => setNewRole(e.target.value as "ADMIN" | "MARKETING")}
+                  className="bg-white dark:bg-black border-4 border-gray-200 dark:border-white/20 rounded-none px-4 py-3 text-sm font-black uppercase text-gray-900 dark:text-white focus:ring-0 focus:border-[#ee2b8c] dark:focus:border-[#FF00FF] outline-none"
+                  disabled={isLoading}
+                >
+                  <option value="MARKETING">Marketing</option>
+                  <option value="ADMIN">Admin</option>
+                </select>
 
-              <button
-                className="w-full md:w-auto px-8 py-3 bg-[#ADFF2F] text-gray-900 border-4 border-gray-200 dark:border-white/20 rounded-none font-black uppercase tracking-tighter text-sm flex items-center justify-center gap-2 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)] dark:hover:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.1)] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all"
-                type="button"
-                onClick={addTeamEmail}
-                disabled={isLoading}
-              >
-                <PlusCircleIcon className="size-5" />
-                <span>Add Member</span>
-              </button>
+                <button
+                  className="px-8 py-3 bg-[#ADFF2F] text-gray-900 border-4 border-gray-200 dark:border-white/20 rounded-none font-black uppercase tracking-tighter text-sm flex items-center justify-center gap-2 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] dark:hover:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.1)] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all"
+                  type="button"
+                  onClick={addTeamMember}
+                  disabled={isLoading}
+                >
+                  <PlusCircleIcon className="size-5" />
+                  <span>Add</span>
+                </button>
+              </div>
             </div>
 
             {/* Submit */}
@@ -230,52 +240,17 @@ const RegisterOrganizerView: React.FC = () => {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="py-12 px-6 bg-white dark:bg-black border-t-4 border-gray-200 dark:border-white/10">
-        <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="flex items-center gap-4">
-            <div className="size-8 text-gray-900 dark:text-white">
-              <svg
-                className="w-full h-full"
-                fill="none"
-                viewBox="0 0 48 48"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z"
-                  fill="currentColor"
-                />
-              </svg>
-            </div>
-            <h2 className="text-xl font-black uppercase tracking-tighter text-gray-900 dark:text-white">
-              Hype
-            </h2>
-          </div>
-          <div className="flex gap-8">
-            <a
-              className="text-gray-400 dark:text-white/40 hover:text-[#00bcd4] dark:hover:text-[#00F0FF] font-black uppercase text-xs transition-colors"
-              href="#"
-            >
-              Twitter
-            </a>
-            <a
-              className="text-gray-400 dark:text-white/40 hover:text-[#ee2b8c] dark:hover:text-[#FF00FF] font-black uppercase text-xs transition-colors"
-              href="#"
-            >
-              Instagram
-            </a>
-            <a
-              className="text-gray-400 dark:text-white/40 hover:text-[#A855F7] font-black uppercase text-xs transition-colors"
-              href="#"
-            >
-              Discord
-            </a>
-          </div>
-          <p className="text-[10px] font-bold text-gray-400 dark:text-white/30 uppercase tracking-widest">
-            © 2024 HYPE EXPERIENCES INC.
-          </p>
-        </div>
-      </footer>
+      <MainFooter />
+
+      {/* Image Cropper Modal */}
+      <ImageCropperModal
+        open={isCropperOpen}
+        imageSrc={uncroppedLogoSrc}
+        onClose={() => setIsCropperOpen(false)}
+        onCropComplete={onCropComplete}
+        title="Crop Organizer Logo"
+        aspectRatio={1} // 1:1 ratio for logos
+      />
 
       {/* Toast */}
       <Snackbar

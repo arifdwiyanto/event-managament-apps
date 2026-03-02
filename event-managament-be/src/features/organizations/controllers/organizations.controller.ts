@@ -2,6 +2,12 @@
 import { OrganizationsService } from "../services/organizations.service.js";
 import { AuthService } from "../../auth/services/auth.service.js";
 import { OrgRole } from "@prisma/client";
+import {
+  createOrganizerSchema,
+  updateOrganizerSchema,
+  addTeamMemberSchema,
+  updateTeamMemberRoleSchema,
+} from "../validations/organizations.validation.js";
 
 export class OrganizationsController {
   private service: OrganizationsService;
@@ -24,11 +30,11 @@ export class OrganizationsController {
   ): Promise<void> => {
     try {
       const userId = req.user!.id;
-      const { name, description } = req.body;
+      const validatedData = createOrganizerSchema.parse(req.body);
 
       const organizer = await this.service.create(userId, {
-        name,
-        description,
+        name: validatedData.name,
+        description: validatedData.description,
       });
 
       const updatedUser = await this.authService.getMe(userId);
@@ -93,7 +99,8 @@ export class OrganizationsController {
     next: NextFunction,
   ): Promise<void> => {
     try {
-      const organizer = await this.service.update(req.params.id as string, req.body);
+      const validatedData = updateOrganizerSchema.parse(req.body);
+      const organizer = await this.service.update(req.params.id as string, validatedData);
       res.status(200).json({
         message: "Organizer updated successfully",
         data: organizer,
@@ -166,12 +173,12 @@ export class OrganizationsController {
     try {
       const organizerId = req.params.id as string;
       const requestingUserId = req.user!.id;
-      const { email, role } = req.body;
+      const validatedData = addTeamMemberSchema.parse(req.body);
 
       const member = await this.service.addMember(
         organizerId,
         requestingUserId,
-        { email, role },
+        { email: validatedData.email, role: validatedData.role as OrgRole | undefined },
       );
 
       res.status(201).json({
@@ -230,13 +237,13 @@ export class OrganizationsController {
       const organizerId = req.params.id as string;
       const requestingUserId = req.user!.id;
       const targetUserId = req.params.userId as string;
-      const { role } = req.body;
+      const validatedData = updateTeamMemberRoleSchema.parse(req.body);
 
       await this.service.updateMemberRole(
         organizerId,
         requestingUserId,
         targetUserId,
-        role,
+        validatedData.role,
       );
 
       res

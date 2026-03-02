@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useRouter, useSearchParams } from "next/navigation";
+import { registerSchema } from "../validations/auth.validation";
 import { useStoreLogin } from "../store/useAuthStore";
 import { SignUp } from "../types/auth.types";
 
@@ -34,21 +35,7 @@ export const useRegisterForm = () => {
       organizerName: "",
       organizerDescription: "",
     },
-    validationSchema: Yup.object({
-      name: Yup.string().required("Full name is required"),
-      email: Yup.string()
-        .email("Invalid email address")
-        .required("Email is required"),
-      password: Yup.string()
-        .min(8, "Password must be at least 8 characters")
-        .required("Password is required"),
-      terms: Yup.boolean().oneOf([true], "You must accept Terms & Conditions"),
-      organizerName: Yup.string().when("role", {
-        is: "ORGANIZER",
-        then: (schema) => schema.required("Organizer name is required"),
-        otherwise: (schema) => schema.optional(),
-      }),
-    }),
+    validationSchema: registerSchema, // Changed to use registerSchema
     onSubmit: async (values) => {
       setIsLoading(true);
       try {
