@@ -19,6 +19,7 @@ export const useEvents = (
   const categoryId = opts.categoryId;
   const location = opts.location;
   const search = opts.search;
+  const organizerId = opts.organizerId;
 
   const [events, setEvents] = useState<Event[]>([]);
   const [meta, setMeta] = useState<Meta | null>(null);
@@ -36,6 +37,7 @@ export const useEvents = (
         categoryId,
         location,
         search,
+        organizerId,
       });
 
       setEvents(response.data);
@@ -46,7 +48,7 @@ export const useEvents = (
     } finally {
       setIsLoading(false);
     }
-  }, [page, _limit, categoryId, location, search]);
+  }, [page, _limit, categoryId, location, search, organizerId]);
 
   useEffect(() => {
     fetchEvents();

@@ -76,6 +76,22 @@ export class OrganizationsRepository {
     });
   };
 
+  public findPublicById = async (id: string): Promise<any> => {
+    return await prisma.organizer.findUnique({
+      where: { id },
+      include: {
+        events: {
+          orderBy: { createdAt: "desc" },
+          include: {
+            category: true,
+            organizer: true,
+            ticketTypes: true,
+          }
+        },
+      },
+    });
+  };
+
   public findMany = async (): Promise<any[]> => {
     return await prisma.organizer.findMany({
       include: {

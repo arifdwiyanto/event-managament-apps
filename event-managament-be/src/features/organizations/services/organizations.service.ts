@@ -51,6 +51,14 @@ export class OrganizationsService {
     return organizer;
   };
 
+  public findPublicOne = async (id: string): Promise<any> => {
+    const organizer = await this.repository.findPublicById(id);
+    if (!organizer) {
+      throw { status: 404, message: "Organizer not found" };
+    }
+    return organizer;
+  };
+
   public update = async (id: string, data: any): Promise<any> => {
     const organizer = await this.repository.findById(id);
     if (!organizer) {

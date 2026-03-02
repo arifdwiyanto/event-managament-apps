@@ -5,6 +5,11 @@ export const getOrganizerProfile = async (id: string) => {
   return response.data;
 };
 
+export const getPublicOrganizerProfile = async (id: string) => {
+  const response = await apiFetch.get(`/organizations/public/${id}`);
+  return response.data;
+};
+
 export const updateOrganizerProfile = async (
   id: string,
   data: { name?: string; description?: string },

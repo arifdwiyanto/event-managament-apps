@@ -22,7 +22,10 @@ export class OrganizationsRouter {
     // List all organizers
     this.router.get("/", this.organizationsController.findAll);
 
-    // Get single organizer
+    // Get public organizer profile (no auth required)
+    this.router.get("/public/:id", this.organizationsController.findPublicOne);
+
+    // Get single organizer (admin/owner view)
     this.router.get("/:id", this.organizationsController.findOne);
 
     // Update organizer (requires auth)

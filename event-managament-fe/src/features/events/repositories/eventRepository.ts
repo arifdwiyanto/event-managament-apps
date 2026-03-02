@@ -9,6 +9,7 @@ export const eventRepository = {
     if (options.categoryId) params.set("categoryId", options.categoryId);
     if (options.location) params.set("location", options.location);
     if (options.search) params.set("name", options.search);
+    if (options.organizerId) params.set("organizerId", options.organizerId);
 
     const response = await apiFetch.get(`/events?${params.toString()}`);
     return response.data;

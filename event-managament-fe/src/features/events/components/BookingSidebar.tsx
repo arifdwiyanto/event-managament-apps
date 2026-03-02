@@ -68,11 +68,11 @@ const BookingSidebar: React.FC<BookingSidebarProps> = ({ event }) => {
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-right-10 duration-700">
       {/* Ticket Selection Area - Glass Container */}
-      <div className="bg-white/70 dark:bg-white/5 backdrop-blur-xl rounded-3xl border border-black/5 dark:border-white/10 shadow-xl dark:shadow-2xl overflow-hidden relative group">
+      <div className="bg-white/70 dark:bg-[#131313]/90 backdrop-blur-xl rounded-3xl border border-black/5 dark:border-white/10 shadow-xl dark:shadow-2xl overflow-hidden relative group">
         {/* Decorative background blur */}
         <div className="absolute -top-10 -right-10 size-32 bg-neon-cyan/5 blur-[50px] rounded-full"></div>
         
-        <div className="p-5 border-b border-black/5 dark:border-white/10 bg-black/5 dark:bg-black/20 flex items-center justify-between">
+        <div className="p-5 border-b border-black/5 dark:border-white/10 bg-black/5 dark:bg-black/40 flex items-center justify-between">
           <h3 className="text-sm font-black uppercase tracking-[0.2em] text-gray-900 dark:text-white">Select Tickets</h3>
           <div className="px-2 py-0.5 rounded-full bg-neon-cyan/20 border border-neon-cyan/30 text-[9px] font-black text-neon-cyan uppercase">Live</div>
         </div>
@@ -92,20 +92,20 @@ const BookingSidebar: React.FC<BookingSidebarProps> = ({ event }) => {
               <div className="inline-block p-4 rounded-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10">
                 <ShoppingCartIcon className="size-8 text-gray-400 dark:text-white/20" />
               </div>
-              <p className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">No tickets available</p>
+              <p className="text-gray-500 dark:text-gray-400 font-bold uppercase text-[10px] tracking-widest">No tickets available</p>
             </div>
           )}
         </div>
       </div>
 
       {/* Order Summary - Premium Glass Card */}
-      <div className="bg-white/80 dark:bg-gradient-to-br dark:from-white/10 dark:to-white/5 backdrop-blur-2xl rounded-3xl p-6 border border-black/5 dark:border-white/10 shadow-xl dark:shadow-[0_20px_60px_rgba(0,0,0,0.4)] relative group overflow-hidden">
+      <div className="bg-white/80 dark:bg-[#131313]/90 backdrop-blur-2xl rounded-3xl p-6 border border-black/5 dark:border-white/10 shadow-xl dark:shadow-[0_20px_60px_rgba(0,0,0,0.6)] relative group overflow-hidden">
         {/* Animated Background Accent */}
         <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-neon-cyan to-transparent opacity-50"></div>
         
         <div className="flex items-center justify-between mb-6 border-b border-black/5 dark:border-white/10 pb-4">
           <h3 className="text-sm font-black uppercase tracking-[0.2em] text-gray-900 dark:text-white">Order Summary</h3>
-          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{selectedTickets.length} Items</span>
+          <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">{selectedTickets.length} Items</span>
         </div>
 
         <div className="space-y-4 mb-8">

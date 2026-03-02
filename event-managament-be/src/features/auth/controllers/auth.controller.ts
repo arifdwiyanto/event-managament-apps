@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { AuthService } from "../services/auth.service.js";
+import { registerSchema, loginSchema } from "../validations/auth.validation.js";
 
 export class AuthController {
   private authService = new AuthService();
@@ -11,9 +12,11 @@ export class AuthController {
     res: Response,
     next: NextFunction,
   ): Promise<void> => {
-    // Handle registration request
     try {
-      const result = await this.authService.register(req.body);
+      // Validate request body
+      const validatedData = registerSchema.parse(req.body);
+
+      const result = await this.authService.register(validatedData);
 
       res.status(200).json({
         message: "Register Successfully",
@@ -29,9 +32,11 @@ export class AuthController {
     res: Response,
     next: NextFunction,
   ): Promise<void> => {
-    // TODO: Implement login
     try {
-      const result = await this.authService.login(req.body);
+      // Validate request body
+      const validatedData = loginSchema.parse(req.body);
+
+      const result = await this.authService.login(validatedData);
 
       res.status(200).json({
         message: "Login Successfully",

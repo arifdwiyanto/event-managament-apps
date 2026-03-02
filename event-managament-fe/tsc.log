@@ -1,3 +1,0 @@
-src/features/reports/components/AttendeeRegistrationsChart.tsx(5,26): error TS2307: Cannot find module 'next-themes' or its corresponding type declarations.
-src/features/reports/components/AttendeeRegistrationsChart.tsx(41,25): error TS2353: Object literal may only specify known properties, and 'hidden' does not exist in type 'Partial<ChartsLegendProps | ContinuousColorLegendProps | PiecewiseColorLegendProps> & ChartsLegendPosition'.
-src/features/reports/components/SalesPerformanceChart.tsx(43,23): error TS2353: Object literal may only specify known properties, and 'hidden' does not exist in type 'Partial<ChartsLegendProps | ContinuousColorLegendProps | PiecewiseColorLegendProps> & ChartsLegendPosition'.

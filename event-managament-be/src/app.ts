@@ -14,6 +14,7 @@ import { NotificationRouter } from "./features/notifications/router.js";
 import { CartRouter } from "./features/cart/router.js";
 import { ReportRouter } from "./features/report/report.router.js";
 import { UserPointRouter } from "./features/userPoint/route.js";
+import { UserCouponRouter } from "./features/userCoupons/router.js";
 
 class App {
   private app: Application;
@@ -65,12 +66,22 @@ class App {
     this.app.use("/api/cart", new CartRouter().getRouter());
     this.app.use("/api/reports", new ReportRouter().getRouter());
     this.app.use("/api/user-points", new UserPointRouter().getRouter());
+    this.app.use("/api/user-coupons", new UserCouponRouter().getRouter());
   };
 
   private configureErrorHandling = (): void => {
     // Global error handler
     this.app.use(
       (err: any, req: Request, res: Response, next: NextFunction) => {
+        if (err.name === "ZodError") {
+          return res.status(400).json({
+            error: {
+              message: "Validation Error",
+              details: err.errors,
+            },
+          });
+        }
+
         console.error(err.stack);
         res.status(err.status || 500).json({
           error: {

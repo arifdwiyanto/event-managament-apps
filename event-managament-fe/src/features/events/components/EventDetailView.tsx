@@ -8,6 +8,7 @@ import EventAboutSection from "./EventAboutSection";
 import BookingSidebar from "./BookingSidebar";
 import EventDetailSkeleton from "./EventDetailSkeleton";
 import { StarIcon, UserIcon } from "@heroicons/react/24/solid";
+import Link from "next/link";
 
 interface EventDetailViewProps {
   eventId: string;
@@ -57,7 +58,7 @@ const EventDetailView: React.FC<EventDetailViewProps> = ({ eventId }) => {
                 <div className="w-2 h-2 rounded-full bg-neon-cyan shadow-[0_0_8px_#00FFDD]"></div>
                 Organizer
               </h3>
-              <div className="flex items-center gap-5">
+              <Link href={`/organizer/${event.organizerId}`} className="flex items-center gap-5 hover:opacity-80 transition-opacity">
                 <div className="size-16 rounded-xl bg-gradient-to-br from-neon-purple to-neon-magenta flex items-center justify-center border border-white/20 shadow-xl overflow-hidden relative group/org">
                   <div className="absolute inset-0 bg-black/20 group-hover/org:bg-transparent transition-colors"></div>
                   <span className="font-black text-xl text-white relative z-10 drop-shadow-md">
@@ -65,14 +66,14 @@ const EventDetailView: React.FC<EventDetailViewProps> = ({ eventId }) => {
                   </span>
                 </div>
                 <div>
-                   <h4 className="text-lg md:text-xl font-black uppercase text-gray-900 dark:text-white tracking-tight leading-none mb-1">
+                   <h4 className="text-lg md:text-xl font-black uppercase text-gray-900 dark:text-white tracking-tight leading-none mb-1 group-hover/org:text-neon-cyan transition-colors">
                      {event.organizer?.name || "Organizer Name"}
                    </h4>
                    <p className="text-[10px] md:text-xs font-bold uppercase text-gray-500 dark:text-gray-400 tracking-widest flex items-center gap-1.5">
                      <span className="text-neon-cyan">★</span> Verified Partner • 4.8 Rating
                    </p>
                  </div>
-              </div>
+              </Link>
             </div>
             
             <div className="bg-gradient-to-br from-neon-cyan/10 to-neon-purple/10 dark:from-neon-cyan/20 dark:to-neon-purple/20 backdrop-blur-xl rounded-2xl p-8 border border-black/5 dark:border-white/20 shadow-xl dark:shadow-2xl relative overflow-hidden group/review">

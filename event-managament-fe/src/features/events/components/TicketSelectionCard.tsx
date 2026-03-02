@@ -23,8 +23,8 @@ const TicketSelectionCard: React.FC<TicketSelectionCardProps> = ({
   return (
     <div className={`relative p-4 rounded-xl border transition-all duration-300 backdrop-blur-md ${
       quantity > 0 
-        ? "bg-neon-cyan/10 border-neon-cyan/50 shadow-[0_0_20px_rgba(0,255,221,0.1)]" 
-        : "bg-black/5 dark:bg-white/5 border-black/5 dark:border-white/10 hover:bg-black/10 dark:hover:bg-white/10"
+        ? "bg-neon-cyan/10 border-neon-cyan/50 shadow-[0_0_20px_rgba(0,255,221,0.1)] dark:bg-neon-cyan/20 dark:border-neon-cyan/60" 
+        : "bg-black/5 dark:bg-[#1A1A1A]/80 border-black/5 dark:border-white/10 hover:bg-black/10 dark:hover:bg-[#2A2A2A]/80"
     }`}>
       {isPopular && (
         <div className="absolute -top-2 -right-2 bg-neon-magenta text-white px-2 py-0.5 font-black text-[8px] uppercase tracking-widest rounded-full shadow-lg border border-white/20 z-10">
@@ -61,7 +61,7 @@ const TicketSelectionCard: React.FC<TicketSelectionCardProps> = ({
           )}
         </div>
 
-        <div className="flex items-center bg-black/5 dark:bg-white/5 rounded-lg border border-black/5 dark:border-white/10 overflow-hidden">
+        <div className="flex items-center bg-black/5 dark:bg-[#1A1A1A] rounded-lg border border-black/5 dark:border-white/10 overflow-hidden">
           <button 
             type="button"
             onClick={onDecrease}
@@ -70,7 +70,7 @@ const TicketSelectionCard: React.FC<TicketSelectionCardProps> = ({
           >
             -
           </button>
-          <div className="w-8 flex items-center justify-center bg-black/5 dark:bg-white/10">
+          <div className="w-8 flex items-center justify-center bg-black/5 dark:bg-[#2A2A2A]">
             <span className="text-xs font-black text-gray-900 dark:text-white">{quantity}</span>
           </div>
           <button 

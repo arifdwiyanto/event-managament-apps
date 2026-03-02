@@ -68,6 +68,7 @@ export interface UseEventsOptions {
   categoryId?: string;
   location?: string;
   search?: string;
+  organizerId?: string;
 }
 
 export interface UseEventsReturn {

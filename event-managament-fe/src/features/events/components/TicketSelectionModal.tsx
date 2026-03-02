@@ -65,10 +65,10 @@ const TicketSelectionModal: React.FC<TicketSelectionModalProps> = ({
       PaperProps={{
         sx: {
           borderRadius: isMobile ? "24px 24px 0 0" : "24px",
-          background: theme.palette.mode === 'dark' ? "rgba(255, 255, 255, 0.05)" : "rgba(255, 255, 255, 0.8)",
+          background: theme.palette.mode === 'dark' ? "rgba(19, 19, 19, 0.95)" : "rgba(255, 255, 255, 0.8)",
           backdropFilter: "blur(20px)",
           border: theme.palette.mode === 'dark' ? "1px solid rgba(255, 255, 255, 0.1)" : "1px solid rgba(0, 0, 0, 0.05)",
-          boxShadow: theme.palette.mode === 'dark' ? "0 20px 50px rgba(0,0,0,0.5)" : "0 20px 50px rgba(0,0,0,0.1)",
+          boxShadow: theme.palette.mode === 'dark' ? "0 20px 50px rgba(0,0,0,0.8)" : "0 20px 50px rgba(0,0,0,0.1)",
           ...(isMobile && {
             height: 'auto',
             maxHeight: '85vh',
@@ -97,7 +97,7 @@ const TicketSelectionModal: React.FC<TicketSelectionModalProps> = ({
         alignItems: "center"
       }}>
         <Box>
-          <Typography className="font-display font-black uppercase tracking-widest text-gray-900 dark:text-white text-lg leading-none mb-1">
+          <Typography className={`font-display font-black uppercase tracking-widest text-lg leading-none mb-1 ${theme.palette.mode === 'dark' ? 'text-white' : 'text-gray-900'}`}>
             Select Tickets
           </Typography>
           <Typography className="text-[10px] text-neon-cyan font-bold uppercase tracking-widest">
@@ -130,19 +130,19 @@ const TicketSelectionModal: React.FC<TicketSelectionModalProps> = ({
             />
           ))}
           {(!event.ticketTypes || event.ticketTypes.length === 0) && (
-            <Typography className="text-gray-500 font-bold uppercase text-center py-8 text-xs tracking-widest">
+            <Typography className={`font-bold uppercase text-center py-8 text-xs tracking-widest ${theme.palette.mode === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
               No tickets available
             </Typography>
           )}
         </Box>
       </DialogContent>
 
-      <DialogActions sx={{ p: 3, borderTop: theme.palette.mode === 'dark' ? "1px solid rgba(255, 255, 255, 0.1)" : "1px solid rgba(0, 0, 0, 0.05)", display: "block", bgcolor: theme.palette.mode === 'dark' ? "rgba(0,0,0,0.2)" : "rgba(0,0,0,0.02)" }}>
+      <DialogActions sx={{ p: 3, borderTop: theme.palette.mode === 'dark' ? "1px solid rgba(255, 255, 255, 0.1)" : "1px solid rgba(0, 0, 0, 0.05)", display: "block", bgcolor: theme.palette.mode === 'dark' ? "rgba(0,0,0,0.4)" : "rgba(0,0,0,0.02)" }}>
         <Box className="flex justify-between items-center mb-4">
-          <Typography className="text-gray-500 dark:text-gray-400 font-bold uppercase text-[10px] tracking-widest">
+          <Typography className={`font-bold uppercase text-[10px] tracking-widest ${theme.palette.mode === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
             Total Amount
           </Typography>
-          <Typography className="text-gray-900 dark:text-white font-black text-xl tracking-tighter italic">
+          <Typography className={`font-black text-xl tracking-tighter italic ${theme.palette.mode === 'dark' ? 'text-white' : 'text-gray-900'}`}>
             IDR {(total / 1000).toFixed(0)}K
           </Typography>
         </Box>
