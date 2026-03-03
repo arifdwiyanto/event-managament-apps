@@ -1,4 +1,4 @@
-import { prisma } from "src/config/prisma.js";
+import { prisma } from "../../../config/prisma.js";
 
 export class OrdersItemRepository {
   public findById = async (id: string): Promise<any> => {

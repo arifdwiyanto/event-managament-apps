@@ -1,4 +1,4 @@
-﻿import { prisma } from "src/config/prisma.js";
+﻿import { prisma } from "../../../config/prisma.js";
 import { Prisma } from "@prisma/client";
 
 export class EventsRepository {

@@ -1,5 +1,5 @@
 ﻿import { Prisma } from "@prisma/client";
-import { prisma } from "src/config/prisma.js";
+import { prisma } from "../../../config/prisma.js";
 
 export class ReviewsRepository {
   public create = async (

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { AuthController } from "./controllers/auth.controller.js";
-import { verifyToken } from "src/middlewares/verifyToken.js";
+import { verifyToken } from "../../middlewares/verifyToken.js";
 
 export class AuthRouter {
   private router: Router;
