@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Order } from "../types/orders.types";
 import {
   Box,
@@ -10,6 +10,8 @@ import {
   Typography,
 } from "@mui/material";
 import { format } from "date-fns";
+import { useUploadPaymentProof } from "../hooks/useOrders";
+import ReviewModal from "@/features/reviews/components/ReviewModal";
 
 interface IOrderDetailProps {
   order: Order;
@@ -39,6 +41,20 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
   onPay,
   isOrganizerView = false,
 }) => {
+  const uploadProofMutation = useUploadPaymentProof();
+  const [proofFile, setProofFile] = useState<File | null>(null);
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
+
+  const handleUploadProof = async () => {
+    if (!proofFile) return;
+    try {
+      await uploadProofMutation.mutateAsync({ id: order.id, file: proofFile });
+      setProofFile(null);
+    } catch (error: any) {
+      alert(error.message || "Failed to upload proof");
+    }
+  };
+
   return (
     <Box
       className="max-w-4xl mx-auto"
@@ -108,7 +124,9 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
                     className="border-2 border-dashed border-gray-300 dark:border-white/10 p-4"
                     sx={{ display: "flex", gap: 2 }}
                   >
-                    <Box sx={{ flex: 1 }}>
+                    <Box
+                      sx={{ flex: 1, display: "flex", flexDirection: "column" }}
+                    >
                       <Typography className="font-black uppercase text-sm mb-1 text-black dark:text-white">
                         {order.event?.name}
                       </Typography>
@@ -120,16 +138,56 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
                         {Number(item.ticketType.price).toLocaleString("id-ID")}
                       </Typography>
                     </Box>
-                    <Box sx={{ textAlign: "right" }}>
-                      <Typography className="font-black text-sm text-black dark:text-white">
-                        x {item.quantity}
-                      </Typography>
-                      <Typography className="font-display font-black text-lg text-black dark:text-white mt-1">
-                        IDR{" "}
-                        {(
-                          Number(item.ticketType.price) * item.quantity
-                        ).toLocaleString("id-ID")}
-                      </Typography>
+
+                    <Box
+                      sx={{
+                        textAlign: "right",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                        alignItems: "flex-end",
+                      }}
+                    >
+                      <Box>
+                        <Typography className="font-black text-sm text-black dark:text-white">
+                          x {item.quantity}
+                        </Typography>
+                        <Typography className="font-display font-black text-lg text-black dark:text-white mt-1">
+                          IDR{" "}
+                          {(
+                            Number(item.ticketType.price) * item.quantity
+                          ).toLocaleString("id-ID")}
+                        </Typography>
+                      </Box>
+                      {order.status === "PAID" && !isOrganizerView && (
+                        <Button
+                          size="medium"
+                          onClick={() => setIsReviewOpen(true)}
+                          className="bg-neon-magenta text-white mt-4"
+                          sx={{
+                            py: 1,
+                            px: 2.5,
+                            fontSize: "0.8rem",
+                            fontWeight: 900,
+                            textTransform: "uppercase",
+                            letterSpacing: "0.05em",
+                            boxShadow: "4px 4px 0 0 #000",
+                            border: "2px solid black",
+                            borderRadius: 0,
+                            "&:hover": {
+                              backgroundColor: "#ff008a",
+                              transform: "translate(-2px, -2px)",
+                              color: "white",
+                            },
+                            ...(theme) =>
+                              theme.palette.mode === "dark" && {
+                                boxShadow: "4px 4px 0 0 rgba(255,255,255,0.2)",
+                              },
+                          }}
+                        >
+                          Leave a Review
+                        </Button>
+                      )}
                     </Box>
                   </Box>
                 ))}
@@ -189,6 +247,67 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
                 )}
               </Box>
 
+              {order.paymentProofUrl ? (
+                <Box className="mb6">
+                  <Typography className="text-gray-500 font-bold uppercase text-xs mb-2">
+                    Payment Proof
+                  </Typography>
+                  <Box className="border-2 border-black dark:border-white/20 p-2 bg-gray-50 dark:bg-gray-900 flex justify-center">
+                    <img
+                      src={order.paymentProofUrl}
+                      alt="Payment Proof"
+                      className="w-full h-auto max-h-64 object-contain"
+                    />
+                  </Box>
+                </Box>
+              ) : (
+                order.status === "PENDING" &&
+                !isOrganizerView && (
+                  <Box className="mb-6 border-4 border-dashed border-black dark:border-white/20 p-4">
+                    <Typography className="font-display font-black uppercase text-sm mb-2 text-black dark:text-white">
+                      Upload Payment Proof
+                    </Typography>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        if (e.target.files?.[0]) {
+                          setProofFile(e.target.files[0]);
+                        }
+                      }}
+                      className="w-full mb-4 text-xs font-bold p-2 file:mr-4 file:py-2 file:px-4 file:border-2 file:border-black file:font-black file:bg-neon-cyan file:text-black hover:file:bg-black hover:file:text-neon-cyan transition-colors dark:text-gray-300"
+                    />
+                    <Button
+                      fullWidth
+                      disabled={!proofFile || uploadProofMutation.isPending}
+                      onClick={handleUploadProof}
+                      className="bg-black text-white dark:bg-white dark:text-black"
+                      sx={{
+                        py: 1.5,
+                        fontWeight: 900,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.1em",
+                        borderRadius: 0,
+                        border: "2px solid",
+                        borderColor: "black",
+                        "&:hover": {
+                          transform: "translate(-2px, -2px)",
+                          boxShadow: "4px 4px 0 0 #ee2b8c",
+                        },
+                        "&.Mui-disabled": {
+                          opacity: 0.5,
+                        },
+                        transition: "all 0.2s",
+                      }}
+                    >
+                      {uploadProofMutation.isPending
+                        ? "Uploading..."
+                        : "Submit Proof"}
+                    </Button>
+                  </Box>
+                )
+              )}
+
               <Divider className="border-black dark:border-white/20 border-t-2 border-dashed mb-6" />
 
               <Box
@@ -238,11 +357,20 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
                   {isPaying ? "Processing..." : "Confirm Payment"}
                 </Button>
               )}
-              {order.status === "PENDING" && !isOrganizerView && (
-                <Box className="w-full py-4 bg-yellow-400 text-black font-black uppercase tracking-widest text-center border-4 border-black dark:border-white">
-                  Waiting for Organizer Confirmation
-                </Box>
-              )}
+              {order.status === "PENDING" &&
+                !isOrganizerView &&
+                order.paymentProofUrl && (
+                  <Box className="w-full py-4 bg-yellow-400 text-black font-black uppercase tracking-widest text-center border-4 border-black dark:border-white">
+                    Waiting for Organizer Confirmation
+                  </Box>
+                )}
+              {order.status === "PENDING" &&
+                !isOrganizerView &&
+                !order.paymentProofUrl && (
+                  <Box className="w-full py-4 bg-red-400 text-white font-black uppercase tracking-widest text-center border-4 border-black dark:border-white">
+                    Payment Proof Required
+                  </Box>
+                )}
               {order.status === "PAID" && (
                 <Box className="w-full py-4 bg-black dark:bg-white text-white dark:text-black font-black uppercase tracking-widest text-center border-4 border-black dark:border-white">
                   Payment Successful
@@ -252,6 +380,14 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
           </Card>
         </Grid>
       </Grid>
+
+      {order.items?.length > 0 && (
+        <ReviewModal
+          open={isReviewOpen}
+          onClose={() => setIsReviewOpen(false)}
+          transactionItemId={order.items[0].id}
+        />
+      )}
     </Box>
   );
 };

@@ -15,7 +15,8 @@ export class PromotionsService {
 
   public create = async (data: any): Promise<any> => {
     return await prisma.$transaction(async (tx) => {
-      const eventId = data.eventId || data.ticketId;
+      const eventId =
+        data.eventId || data.ticketId || data.events?.create[0]?.eventId;
       const event = await this.eventsRepository.findById(eventId);
 
       if (!event) {

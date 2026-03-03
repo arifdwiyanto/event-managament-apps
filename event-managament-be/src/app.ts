@@ -29,12 +29,21 @@ class App {
   }
 
   private configureMiddlewares = (): void => {
+    const isDevelopment = process.env.NODE_ENV !== 'production';
+    const corsOrigins = isDevelopment
+      ? [
+          "http://localhost:3000",
+          "http://localhost:3001",
+          "http://localhost:8000"
+        ]
+      : [
+          "https://hype-event-alpha.vercel.app",
+          process.env.FRONTEND_URL || "https://hype-event-alpha.vercel.app"
+        ];
+
     this.app.use(cors({
-    origin: [
-      "http://localhost:3000", 
-      "https://hype-event-alpha.vercel.app"
-    ],
-      credentials:true
+      origin: corsOrigins,
+      credentials: true
     }));
     this.app.use(express.json());
     this.app.use(morgan("dev"));

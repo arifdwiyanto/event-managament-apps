@@ -2,7 +2,12 @@
 
 import React from "react";
 import { Event } from "../types/event.types";
-import { CalendarIcon, ClockIcon, MapPinIcon } from "@heroicons/react/24/outline";
+import {
+  CalendarIcon,
+  ClockIcon,
+  MapPinIcon,
+  TagIcon,
+} from "@heroicons/react/24/outline";
 
 interface EventInfoSectionProps {
   event: Event;
@@ -10,20 +15,29 @@ interface EventInfoSectionProps {
 
 const EventInfoSection: React.FC<EventInfoSectionProps> = ({ event }) => {
   const startDate = event.startDate ? new Date(event.startDate) : null;
-  
-  const displayDate = startDate ? startDate.toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  }).toUpperCase() : "TBA";
 
-  const displayTime = startDate ? startDate.toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "numeric",
-    hour12: true,
-  }).toUpperCase() : "TBA";
+  const displayDate = startDate
+    ? startDate
+        .toLocaleDateString("en-US", {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+        })
+        .toUpperCase()
+    : "TBA";
 
-  const displayLocation = typeof event.location === 'object' ? event.location.name : event.location;
+  const displayTime = startDate
+    ? startDate
+        .toLocaleTimeString("en-US", {
+          hour: "numeric",
+          minute: "numeric",
+          hour12: true,
+        })
+        .toUpperCase()
+    : "TBA";
+
+  const displayLocation =
+    typeof event.location === "object" ? event.location.name : event.location;
 
   return (
     <div className="space-y-8 py-4">
@@ -32,8 +46,10 @@ const EventInfoSection: React.FC<EventInfoSectionProps> = ({ event }) => {
           {event.name}
         </h1>
         <div className="flex items-center gap-2">
-           <div className="h-1 w-12 bg-gradient-to-r from-neon-cyan to-transparent"></div>
-           <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.3em] text-neon-cyan/80">Premium Event</span>
+          <div className="h-1 w-12 bg-gradient-to-r from-neon-cyan to-transparent"></div>
+          <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.3em] text-neon-cyan/80">
+            Premium Event
+          </span>
         </div>
       </div>
 
@@ -44,8 +60,12 @@ const EventInfoSection: React.FC<EventInfoSectionProps> = ({ event }) => {
             <CalendarIcon className="size-5 md:size-6 stroke-[2.5]" />
           </div>
           <div>
-            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-none mb-1">Date</p>
-            <span className="font-black uppercase text-xs md:text-sm text-gray-800 dark:text-white tracking-widest">{displayDate}</span>
+            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-none mb-1">
+              Date
+            </p>
+            <span className="font-black uppercase text-xs md:text-sm text-gray-800 dark:text-white tracking-widest">
+              {displayDate}
+            </span>
           </div>
         </div>
 
@@ -55,8 +75,12 @@ const EventInfoSection: React.FC<EventInfoSectionProps> = ({ event }) => {
             <ClockIcon className="size-5 md:size-6 stroke-[2.5]" />
           </div>
           <div>
-            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-none mb-1">Time</p>
-            <span className="font-black uppercase text-xs md:text-sm text-gray-800 dark:text-white tracking-widest">{displayTime}</span>
+            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-none mb-1">
+              Time
+            </p>
+            <span className="font-black uppercase text-xs md:text-sm text-gray-800 dark:text-white tracking-widest">
+              {displayTime}
+            </span>
           </div>
         </div>
 
@@ -66,13 +90,44 @@ const EventInfoSection: React.FC<EventInfoSectionProps> = ({ event }) => {
             <MapPinIcon className="size-5 md:size-6 stroke-[2.5]" />
           </div>
           <div>
-            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-none mb-1">Venue</p>
+            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-none mb-1">
+              Venue
+            </p>
             <span className="font-black uppercase text-xs md:text-sm text-gray-800 dark:text-white tracking-widest line-clamp-1 max-w-[150px] md:max-w-[250px]">
               {displayLocation || "Venue TBA"}
             </span>
           </div>
         </div>
       </div>
+
+      {event.promotions && event.promotions.length > 0 && (
+        <div className="pt-4">
+          <p className="text-sm md:text-lg font-bold text-gray-500 uppercase tracking-widest leading-none mb-3">
+            Available Promos
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {event.promotions.map(
+              (p: any) =>
+                p.promotion && (
+                  <div
+                    key={p.promotion.id}
+                    className="flex items-center gap-2 bg-[#ee2b8c]/10 border border-[#ee2b8c]/20 px-3 py-1.5 rounded-lg"
+                  >
+                    <TagIcon className="w-4 h-4 text-[#ee2b8c]" />
+                    <span className="font-mono text-sm md:text-lg font-bold text-[#ee2b8c] uppercase tracking-wider">
+                      {p.promotion.code}
+                    </span>
+                    <span className="text-sm md:text-lg font-bold text-[#ee2b8c]/80 uppercase ml-1">
+                      {p.promotion.discountPercentage
+                        ? `${p.promotion.discountPercentage}% OFF`
+                        : `Rp ${Number(p.promotion.discountAmount).toLocaleString("id-ID")} OFF`}
+                    </span>
+                  </div>
+                ),
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

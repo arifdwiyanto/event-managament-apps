@@ -9,6 +9,7 @@ export interface IOrdersRepositoryProps {
   eventId: string;
   paymentMethod: string;
   voucherId?: string;
+  promotionId?: string;
   items: {
     ticketTypeId: string;
     qty: number;
@@ -34,6 +35,7 @@ export class OrdersRepository {
         eventId: data.eventId,
         paymentMethod: data.paymentMethod,
         userCouponId: data.voucherId,
+        promotionId: data.promotionId,
         items: {
           create: data.items.map((item) => ({
             ticketType: { connect: { id: item.ticketTypeId } },
@@ -92,7 +94,12 @@ export class OrdersRepository {
       where: { id },
       include: {
         user: true,
-        event: true,
+        event: {
+          include: {
+            organizer: true,
+          },
+        },
+        promotion: true,
         items: {
           include: {
             ticketType: true,

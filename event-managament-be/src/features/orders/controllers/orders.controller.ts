@@ -39,7 +39,7 @@ export class OrdersController {
       } else {
         filters.userId = req.user?.id;
       }
-      
+
       const { data, meta } = await this.ordersService.findAll(
         filters,
         page,
@@ -107,6 +107,31 @@ export class OrdersController {
       const paymentData = req.body;
 
       const result = await this.ordersService.pay(orderId, paymentData);
+
+      res.status(200).send(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public uploadPaymentProof = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
+    try {
+      const orderId = req.params.id as string;
+      const file = req.file;
+
+      if (!file) {
+        res.status(400).send({ message: "No payment proof file uploaded" });
+        return;
+      }
+
+      const result = await this.ordersService.updatePaymentProof(
+        orderId,
+        file.path,
+      );
 
       res.status(200).send(result);
     } catch (error) {

@@ -13,7 +13,8 @@ import {
   Cog6ToothIcon,
   XMarkIcon,
   RocketLaunchIcon,
-  ChevronRightIcon
+  ChevronRightIcon,
+  TagIcon
 } from "@heroicons/react/24/outline";
 
 const navItems = [
@@ -21,6 +22,7 @@ const navItems = [
   { id: "events", label: "My Events", href: "/dashboard/events", icon: CalendarIcon },
   { id: "transactions", label: "Transactions", href: "/dashboard/transactions", icon: CreditCardIcon },
   { id: "reports", label: "Reports", href: "/dashboard/reports", icon: ChartBarIcon },
+  { id: "promotions", label: "Promotions", href: "/dashboard/promotions", icon: TagIcon },
   { id: "settings", label: "Settings", href: "/dashboard/settings", icon: Cog6ToothIcon },
 ];
 
