@@ -1,8 +1,8 @@
-﻿import { prisma } from "src/config/prisma.js";
+﻿import { prisma } from "../../../config/prisma.js";
 import { OrdersRepository } from "../repositories/orders.repository.js";
-import { TicketsRepository } from "src/features/events/repositories/tickets.repository.js";
-import { generateInvoiceHtml } from "src/services/email/templates/invoice.template.js";
-import { EmailService } from "src/services/email/email.service.js";
+import { TicketsRepository } from "../../events/repositories/tickets.repository.js";
+import { generateInvoiceHtml } from "../../../services/email/templates/invoice.template.js";
+import { EmailService } from "../../../services/email/email.service.js";
 
 export interface IOrdersServiceProps {
   customerId: string;

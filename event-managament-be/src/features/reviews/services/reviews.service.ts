@@ -1,4 +1,4 @@
-﻿import { OrdersItemRepository } from "src/features/orders/repositories/ordersItem.repository.js";
+﻿import { OrdersItemRepository } from "../../orders/repositories/ordersItem.repository.js";
 import { ReviewsRepository } from "../repositories/reviews.repository.js";
 
 export class ReviewsService {
