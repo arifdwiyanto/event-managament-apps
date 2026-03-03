@@ -22,6 +22,8 @@ import {
   IconButton,
 } from "@mui/material";
 import { XMarkIcon } from "@heroicons/react/24/outline";
+import { useFormik } from "formik";
+import { promotionValidationSchema } from "../schemas/promotions.schemas";
 
 interface Props {
   isOpen: boolean;
@@ -36,10 +38,6 @@ const PromotionFormModal = ({
   promotion,
   organizerId,
 }: Props) => {
-  const [discountType, setDiscountType] = useState<"percentage" | "amount">(
-    "percentage",
-  );
-
   const { events: eventsResponse = [], isLoading: isLoadingEvents } =
     useManageEvents({ organizerId, limit: 100 });
   const events = eventsResponse;
@@ -49,85 +47,84 @@ const PromotionFormModal = ({
   const { mutateAsync: updatePromo, isPending: isUpdating } =
     useUpdatePromotion();
 
-  const [formData, setFormData] = useState({
-    name: "",
-    code: "",
-    discountPercentage: "",
-    discountAmount: "",
-    maxUsage: "",
-    startDate: "",
-    endDate: "",
-    eventId: "",
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      code: "",
+      discountType: "percentage" as "percentage" | "amount",
+      discountPercentage: "",
+      discountAmount: "",
+      maxUsage: "",
+      startDate: "",
+      endDate: "",
+      eventId: "",
+    },
+    validationSchema: promotionValidationSchema,
+    validateOnMount: false,
+    validateOnBlur: true,
+    validateOnChange: true,
+    enableReinitialize: true,
+    onSubmit: async (values, { setSubmitting }) => {
+      const payload: any = {
+        name: values.name,
+        code: values.code.toUpperCase(),
+        startDate: new Date(values.startDate).toISOString(),
+        endDate: new Date(values.endDate).toISOString(),
+      };
+
+      if (values.discountType === "percentage") {
+        payload.discountPercentage = Number(values.discountPercentage);
+        payload.discountAmount = null;
+      } else {
+        payload.discountAmount = Number(values.discountAmount);
+        payload.discountPercentage = null;
+      }
+
+      if (values.maxUsage) {
+        payload.maxUsage = Number(values.maxUsage);
+      } else {
+        payload.maxUsage = null;
+      }
+
+      try {
+        if (promotion) {
+          await updatePromo({ id: promotion.id, data: payload });
+        } else {
+          payload.organizerId = organizerId;
+          payload.events = {
+            create: [{ eventId: values.eventId }],
+          };
+          await createPromo(payload);
+        }
+        onClose();
+      } catch (err: any) {
+        alert(err?.response?.data?.message || "An error occurred");
+      } finally {
+        setSubmitting(false);
+      }
+    },
   });
 
   useEffect(() => {
-    if (promotion && isOpen) {
-      setFormData({
-        name: promotion.name,
-        code: promotion.code,
-        discountPercentage: promotion.discountPercentage?.toString() || "",
-        discountAmount: promotion.discountAmount?.toString() || "",
-        maxUsage: promotion.maxUsage?.toString() || "",
-        startDate: new Date(promotion.startDate).toISOString().split("T")[0],
-        endDate: new Date(promotion.endDate).toISOString().split("T")[0],
-        eventId: promotion.events?.[0]?.eventId || "",
-      });
-      setDiscountType(promotion.discountPercentage ? "percentage" : "amount");
-    } else if (isOpen) {
-      setFormData({
-        name: "",
-        code: "",
-        discountPercentage: "",
-        discountAmount: "",
-        maxUsage: "",
-        startDate: "",
-        endDate: "",
-        eventId: "",
-      });
+    if (isOpen) {
+      formik.resetForm();
+      if (promotion) {
+        formik.setValues({
+          name: promotion.name,
+          code: promotion.code,
+          discountType: promotion.discountPercentage ? "percentage" : "amount",
+          discountPercentage: promotion.discountPercentage?.toString() || "",
+          discountAmount: promotion.discountAmount?.toString() || "",
+          maxUsage: promotion.maxUsage?.toString() || "",
+          startDate: new Date(promotion.startDate).toISOString().split("T")[0],
+          endDate: new Date(promotion.endDate).toISOString().split("T")[0],
+          eventId: promotion.events?.[0]?.eventId || "",
+        });
+      }
     }
   }, [promotion, isOpen]);
 
   if (!isOpen) return null;
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const payload: any = {
-      name: formData.name,
-      code: formData.code.toUpperCase(),
-      startDate: new Date(formData.startDate).toISOString(),
-      endDate: new Date(formData.endDate).toISOString(),
-    };
-
-    if (discountType === "percentage") {
-      payload.discountPercentage = Number(formData.discountPercentage);
-      payload.discountAmount = null;
-    } else {
-      payload.discountAmount = Number(formData.discountAmount);
-      payload.discountPercentage = null;
-    }
-
-    if (formData.maxUsage) {
-      payload.maxUsage = Number(formData.maxUsage);
-    } else {
-      payload.maxUsage = null;
-    }
-
-    try {
-      if (promotion) {
-        await updatePromo({ id: promotion.id, data: payload });
-      } else {
-        payload.organizerId = organizerId;
-        payload.events = {
-          create: [{ eventId: formData.eventId }],
-        };
-        await createPromo(payload);
-      }
-      onClose();
-    } catch (err: any) {
-      alert(err?.response?.data?.message || "An error occurred");
-    }
-  };
 
   return (
     <Dialog
@@ -158,17 +155,20 @@ const PromotionFormModal = ({
         </IconButton>
       </DialogTitle>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={formik.handleSubmit}>
         <DialogContent
           dividers
           sx={{ display: "flex", flexDirection: "column", gap: 3 }}
         >
           <TextField
+            name="name"
             label="Promotion Name"
-            required
             fullWidth
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            value={formik.values.name}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.name && Boolean(formik.errors.name)}
+            helperText={formik.touched.name && formik.errors.name}
             placeholder="e.g. Summer Sale 2026"
             sx={{
               "& .MuiOutlinedInput-root": {
@@ -178,16 +178,23 @@ const PromotionFormModal = ({
           />
 
           <TextField
+            name="code"
             label="Status Code"
-            required
             fullWidth
             disabled={!!promotion}
-            value={formData.code}
-            onChange={(e) =>
-              setFormData({ ...formData, code: e.target.value.toUpperCase() })
+            value={formik.values.code}
+            onChange={(e) => {
+              e.target.value = e.target.value.toUpperCase();
+              formik.handleChange(e);
+            }}
+            onBlur={formik.handleBlur}
+            error={formik.touched.code && Boolean(formik.errors.code)}
+            helperText={
+              (formik.touched.code && formik.errors.code) ||
+              (!promotion &&
+                "Must be unique. Code cannot be changed once created.")
             }
             placeholder="e.g. SUMMER50"
-            helperText="Must be unique. Code cannot be changed once created."
             sx={{
               "& .MuiOutlinedInput-root": {
                 borderRadius: 1,
@@ -201,10 +208,14 @@ const PromotionFormModal = ({
             </Typography>
             <ToggleButtonGroup
               color="primary"
-              value={discountType}
+              value={formik.values.discountType}
               exclusive
               onChange={(_, newValue) => {
-                if (newValue !== null) setDiscountType(newValue);
+                if (newValue !== null) {
+                  formik.setFieldValue("discountType", newValue);
+                  formik.setFieldTouched("discountPercentage", false);
+                  formik.setFieldTouched("discountAmount", false);
+                }
               }}
               fullWidth
             >
@@ -213,16 +224,23 @@ const PromotionFormModal = ({
             </ToggleButtonGroup>
           </Box>
 
-          {discountType === "percentage" ? (
+          {formik.values.discountType === "percentage" ? (
             <TextField
+              name="discountPercentage"
               label="Discount Percentage (%)"
               type="number"
-              required
               fullWidth
               slotProps={{ input: { inputProps: { min: 1, max: 100 } } }}
-              value={formData.discountPercentage}
-              onChange={(e) =>
-                setFormData({ ...formData, discountPercentage: e.target.value })
+              value={formik.values.discountPercentage}
+              onChange={(e) => formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={
+                formik.touched.discountPercentage &&
+                Boolean(formik.errors.discountPercentage)
+              }
+              helperText={
+                formik.touched.discountPercentage &&
+                formik.errors.discountPercentage
               }
               sx={{
                 "& .MuiOutlinedInput-root": {
@@ -232,14 +250,20 @@ const PromotionFormModal = ({
             />
           ) : (
             <TextField
+              name="discountAmount"
               label="Discount Amount (Rp)"
               type="number"
-              required
               fullWidth
               slotProps={{ input: { inputProps: { min: 0 } } }}
-              value={formData.discountAmount}
-              onChange={(e) =>
-                setFormData({ ...formData, discountAmount: e.target.value })
+              value={formik.values.discountAmount}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={
+                formik.touched.discountAmount &&
+                Boolean(formik.errors.discountAmount)
+              }
+              helperText={
+                formik.touched.discountAmount && formik.errors.discountAmount
               }
               sx={{
                 "& .MuiOutlinedInput-root": {
@@ -250,18 +274,18 @@ const PromotionFormModal = ({
           )}
 
           {!promotion && (
-            <FormControl fullWidth required>
+            <FormControl
+              fullWidth
+              error={formik.touched.eventId && Boolean(formik.errors.eventId)}
+            >
               <InputLabel id="event-select-label">Applicable Event</InputLabel>
               <Select
+                name="eventId"
                 labelId="event-select-label"
-                value={formData.eventId}
+                value={formik.values.eventId}
                 label="Applicable Event"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    eventId: e.target.value as string,
-                  })
-                }
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
               >
                 {events.map((ev: any) => (
                   <MenuItem key={ev.id} value={ev.id}>
@@ -269,19 +293,33 @@ const PromotionFormModal = ({
                   </MenuItem>
                 ))}
               </Select>
+              {formik.touched.eventId && formik.errors.eventId && (
+                <Typography
+                  variant="caption"
+                  color="error"
+                  sx={{ mt: 0.5, ml: 2 }}
+                >
+                  {String(formik.errors.eventId)}
+                </Typography>
+              )}
             </FormControl>
           )}
 
           <Box sx={{ display: "flex", gap: 2 }}>
             <TextField
+              name="startDate"
               label="Start Date"
               type="date"
-              required
               fullWidth
               slotProps={{ inputLabel: { shrink: true } }}
-              value={formData.startDate}
-              onChange={(e) =>
-                setFormData({ ...formData, startDate: e.target.value })
+              value={formik.values.startDate}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={
+                formik.touched.startDate && Boolean(formik.errors.startDate)
+              }
+              helperText={
+                formik.touched.startDate && (formik.errors.startDate as string)
               }
               sx={{
                 "& .MuiOutlinedInput-root": {
@@ -290,14 +328,17 @@ const PromotionFormModal = ({
               }}
             />
             <TextField
+              name="endDate"
               label="End Date"
               type="date"
-              required
               fullWidth
               slotProps={{ inputLabel: { shrink: true } }}
-              value={formData.endDate}
-              onChange={(e) =>
-                setFormData({ ...formData, endDate: e.target.value })
+              value={formik.values.endDate}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.endDate && Boolean(formik.errors.endDate)}
+              helperText={
+                formik.touched.endDate && (formik.errors.endDate as string)
               }
               sx={{
                 "& .MuiOutlinedInput-root": {
@@ -308,15 +349,19 @@ const PromotionFormModal = ({
           </Box>
 
           <TextField
+            name="maxUsage"
             label="Max Usage Limit"
             type="number"
             fullWidth
             slotProps={{ input: { inputProps: { min: 1 } } }}
-            value={formData.maxUsage}
-            onChange={(e) =>
-              setFormData({ ...formData, maxUsage: e.target.value })
+            value={formik.values.maxUsage}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.maxUsage && Boolean(formik.errors.maxUsage)}
+            helperText={
+              (formik.touched.maxUsage && formik.errors.maxUsage) ||
+              "Leave blank for unlimited"
             }
-            helperText="Leave blank for unlimited"
             sx={{
               "& .MuiOutlinedInput-root": {
                 borderRadius: 1,
@@ -332,7 +377,7 @@ const PromotionFormModal = ({
           <Button
             type="submit"
             variant="contained"
-            disabled={isCreating || isUpdating}
+            disabled={formik.isSubmitting || isCreating || isUpdating}
             sx={{
               bgcolor: "#ee2b8c",
               "&:hover": { bgcolor: "#d42279" },
@@ -340,7 +385,7 @@ const PromotionFormModal = ({
               borderRadius: 2,
             }}
           >
-            {isCreating || isUpdating ? "Saving..." : "Save Promotion"}
+            {formik.isSubmitting || isCreating || isUpdating ? "Saving..." : "Save Promotion"}
           </Button>
         </DialogActions>
       </form>
