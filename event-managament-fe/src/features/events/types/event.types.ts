@@ -46,6 +46,7 @@ export interface Event {
   currency?: string;
   isFree?: boolean;
   categoryName?: string;
+  promotions?: any[];
 }
 
 export interface Meta {

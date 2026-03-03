@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { format } from "date-fns";
 import { useUploadPaymentProof } from "../hooks/useOrders";
+import ReviewModal from "@/features/reviews/components/ReviewModal";
 
 interface IOrderDetailProps {
   order: Order;
@@ -42,6 +43,7 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
 }) => {
   const uploadProofMutation = useUploadPaymentProof();
   const [proofFile, setProofFile] = useState<File | null>(null);
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
 
   const handleUploadProof = async () => {
     if (!proofFile) return;
@@ -122,7 +124,9 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
                     className="border-2 border-dashed border-gray-300 dark:border-white/10 p-4"
                     sx={{ display: "flex", gap: 2 }}
                   >
-                    <Box sx={{ flex: 1 }}>
+                    <Box
+                      sx={{ flex: 1, display: "flex", flexDirection: "column" }}
+                    >
                       <Typography className="font-black uppercase text-sm mb-1 text-black dark:text-white">
                         {order.event?.name}
                       </Typography>
@@ -134,16 +138,56 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
                         {Number(item.ticketType.price).toLocaleString("id-ID")}
                       </Typography>
                     </Box>
-                    <Box sx={{ textAlign: "right" }}>
-                      <Typography className="font-black text-sm text-black dark:text-white">
-                        x {item.quantity}
-                      </Typography>
-                      <Typography className="font-display font-black text-lg text-black dark:text-white mt-1">
-                        IDR{" "}
-                        {(
-                          Number(item.ticketType.price) * item.quantity
-                        ).toLocaleString("id-ID")}
-                      </Typography>
+
+                    <Box
+                      sx={{
+                        textAlign: "right",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                        alignItems: "flex-end",
+                      }}
+                    >
+                      <Box>
+                        <Typography className="font-black text-sm text-black dark:text-white">
+                          x {item.quantity}
+                        </Typography>
+                        <Typography className="font-display font-black text-lg text-black dark:text-white mt-1">
+                          IDR{" "}
+                          {(
+                            Number(item.ticketType.price) * item.quantity
+                          ).toLocaleString("id-ID")}
+                        </Typography>
+                      </Box>
+                      {order.status === "PAID" && !isOrganizerView && (
+                        <Button
+                          size="medium"
+                          onClick={() => setIsReviewOpen(true)}
+                          className="bg-neon-magenta text-white mt-4"
+                          sx={{
+                            py: 1,
+                            px: 2.5,
+                            fontSize: "0.8rem",
+                            fontWeight: 900,
+                            textTransform: "uppercase",
+                            letterSpacing: "0.05em",
+                            boxShadow: "4px 4px 0 0 #000",
+                            border: "2px solid black",
+                            borderRadius: 0,
+                            "&:hover": {
+                              backgroundColor: "#ff008a",
+                              transform: "translate(-2px, -2px)",
+                              color: "white",
+                            },
+                            ...(theme) =>
+                              theme.palette.mode === "dark" && {
+                                boxShadow: "4px 4px 0 0 rgba(255,255,255,0.2)",
+                              },
+                          }}
+                        >
+                          Leave a Review
+                        </Button>
+                      )}
                     </Box>
                   </Box>
                 ))}
@@ -336,6 +380,14 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
           </Card>
         </Grid>
       </Grid>
+
+      {order.items?.length > 0 && (
+        <ReviewModal
+          open={isReviewOpen}
+          onClose={() => setIsReviewOpen(false)}
+          transactionItemId={order.items[0].id}
+        />
+      )}
     </Box>
   );
 };

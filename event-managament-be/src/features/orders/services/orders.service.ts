@@ -8,6 +8,7 @@ export interface IOrdersServiceProps {
   customerId: string;
   pointUsed?: number;
   voucherId?: string;
+  promotionId?: string;
   paymentMethod: string;
   items: {
     ticketId: string;
@@ -71,10 +72,53 @@ export class OrdersService {
         throw new Error("No valid event found for tickets");
       }
 
-      const finalPrice = totalPrice - (data.pointUsed || 0);
+      let promoDiscount = 0;
+      if (data.promotionId) {
+        const promotion = await tx.promotion.findUnique({
+          where: { id: data.promotionId },
+          include: { events: true },
+        });
+
+        if (!promotion) {
+          throw new Error("Invalid promotion code");
+        }
+
+        const isEventEligible = promotion.events.some(
+          (pe: any) => pe.eventId === eventId,
+        );
+
+        if (!isEventEligible) {
+          throw new Error("Promotion is not applicable for this event");
+        }
+
+        if (
+          promotion.startDate > new Date() ||
+          promotion.endDate < new Date()
+        ) {
+          throw new Error("Promotion is expired or not yet active");
+        }
+
+        if (promotion.maxUsage !== null) {
+          const usageCount = await tx.transaction.count({
+            where: { promotionId: promotion.id },
+          });
+          if (usageCount >= promotion.maxUsage) {
+            throw new Error("Promotion usage limit reached");
+          }
+        }
+
+        if (promotion.discountPercentage) {
+          promoDiscount =
+            (totalPrice * Number(promotion.discountPercentage)) / 100;
+        } else if (promotion.discountAmount) {
+          promoDiscount = Number(promotion.discountAmount);
+        }
+      }
+
+      let finalPrice = totalPrice - promoDiscount - (data.pointUsed || 0);
 
       if (finalPrice < 0) {
-        throw new Error("Price cannot be negative");
+        finalPrice = 0;
       }
 
       const invoice = `INV-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
@@ -89,6 +133,7 @@ export class OrdersService {
         eventId,
         paymentMethod: data.paymentMethod,
         voucherId: data.voucherId,
+        promotionId: data.promotionId,
         items: orderItems,
       };
 

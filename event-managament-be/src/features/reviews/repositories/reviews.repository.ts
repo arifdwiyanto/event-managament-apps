@@ -12,6 +12,18 @@ export class ReviewsRepository {
     });
   };
 
+  public findByUserAndEvent = async (
+    userId: string,
+    eventId: string,
+  ): Promise<any> => {
+    return await prisma.review.findFirst({
+      where: {
+        userId,
+        eventId,
+      },
+    });
+  };
+
   public findMany = async (
     filters: any,
     skip?: number,
@@ -76,7 +88,7 @@ export class ReviewsRepository {
       prisma.review.findMany({
         where: filters,
         include: {
-            user: true
+          user: true,
         },
         skip,
         take,
