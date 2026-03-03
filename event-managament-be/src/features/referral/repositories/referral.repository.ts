@@ -16,7 +16,7 @@ export class ReferralRepository {
   };
 
   public createReferral = async (
-    data: any,
+    data: Prisma.ReferralCreateInput,
     tx?: Prisma.TransactionClient,
   ) => {
     const client = tx || prisma;

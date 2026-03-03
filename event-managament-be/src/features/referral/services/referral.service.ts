@@ -62,7 +62,7 @@ export class ReferralService {
       profile: {
         id: user.id,
         name: user.name,
-        avatar: "https://placehold.co/400",
+        avatar: user.avatarUrl,
         memberSince: user.createdAt.toISOString(),
         location: "Indonesia",
         referralCode: user.referralCode,

@@ -17,6 +17,7 @@ export interface SignIn {
 export interface AuthUser {
   id: string;
   name: string;
+  avatarUrl:string;
   email: string;
   roles: string[];
   organizer?: {
@@ -24,6 +25,15 @@ export interface AuthUser {
     name: string;
     description?: string;
     logoUrl?: string;
+    createdAt:string;
+    isVerified:boolean;
+    teams?: {
+      role: string;
+      user: {
+        id: string;
+        name: string;
+      };
+    }[];
   } | null;
 }
 

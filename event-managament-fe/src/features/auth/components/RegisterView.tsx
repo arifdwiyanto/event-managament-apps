@@ -2,7 +2,7 @@
 
 import React from "react";
 import RegisterForm from "./RegisterForm";
-import AuthLayout from "./AuthLayout";
+import AuthLayout from "../../../components/layouts/auth/AuthLayout";
 import { StarIcon } from "@heroicons/react/24/solid";
 
 const RegisterView: React.FC = () => {

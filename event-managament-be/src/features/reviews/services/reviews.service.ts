@@ -10,11 +10,14 @@ export class ReviewsService {
     this.ordersItemRepository = new OrdersItemRepository();
   }
 
-  public create = async (data: {
-    rating: number;
-    feedback?: string;
-    transactionItemId: string;
-  }): Promise<any> => {
+  public create = async (
+    data: {
+      rating: number;
+      feedback?: string;
+      transactionItemId: string;
+    },
+    userId: string,
+  ): Promise<any> => {
     const item = await this.ordersItemRepository.findById(
       data.transactionItemId,
     );
@@ -23,29 +26,38 @@ export class ReviewsService {
       throw new Error("Transaction item not found");
     }
 
-    // New schema: Review links to Event and User.
-    // We get Event from item.ticketType.event
-    // We get User from item.transaction.user
     const eventId = item.ticketType?.event?.id;
-    const userId = item.transaction?.user?.id;
+    const itemUserId = item.transaction?.userId;
 
-    if (!eventId || !userId) {
-        throw new Error("Invalid transaction item data for review");
+    if (!eventId || !itemUserId) {
+      throw new Error("Invalid transaction item data for review");
     }
 
-    // Optional: Check if review already exists for this user and event
-    // const existingReviews = await this.reviewsRepository.findMany({ userId, eventId });
-    // if (existingReviews.total > 0) { throw new Error("Review already exists"); }
+    if (itemUserId !== userId) {
+      throw new Error("Unauthorized to review this item");
+    }
+
+    if (item.transaction?.status !== "PAID") {
+      throw new Error("Can only review paid orders");
+    }
 
     if (data.rating < 1 || data.rating > 5) {
       throw new Error("Rating must be between 1 and 5");
     }
 
+    const existingReview = await this.reviewsRepository.findByUserAndEvent(
+      userId,
+      eventId,
+    );
+    if (existingReview) {
+      throw new Error("You have already reviewed this event");
+    }
+
     return await this.reviewsRepository.create({
       rating: data.rating,
-      comment: data.feedback, // mapped feedback to comment
+      comment: data.feedback,
       userId: userId,
-      eventId: eventId
+      eventId: eventId,
     });
   };
 

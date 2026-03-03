@@ -21,10 +21,10 @@ export class PromotionsRepository {
         include: {
           organizer: true,
           events: {
-              include: {
-                  event: true
-              }
-          }
+            include: {
+              event: true,
+            },
+          },
         },
         skip,
         take,
@@ -44,10 +44,10 @@ export class PromotionsRepository {
       include: {
         organizer: true,
         events: {
-            include: {
-                event: true
-            }
-        }
+          include: {
+            event: true,
+          },
+        },
       },
     });
   };
@@ -66,6 +66,19 @@ export class PromotionsRepository {
   };
 
   public findByCode = async (code: string): Promise<any> => {
-    throw new Error("Method not implemented.");
+    return await prisma.promotion.findUnique({
+      where: { code },
+      include: {
+        organizer: true,
+        events: {
+          include: {
+            event: true,
+          },
+        },
+        _count: {
+          select: { transactions: true },
+        },
+      },
+    });
   };
 }

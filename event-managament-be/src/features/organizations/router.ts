@@ -1,6 +1,9 @@
 ﻿import { Router } from "express";
 import { OrganizationsController } from "./controllers/organizations.controller.js";
 import { verifyToken } from "../../middlewares/verifyToken.js";
+import { uploadcloudinaryImage } from "../uploadCloudinary/utils/uploadImage.js";
+import { requireOrgRole } from "../../middlewares/requireOrgRole.js";
+import { requireRole } from "../../middlewares/requireRole.js";
 
 export class OrganizationsRouter {
   private router: Router;
@@ -19,11 +22,22 @@ export class OrganizationsRouter {
     // List all organizers
     this.router.get("/", this.organizationsController.findAll);
 
-    // Get single organizer
+    // Get public organizer profile (no auth required)
+    this.router.get("/public/:id", this.organizationsController.findPublicOne);
+
+    // Get single organizer (admin/owner view)
     this.router.get("/:id", this.organizationsController.findOne);
 
     // Update organizer (requires auth)
     this.router.patch("/:id", verifyToken, this.organizationsController.update);
+
+    // Update organizer logo
+    this.router.patch(
+      "/:id/logo",
+      verifyToken,
+      uploadcloudinaryImage("organizer-profile").single("image"),
+      this.organizationsController.updateLogo
+    );
 
     // Delete organizer (requires auth)
     this.router.delete(
@@ -32,18 +46,31 @@ export class OrganizationsRouter {
       this.organizationsController.delete,
     );
 
-    // Add team member — invite by email (requires auth, OWNER/ADMIN check in service)
+    // Add team member — invite by email (Requires OWNER, ADMIN)
     this.router.post(
       "/:id/members",
       verifyToken,
+      requireRole("ORGANIZER"),
+      requireOrgRole(["ADMIN"], "organizer"),
       this.organizationsController.addTeamMember,
     );
 
-    // Remove team member (requires auth)
+    // Remove team member (Requires OWNER, ADMIN)
     this.router.delete(
       "/:id/members/:userId",
       verifyToken,
+      requireRole("ORGANIZER"),
+      requireOrgRole(["ADMIN"], "organizer"),
       this.organizationsController.removeTeamMember,
+    );
+
+    // Update team member role (Requires OWNER, ADMIN)
+    this.router.patch(
+      "/:id/members/:userId",
+      verifyToken,
+      requireRole("ORGANIZER"),
+      requireOrgRole(["ADMIN"], "organizer"),
+      this.organizationsController.updateTeamMemberRole,
     );
   };
 

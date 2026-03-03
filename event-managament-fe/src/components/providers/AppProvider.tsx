@@ -3,9 +3,11 @@
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ThemeProvider as HypeThemeProvider } from "@/features/theme";
+import { ThemeProvider as HypeThemeProvider, FloatingThemeToggle } from "@/features/theme";
+
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const theme = createTheme({
   palette: {
@@ -54,24 +56,36 @@ const theme = createTheme({
 });
 
 export default function AppProvider({ children }: { children: ReactNode }) {
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false,
+        retry: 1,
+      },
+    },
+  }));
+
   return (
-    <AppRouterCacheProvider>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <HypeThemeProvider>
-          <AnimatePresence mode="wait">
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              transition={{ duration: 0.3 }}
-            >
-              {children}
-            </motion.div>
-          </AnimatePresence>
-        </HypeThemeProvider>
-      </ThemeProvider>
-    </AppRouterCacheProvider>
+    <QueryClientProvider client={queryClient}>
+      <AppRouterCacheProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <HypeThemeProvider>
+            <AnimatePresence mode="wait">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                transition={{ duration: 0.3 }}
+              >
+                {children}
+              </motion.div>
+            </AnimatePresence>
+            <FloatingThemeToggle />
+          </HypeThemeProvider>
+        </ThemeProvider>
+      </AppRouterCacheProvider>
+    </QueryClientProvider>
   );
 }
 

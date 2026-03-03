@@ -30,7 +30,15 @@ export class OrdersController {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
 
-      const { page: _p, limit: _l, ...filters } = req.query;
+      const { page: _p, limit: _l, organizerId, ...queryFilters } = req.query;
+
+      let filters: any = { ...queryFilters };
+
+      if (req.user?.roles?.includes("ORGANIZER") && organizerId) {
+        filters.organizerId = organizerId;
+      } else {
+        filters.userId = req.user?.id;
+      }
 
       const { data, meta } = await this.ordersService.findAll(
         filters,
@@ -94,6 +102,40 @@ export class OrdersController {
     res: Response,
     next: NextFunction,
   ): Promise<void> => {
-    throw new Error("Method not implemented.");
+    try {
+      const orderId = req.params.id as string;
+      const paymentData = req.body;
+
+      const result = await this.ordersService.pay(orderId, paymentData);
+
+      res.status(200).send(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public uploadPaymentProof = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
+    try {
+      const orderId = req.params.id as string;
+      const file = req.file;
+
+      if (!file) {
+        res.status(400).send({ message: "No payment proof file uploaded" });
+        return;
+      }
+
+      const result = await this.ordersService.updatePaymentProof(
+        orderId,
+        file.path,
+      );
+
+      res.status(200).send(result);
+    } catch (error) {
+      next(error);
+    }
   };
 }

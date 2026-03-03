@@ -18,3 +18,17 @@ export const getMe = async () => {
   const response = await apiFetch.get("/auth/me");
   return response.data;
 };
+
+export const updateUserAvatar = async (
+  id: string, 
+  formData: FormData,
+  onUploadProgress?: (progressEvent: any) => void
+) => {
+  const response = await apiFetch.patch(`/users/${id}/avatar`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+    onUploadProgress,
+  });
+  return response.data;
+};

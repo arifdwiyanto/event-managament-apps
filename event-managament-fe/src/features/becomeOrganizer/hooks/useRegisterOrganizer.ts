@@ -2,22 +2,38 @@
 
 import { useState } from "react";
 import { useFormik } from "formik";
-import * as Yup from "yup";
 import { useRouter } from "next/navigation";
-import { createOrganizer, inviteTeamMember } from "../services/organizerService";
+import { createOrganizer, inviteTeamMember, updateOrganizerLogo } from "../services/organizerService";
 import { useStoreLogin } from "../../auth/store/useAuthStore";
+import { registerOrganizerSchema } from "../validations/becomeOrganizer.validation";
+import Cookies from "js-cookie";
 
 export interface TeamMemberInput {
   email: string;
+  role: "ADMIN" | "MARKETING";
 }
 
-export const useRegisterOrganizer = () => {
+interface UseRegisterOrganizerProps {
+  onSuccess?: () => void;
+}
+
+export const useRegisterOrganizer = ({
+  onSuccess,
+}: UseRegisterOrganizerProps = {}) => {
   const router = useRouter();
-  const { me } = useStoreLogin();
+  const { accessToken, user, me } = useStoreLogin();
   const [isLoading, setIsLoading] = useState(false);
-  const [teamEmails, setTeamEmails] = useState<TeamMemberInput[]>([]);
+  const [teamMembers, setTeamMembers] = useState<TeamMemberInput[]>([]);
   const [newEmail, setNewEmail] = useState("");
-  const [toast, setToast] = useState({
+  const [newRole, setNewRole] = useState<"ADMIN" | "MARKETING">("MARKETING");
+  
+  // Logo & Cropper State
+  const [isCropperOpen, setIsCropperOpen] = useState(false);
+  const [uncroppedLogoSrc, setUncroppedLogoSrc] = useState<string | null>(null);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreviewUrl, setLogoPreviewUrl] = useState<string | null>(null);
+
+  const [toastState, setToastState] = useState({
     open: false,
     message: "",
     severity: "success" as "success" | "error",
@@ -28,12 +44,7 @@ export const useRegisterOrganizer = () => {
       name: "",
       description: "",
     },
-    validationSchema: Yup.object({
-      name: Yup.string()
-        .required("Organizer name is required")
-        .min(2, "Name must be at least 2 characters"),
-      description: Yup.string().optional(),
-    }),
+    validationSchema: registerOrganizerSchema,
     onSubmit: async (values) => {
       setIsLoading(true);
       try {
@@ -42,11 +53,25 @@ export const useRegisterOrganizer = () => {
           description: values.description || undefined,
         });
 
+        if (result.tokens) {
+          Cookies.set("token", result.tokens.accessToken);
+          Cookies.set("refreshToken", result.tokens.refreshToken);
+        }
+
+        // Upload logo if we have one
+        if (result.data?.id && logoFile) {
+          try {
+             await updateOrganizerLogo(result.data.id, logoFile);
+          } catch (err: any) {
+             console.warn("Failed to upload logo:", err);
+          }
+        }
+
         // Invite team members if any
-        if (teamEmails.length > 0 && result.data?.id) {
-          const invitePromises = teamEmails.map((member) =>
-            inviteTeamMember(result.data.id, { email: member.email }).catch(
-              (err) => {
+        if (teamMembers.length > 0 && result.data?.id) {
+          const invitePromises = teamMembers.map((member) =>
+            inviteTeamMember(result.data.id, { email: member.email, role: member.role }).catch(
+              (err: any) => {
                 console.warn(`Failed to invite ${member.email}:`, err);
                 return null;
               },
@@ -58,7 +83,7 @@ export const useRegisterOrganizer = () => {
         // Refresh user data to get updated roles
         await me();
 
-        setToast({
+        setToastState({
           open: true,
           message: "Organizer profile created! Redirecting...",
           severity: "success",
@@ -72,7 +97,7 @@ export const useRegisterOrganizer = () => {
           error.response?.data?.message ||
           error.message ||
           "Failed to create organizer profile";
-        setToast({
+        setToastState({
           open: true,
           message,
           severity: "error",
@@ -83,14 +108,31 @@ export const useRegisterOrganizer = () => {
     },
   });
 
-  const addTeamEmail = () => {
+  const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.addEventListener("load", () => {
+        setUncroppedLogoSrc(reader.result?.toString() || null);
+        setIsCropperOpen(true);
+      });
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const onCropComplete = (file: File) => {
+    setLogoPreviewUrl(URL.createObjectURL(file));
+    setLogoFile(file);
+    setIsCropperOpen(false);
+  };
+
+  const addTeamMember = () => {
     const email = newEmail.trim();
     if (!email) return;
 
-    // Simple email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setToast({
+      setToastState({
         open: true,
         message: "Please enter a valid email address",
         severity: "error",
@@ -98,9 +140,8 @@ export const useRegisterOrganizer = () => {
       return;
     }
 
-    // Check duplicate
-    if (teamEmails.some((m) => m.email === email)) {
-      setToast({
+    if (teamMembers.some((m) => m.email === email)) {
+      setToastState({
         open: true,
         message: "This email is already in the list",
         severity: "error",
@@ -108,9 +149,8 @@ export const useRegisterOrganizer = () => {
       return;
     }
 
-    // Max 10 members
-    if (teamEmails.length >= 10) {
-      setToast({
+    if (teamMembers.length >= 10) {
+      setToastState({
         open: true,
         message: "Maximum 10 team members allowed",
         severity: "error",
@@ -118,27 +158,35 @@ export const useRegisterOrganizer = () => {
       return;
     }
 
-    setTeamEmails((prev) => [...prev, { email }]);
+    setTeamMembers((prev) => [...prev, { email, role: newRole }]);
     setNewEmail("");
   };
 
-  const removeTeamEmail = (email: string) => {
-    setTeamEmails((prev) => prev.filter((m) => m.email !== email));
+  const removeTeamMember = (email: string) => {
+    setTeamMembers((prev) => prev.filter((m) => m.email !== email));
   };
 
   const handleCloseToast = () => {
-    setToast((prev) => ({ ...prev, open: false }));
+    setToastState((prev) => ({ ...prev, open: false }));
   };
 
   return {
     formik,
     isLoading,
-    teamEmails,
+    teamMembers,
     newEmail,
     setNewEmail,
-    addTeamEmail,
-    removeTeamEmail,
-    toast,
+    newRole,
+    setNewRole,
+    addTeamMember,
+    removeTeamMember,
+    isCropperOpen,
+    setIsCropperOpen,
+    uncroppedLogoSrc,
+    logoPreviewUrl,
+    handleLogoChange,
+    onCropComplete,
+    toast: toastState,
     handleCloseToast,
   };
 };

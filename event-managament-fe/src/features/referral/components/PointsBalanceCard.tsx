@@ -23,9 +23,9 @@ const PointsBalanceCard: React.FC<PointsBalanceCardProps> = ({ balance }) => (
           Balance
         </h3>
       </div>
-      <div className="bg-[#00FFFF] border-2 border-black px-2 md:px-3 py-0.5 md:py-1 transform rotate-2 shadow-[1px_1px_0px_0px_#ffffff] md:shadow-[2px_2px_0px_0px_#ffffff]">
+      {/* <div className="bg-[#00FFFF] border-2 border-black px-2 md:px-3 py-0.5 md:py-1 transform rotate-2 shadow-[1px_1px_0px_0px_#ffffff] md:shadow-[2px_2px_0px_0px_#ffffff]">
         <span className="text-[10px] md:text-xs font-black uppercase text-black">Gold Tier</span>
-      </div>
+      </div> */}
     </div>
 
     {/* Points Display */}
@@ -45,18 +45,21 @@ const PointsBalanceCard: React.FC<PointsBalanceCardProps> = ({ balance }) => (
         <span className="text-[#00FFFF]">{balance.nextTierProgress}%</span>
       </div>
       <div className="h-4 md:h-6 w-full bg-black/60 border-2 border-white/20 relative overflow-hidden">
-        <div 
+        <div
           className="h-full bg-[#00FFFF] border-r-2 border-black shadow-[0_0_10px_rgba(6,182,212,0.5)]"
-          style={{ 
+          style={{
             width: `${balance.nextTierProgress}%`,
-            backgroundImage: "linear-gradient(45deg,rgba(0,0,0,.15) 25%,transparent 25%,transparent 50%,rgba(0,0,0,.15) 50%,rgba(0,0,0,.15) 75%,transparent 75%,transparent)",
-            backgroundSize: "0.75rem 0.75rem"
+            backgroundImage:
+              "linear-gradient(45deg,rgba(0,0,0,.15) 25%,transparent 25%,transparent 50%,rgba(0,0,0,.15) 50%,rgba(0,0,0,.15) 75%,transparent 75%,transparent)",
+            backgroundSize: "0.75rem 0.75rem",
           }}
         />
       </div>
       <p className="mt-2 md:mt-3 text-[10px] md:text-xs font-bold text-gray-300 flex items-center gap-1 uppercase">
         <ScheduleIcon />
-        {balance.expiresIn ? `Expires in ${balance.expiresIn}` : 'No active points'}
+        {balance.expiresIn
+          ? `Expires in ${balance.expiresIn}`
+          : "No active points"}
       </p>
     </div>
   </div>

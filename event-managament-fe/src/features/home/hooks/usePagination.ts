@@ -36,19 +36,17 @@ export const usePagination = (totalPages = 1): UsePaginationReturn => {
     [router, createPageUrl, totalPages],
   );
 
-  const nextPage = () =>
-    useCallback(() => {
-      if (currentPage < totalPages) {
-        goToPage(currentPage + 1);
-      }
-    }, [currentPage, totalPages, goToPage]);
+  const nextPage = useCallback(() => {
+    if (currentPage < totalPages) {
+      goToPage(currentPage + 1);
+    }
+  }, [currentPage, totalPages, goToPage]);
 
-  const prevPage = () =>
-    useCallback(() => {
-      if (currentPage > 1) {
-        goToPage(currentPage - 1);
-      }
-    }, [currentPage, goToPage]);
+  const prevPage = useCallback(() => {
+    if (currentPage > 1) {
+      goToPage(currentPage - 1);
+    }
+  }, [currentPage, goToPage]);
 
   return {
     currentPage,

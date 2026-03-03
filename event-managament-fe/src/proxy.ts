@@ -13,13 +13,8 @@ function decodeJwtPayload(token: string): Record<string, unknown> | null {
   }
 }
 
-// Routes that require specific roles
-const ROLE_PROTECTED_ROUTES: Record<string, string[]> = {
-  "/dashboard": ["ORGANIZER"],
-};
-
 // Routes that require authentication (any role)
-const AUTH_REQUIRED_ROUTES = ["/user-referral"];
+const AUTH_REQUIRED_ROUTES = ["/dashboard", "/user-referral"];
 
 // Routes only for guests (redirect to home if authenticated)
 const GUEST_ONLY_ROUTES = ["/login", "/register"];
@@ -31,7 +26,6 @@ export function proxy(request: NextRequest) {
   // Decode JWT payload
   const payload = token ? decodeJwtPayload(token) : null;
   const isAuthenticated = !!payload;
-  const userRoles: string[] = (payload?.roles as string[]) || [];
 
   // 1. Guest-only routes: redirect authenticated users to home
   if (GUEST_ONLY_ROUTES.some((route) => pathname.startsWith(route))) {
@@ -47,26 +41,6 @@ export function proxy(request: NextRequest) {
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("callbackUrl", pathname);
       return NextResponse.redirect(loginUrl);
-    }
-  }
-
-  // 3. Role-protected routes: check required roles
-  for (const [route, requiredRoles] of Object.entries(ROLE_PROTECTED_ROUTES)) {
-    if (pathname.startsWith(route)) {
-      // Must be authenticated
-      if (!isAuthenticated) {
-        const loginUrl = new URL("/login", request.url);
-        loginUrl.searchParams.set("callbackUrl", pathname);
-        return NextResponse.redirect(loginUrl);
-      }
-
-      // Must have at least one required role
-      const hasRole = userRoles.some((role) => requiredRoles.includes(role));
-      if (!hasRole) {
-        const homeUrl = new URL("/", request.url);
-        homeUrl.searchParams.set("error", "forbidden");
-        return NextResponse.redirect(homeUrl);
-      }
     }
   }
 

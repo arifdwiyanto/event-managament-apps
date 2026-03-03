@@ -1,43 +1,60 @@
 @import url("https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700;800&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap");
 @import "tailwindcss";
 
 /* Enable class-based dark mode for manual toggle */
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  /* Neon Colors */
-  --neon-pink: #ff00ff;
-  --neon-cyan: #00ffff;
-  --neon-purple: #b026ff;
-  --neon-lime: #ccff00;
-  --background-dark: #050505;
-  --surface-dark: #121212;
+  --background: #FAFAFA;
+  --foreground: #000000;
+  --surface: #FFFFFF;
+  --off-white: #FAFAFA;
+  
+  /* Neon Hype Design Tokens */
+  --neon-purple: #A855F7;
+  --neon-cyan: #00F0FF;
+  --neon-magenta: #FF00E5;
+  --dark-charcoal: #1A1A1A;
+}
+
+.dark {
+  --background: #000000;
+  --foreground: #ffffff;
+  --surface: #1A1A1A;
+  --off-white: #000000;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-primary: #ee2b8c;
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-surface: var(--surface);
+  --color-off-white: var(--off-white);
+  --color-neon-purple: var(--neon-purple);
+  --color-neon-cyan: var(--neon-cyan);
+  --color-neon-magenta: var(--neon-magenta);
+  --color-neon-pink: #FF00FF;
+  --color-neon-lime: #CCFF00;
+  --color-background-dark: #050505;
+  --color-surface-dark: #121212;
+  --color-dark-charcoal: var(--dark-charcoal);
   --font-display: "Clash Display", sans-serif;
   --font-body: "Space Grotesk", sans-serif;
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --shadow-neon: 0 0 10px rgba(0, 255, 255, 0.5), 0 0 20px rgba(0, 255, 255, 0.3);
+  --shadow-neon-pink: 0 0 10px rgba(255, 0, 255, 0.5), 0 0 20px rgba(255, 0, 255, 0.3);
+  --shadow-neon-purple: 0 0 10px rgba(176, 38, 255, 0.5), 0 0 20px rgba(176, 38, 255, 0.3);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: "Spline Sans", Arial, Helvetica, sans-serif;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(176, 38, 255, 0.15) 0%, transparent 20%),
+    radial-gradient(circle at 90% 80%, rgba(0, 255, 255, 0.1) 0%, transparent 25%);
+  background-attachment: fixed;
 }
 
 /* Font Family Utilities */
@@ -48,11 +65,48 @@ body {
   font-family: "Space Grotesk", sans-serif;
 }
 
+/* Material Symbols Settings */
+.material-symbols-outlined {
+  font-variation-settings:
+    "FILL" 1,
+    "wght" 600,
+    "GRAD" 0,
+    "opsz" 24;
+}
+
+/* Brutalist Card Styles */
+.brutalist-card {
+  @apply bg-surface border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)];
+}
+
 /* Glass Card Effect */
 .glass-card {
   background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.text-stroke {
+  -webkit-text-stroke: 1px currentColor;
+  color: transparent;
+}
+
+/* Brutalist Button */
+.brutalist-button {
+  @apply border-4 border-black rounded-none font-black uppercase tracking-tighter transition-all;
+}
+.brutalist-button:hover {
+  @apply translate-x-1 translate-y-1 shadow-none;
+}
+
+/* Neon Glows */
+.neon-glow-purple {
+  box-shadow:
+    0 0 20px rgba(168, 85, 247, 0.4),
+    8px 8px 0px 0px rgba(0, 0, 0, 1);
+}
+.neon-glow-purple:hover {
+  box-shadow: 0 0 30px rgba(168, 85, 247, 0.6);
 }
 
 /* Sticker Rotate Effect */
@@ -92,6 +146,7 @@ body {
 /* Custom scrollbar - Neon Theme */
 ::-webkit-scrollbar {
   width: 10px;
+  height: 8px; /* For horizontal scrollbars */
 }
 ::-webkit-scrollbar-track {
   background: #111;
@@ -102,4 +157,44 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #b026ff;
+}
+
+/* Horizontal Scrollbar specifically for Categories */
+.custom-horizontal-scrollbar::-webkit-scrollbar {
+  height: 6px;
+  display: block; /* Ensure it's not hidden */
+}
+.custom-horizontal-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+.custom-horizontal-scrollbar::-webkit-scrollbar-thumb {
+  background: #00F0FF; /* Neon Cyan for categories */
+  border-radius: 10px;
+}
+.custom-horizontal-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #FF00E5; /* Neon Magenta on hover */
+}
+
+/* Custom Vertical Scrollbar for generic components (light/dark supported) */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1; /* slate-300 for light mode */
+  border-radius: 10px;
+  border: none;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8; /* slate-400 */
+}
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #3f3f46; /* zinc-700 for modern dark mode */
+  border: none;
+}
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #52525b; /* zinc-600 */
 }

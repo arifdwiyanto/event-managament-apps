@@ -18,7 +18,7 @@ import {
 } from "../services/dashboardService";
 
 // Hook for chart data with filter
-export function useChartData(initialFilter: ChartFilter = "daily") {
+export function useChartData(initialFilter: ChartFilter = "weekly") {
   const [filter, setFilter] = useState<ChartFilter>(initialFilter);
   const [data, setData] = useState<ChartDataPoint[]>([]);
   const [loading, setLoading] = useState(true);

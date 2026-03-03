@@ -14,7 +14,10 @@ export class ReviewsController {
     next: NextFunction,
   ): Promise<void> => {
     try {
-      const review = await this.reviewsService.create(req.body);
+      if (!req.user?.id) {
+        throw new Error("Unauthorized");
+      }
+      const review = await this.reviewsService.create(req.body, req.user.id);
       res.status(201).send(review);
     } catch (error) {
       next(error);
@@ -27,8 +30,8 @@ export class ReviewsController {
     next: NextFunction,
   ): Promise<void> => {
     try {
-      const page = parseInt(req.params.page as string) || 1;
-      const limit = parseInt(req.params.limit as string) || 10;
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
 
       const { page: _p, limit: _l, ...filters } = req.query;
 

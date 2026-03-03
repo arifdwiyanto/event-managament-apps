@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import DashboardClientLayout from "../../components/providers/DashboardClientLayout";
 
 export const metadata: Metadata = {
   title: "Dashboard - Hype",
@@ -10,5 +11,5 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return <DashboardClientLayout>{children}</DashboardClientLayout>;
 }

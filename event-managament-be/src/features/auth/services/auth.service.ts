@@ -9,15 +9,18 @@ import jwt from "jsonwebtoken";
 import { UserPointRepository } from "../../userPoint/repositories/userPoint.repository.js";
 import { prisma } from "../../../config/prisma.js";
 import { UserCouponRepository } from "../../userCoupons/repositories/voucher.repository.js";
+import { NotificationService } from "../../notifications/services/notification.service.js";
 
 export class AuthService {
   private UserPointRepository = new UserPointRepository();
   private AuthRepository = new AuthRepository();
   private UserCouponRepository = new UserCouponRepository();
+  private NotificationService = new NotificationService();
   constructor() {
     this.AuthRepository = new AuthRepository();
     this.UserPointRepository = new UserPointRepository();
     this.UserCouponRepository = new UserCouponRepository();
+    this.NotificationService = new NotificationService();
   }
   public register = async (data: RegisterRequest): Promise<any> => {
     // Registration logic
@@ -74,7 +77,29 @@ export class AuthService {
                 expiresAt: couponExpiresAt,
                 isUsed: false
             },
-            tx
+                tx
+        );
+
+        // Notify Referrer
+        await this.NotificationService.sendToUser(
+          referrerId,
+          {
+            title: "Bonus Referral! 🎁",
+            message: "Selamat! Kamu baru saja mendapatkan 10.000 poin karena temanmu menggunakan kode referralmu.",
+            type: "EARN_REFERRAL",
+          },
+          tx
+        );
+
+        // Notify Referee
+        await this.NotificationService.sendToUser(
+          newUser.id,
+          {
+            title: "Selamat Datang! ✨",
+            message: "Kamu baru saja mendapatkan kupon diskon 10% karena menggunakan kode referral. Selamat berbelanja!",
+            type: "REWARD",
+          },
+          tx
         );
       }
 
@@ -118,15 +143,41 @@ export class AuthService {
     // Fetch organizer profile if user has ORGANIZER role
     let organizer = null;
     if (roles.includes("ORGANIZER")) {
-      organizer = await prisma.organizer.findUnique({
-        where: { ownerId: user.id },
-        select: { id: true, name: true, description: true, logoUrl: true },
+      organizer = await prisma.organizer.findFirst({
+        where: { 
+          teams: {
+            some: {
+              userId: user.id
+            }
+          }
+        },
+        select: { 
+          id: true, 
+          name: true, 
+          description: true, 
+          logoUrl: true,
+          createdAt:true,
+          isVerified:true,
+          owner:true,
+          teams: {
+            select: {
+              role: true,
+              user: {
+                select: {
+                  id: true,
+                  name: true
+                }
+              }
+            }
+          } 
+        },
       });
     }
 
     return {
       user: {
         id: user.id,
+        avatarUrl:user.avatarUrl,
         name: user.name,
         email: user.email,
         roles,
@@ -147,14 +198,40 @@ export class AuthService {
     // Fetch organizer profile if user has ORGANIZER role
     let organizer = null;
     if (roles.includes("ORGANIZER")) {
-      organizer = await prisma.organizer.findUnique({
-        where: { ownerId: id },
-        select: { id: true, name: true, description: true, logoUrl: true },
+      organizer = await prisma.organizer.findFirst({
+        where: { 
+          teams: {
+            some: {
+              userId: id
+            }
+          }
+        },
+        select: { 
+          id: true, 
+          name: true, 
+          description: true, 
+          logoUrl: true,
+          isVerified: true,
+          createdAt: true,
+          owner: true,
+          teams: {
+            select: {
+              role: true,
+              user: {
+                select: {
+                  id: true,
+                  name: true
+                }
+              }
+            }
+          }
+        },
       });
     }
 
     return {
       id: user.id,
+      avatarUrl:user.avatarUrl,
       name: user.name,
       email: user.email,
       referralCode: user.referralCode,

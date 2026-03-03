@@ -8,12 +8,11 @@ export interface Event {
   category: {
     id: string;
     name: string;
-    color: 'pink' | 'cyan' | 'purple' | 'green' | 'lime';
+    color: "pink" | "cyan" | "purple" | "green" | "lime";
   };
   date: string;
   time: string;
   location: {
-    name: string;
     city: string;
   };
   price: number;
@@ -42,11 +41,12 @@ export const mockEvents: EventsResponse = {
       category: { id: "cat-music", name: "Music", color: "pink" },
       date: "Sat, Oct 24",
       time: "8:00 PM",
-      location: { name: "GBK Senayan", city: "Jakarta" },
+      location: { city: "Jakarta" },
       price: 450000,
       currency: "IDR",
       isFree: false,
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuD1WMCZoHaSjngfsapkDhVHLgDTxMNqXxRRTUYcoJvyzaHyf1gLIIKM-DQCIwjlZzN5mxDCzT4AUx_zb-gP4hfAj4JTp8JzT5wPom0D0KSK2wvAvXdIbvfZvK1bxv_DtasgZTq26l03bjJpOvcLTm3-W5OHiXcCf1VwVVQzQo4sa6IzmQgw7f5mzBeDl3crEd42p99COQmTx5fkdNWtT9s7jxs-gf8ocM5UGeI15OE0GCGiv5MEDTATjQy4ypZJ7OsWWDItnoSDYQA",
+      image:
+        "https://lh3.googleusercontent.com/aida-public/AB6AXuD1WMCZoHaSjngfsapkDhVHLgDTxMNqXxRRTUYcoJvyzaHyf1gLIIKM-DQCIwjlZzN5mxDCzT4AUx_zb-gP4hfAj4JTp8JzT5wPom0D0KSK2wvAvXdIbvfZvK1bxv_DtasgZTq26l03bjJpOvcLTm3-W5OHiXcCf1VwVVQzQo4sa6IzmQgw7f5mzBeDl3crEd42p99COQmTx5fkdNWtT9s7jxs-gf8ocM5UGeI15OE0GCGiv5MEDTATjQy4ypZJ7OsWWDItnoSDYQA",
       isFavorite: false,
     },
     {
@@ -56,11 +56,12 @@ export const mockEvents: EventsResponse = {
       category: { id: "cat-workshop", name: "Workshop", color: "cyan" },
       date: "Sun, Oct 25",
       time: "4:00 PM",
-      location: { name: "Semesta Gallery", city: "Jaksel" },
+      location: { city: "Jaksel" },
       price: 350000,
       currency: "IDR",
       isFree: false,
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCJnPkYGfBE5cP94vJ88oI0Z0uDmkb5vidVRnfhJtB4oUGVxbXQbPo7cxw4ebcegpwuZu7_Io5yTdVtdkwziG0zf8co13cWWQf-5OZch7HavJSxyfp_BTyL02lGn8TKHxwnLq9i-Xn6l_1BXTYZF8uqHyYjLtcPd704eZAV05qcKzAsPks5rEx7_LzssuT6WGVSkaIpQmBDEZmt-zCgXaeZwK2h3N-5F9nrnD3105xfIj7diU4RB6kNtRIGUjrTMljPW-Op5FKtITQ",
+      image:
+        "https://lh3.googleusercontent.com/aida-public/AB6AXuCJnPkYGfBE5cP94vJ88oI0Z0uDmkb5vidVRnfhJtB4oUGVxbXQbPo7cxw4ebcegpwuZu7_Io5yTdVtdkwziG0zf8co13cWWQf-5OZch7HavJSxyfp_BTyL02lGn8TKHxwnLq9i-Xn6l_1BXTYZF8uqHyYjLtcPd704eZAV05qcKzAsPks5rEx7_LzssuT6WGVSkaIpQmBDEZmt-zCgXaeZwK2h3N-5F9nrnD3105xfIj7diU4RB6kNtRIGUjrTMljPW-Op5FKtITQ",
       isFavorite: false,
     },
     {
@@ -70,11 +71,12 @@ export const mockEvents: EventsResponse = {
       category: { id: "cat-nightlife", name: "Nightlife", color: "purple" },
       date: "Fri, Oct 30",
       time: "10:00 PM",
-      location: { name: "The Bunker", city: "Jakarta" },
+      location: { city: "Jakarta" },
       price: 200000,
       currency: "IDR",
       isFree: false,
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuD1WMCZoHaSjngfsapkDhVHLgDTxMNqXxRRTUYcoJvyzaHyf1gLIIKM-DQCIwjlZzN5mxDCzT4AUx_zb-gP4hfAj4JTp8JzT5wPom0D0KSK2wvAvXdIbvfZvK1bxv_DtasgZTq26l03bjJpOvcLTm3-W5OHiXcCf1VwVVQzQo4sa6IzmQgw7f5mzBeDl3crEd42p99COQmTx5fkdNWtT9s7jxs-gf8ocM5UGeI15OE0GCGiv5MEDTATjQy4ypZJ7OsWWDItnoSDYQA",
+      image:
+        "https://lh3.googleusercontent.com/aida-public/AB6AXuD1WMCZoHaSjngfsapkDhVHLgDTxMNqXxRRTUYcoJvyzaHyf1gLIIKM-DQCIwjlZzN5mxDCzT4AUx_zb-gP4hfAj4JTp8JzT5wPom0D0KSK2wvAvXdIbvfZvK1bxv_DtasgZTq26l03bjJpOvcLTm3-W5OHiXcCf1VwVVQzQo4sa6IzmQgw7f5mzBeDl3crEd42p99COQmTx5fkdNWtT9s7jxs-gf8ocM5UGeI15OE0GCGiv5MEDTATjQy4ypZJ7OsWWDItnoSDYQA",
       isFavorite: true,
     },
     {
@@ -84,11 +86,12 @@ export const mockEvents: EventsResponse = {
       category: { id: "cat-music", name: "Music", color: "pink" },
       date: "Thu, Nov 02",
       time: "7:30 PM",
-      location: { name: "Motion Blue", city: "Jakarta" },
+      location: { city: "Jakarta" },
       price: 150000,
       currency: "IDR",
       isFree: false,
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBSC_qi23849UgaBqsquDgdbtxVQxBYKND7DI_Z96-n8dzgd4mtKW7kHVa-G6J8a5YQfdlOaZ955OFDaYad5r4wM_kW8307jICKVE72ZtnhNVP0a0-d9BilegHv3z4YKRg2jvOzpjorv1XpG6uqZi-8AkNQvRjCRZb9Vr33U9qqHPlVNZfQL6Qmi27oKQYyr9oUF1hu-oq6lCX3C9xymV1xWCUNE9FpP9JV33thRSXAcWXHINBYliDOgzmOlbqFCQhH7v6xK2nXzVQ",
+      image:
+        "https://lh3.googleusercontent.com/aida-public/AB6AXuBSC_qi23849UgaBqsquDgdbtxVQxBYKND7DI_Z96-n8dzgd4mtKW7kHVa-G6J8a5YQfdlOaZ955OFDaYad5r4wM_kW8307jICKVE72ZtnhNVP0a0-d9BilegHv3z4YKRg2jvOzpjorv1XpG6uqZi-8AkNQvRjCRZb9Vr33U9qqHPlVNZfQL6Qmi27oKQYyr9oUF1hu-oq6lCX3C9xymV1xWCUNE9FpP9JV33thRSXAcWXHINBYliDOgzmOlbqFCQhH7v6xK2nXzVQ",
       isFavorite: false,
     },
     {
@@ -98,11 +101,12 @@ export const mockEvents: EventsResponse = {
       category: { id: "cat-tech", name: "Tech", color: "green" },
       date: "Tue, Nov 05",
       time: "6:30 PM",
-      location: { name: "WeWork Revenue", city: "Jakarta" },
+      location: { city: "Jakarta" },
       price: 0,
       currency: "IDR",
       isFree: true,
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAieRbDC6ZpJa9_QUxpKKLJQCWKs9X0cxi6be1u8HXFg9GcQIanTEQaIGl631IgsE-jnOAY0b5xRSEtQx5vh8MTEe4_iEOjCqUyp9PqoZEsXtJQzc8n5jQEBXEhA_qjpJncYdjassGmE3oWswDqzYuz9Ex3ZVQVoQ-Dx4MHxEa1t18ydLshGc4SUQCvXx36XraAu778htb1-2rQIAmNV1bhvf4vn6hV0ByveeL57n36kFv0NiA4MGugWIddgr7xyrrkvifyTH0wCCI",
+      image:
+        "https://lh3.googleusercontent.com/aida-public/AB6AXuAieRbDC6ZpJa9_QUxpKKLJQCWKs9X0cxi6be1u8HXFg9GcQIanTEQaIGl631IgsE-jnOAY0b5xRSEtQx5vh8MTEe4_iEOjCqUyp9PqoZEsXtJQzc8n5jQEBXEhA_qjpJncYdjassGmE3oWswDqzYuz9Ex3ZVQVoQ-Dx4MHxEa1t18ydLshGc4SUQCvXx36XraAu778htb1-2rQIAmNV1bhvf4vn6hV0ByveeL57n36kFv0NiA4MGugWIddgr7xyrrkvifyTH0wCCI",
       isFavorite: false,
     },
     {
@@ -112,11 +116,12 @@ export const mockEvents: EventsResponse = {
       category: { id: "cat-art", name: "Art", color: "cyan" },
       date: "Sat, Nov 09",
       time: "10:00 AM",
-      location: { name: "MACAN Museum", city: "Jakarta" },
+      location: { city: "Jakarta" },
       price: 100000,
       currency: "IDR",
       isFree: false,
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCJnPkYGfBE5cP94vJ88oI0Z0uDmkb5vidVRnfhJtB4oUGVxbXQbPo7cxw4ebcegpwuZu7_Io5yTdVtdkwziG0zf8co13cWWQf-5OZch7HavJSxyfp_BTyL02lGn8TKHxwnLq9i-Xn6l_1BXTYZF8uqHyYjLtcPd704eZAV05qcKzAsPks5rEx7_LzssuT6WGVSkaIpQmBDEZmt-zCgXaeZwK2h3N-5F9nrnD3105xfIj7diU4RB6kNtRIGUjrTMljPW-Op5FKtITQ",
+      image:
+        "https://lh3.googleusercontent.com/aida-public/AB6AXuCJnPkYGfBE5cP94vJ88oI0Z0uDmkb5vidVRnfhJtB4oUGVxbXQbPo7cxw4ebcegpwuZu7_Io5yTdVtdkwziG0zf8co13cWWQf-5OZch7HavJSxyfp_BTyL02lGn8TKHxwnLq9i-Xn6l_1BXTYZF8uqHyYjLtcPd704eZAV05qcKzAsPks5rEx7_LzssuT6WGVSkaIpQmBDEZmt-zCgXaeZwK2h3N-5F9nrnD3105xfIj7diU4RB6kNtRIGUjrTMljPW-Op5FKtITQ",
       isFavorite: false,
     },
   ],

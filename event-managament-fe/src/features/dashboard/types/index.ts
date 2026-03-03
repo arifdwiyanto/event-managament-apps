@@ -1,6 +1,6 @@
 // Dashboard Types
 
-export type ChartFilter = "daily" | "monthly" | "yearly";
+export type ChartFilter = "weekly" | "monthly" | "yearly";
 
 export interface ChartDataPoint {
   label: string;

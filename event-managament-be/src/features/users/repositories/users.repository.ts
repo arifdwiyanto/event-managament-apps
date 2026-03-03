@@ -20,6 +20,13 @@ export class UsersRepository {
     throw new Error("Method not implemented.");
   };
 
+  public updateAvatar = async (id: string, avatarUrl: string): Promise<User> => {
+    return await prisma.user.update({
+      where: { id },
+      data: { avatarUrl },
+    });
+  };
+
   public delete = async (id: number): Promise<any> => {
     throw new Error("Method not implemented.");
   };

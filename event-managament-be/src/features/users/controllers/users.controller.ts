@@ -50,6 +50,36 @@ export class UsersController {
     throw new Error("Method not implemented.");
   };
 
+  public updateAvatar = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
+    try {
+      const requestingUserId = req.user!.id;
+      const targetUserId = req.params.id as string;
+
+      if (requestingUserId !== targetUserId) {
+        res.status(403).json({ message: "You can only update your own avatar" });
+        return;
+      }
+
+      const imageUrl = req.file?.path;
+      const updatedUser = await this.UsersService.updateAvatar(targetUserId, imageUrl);
+
+      res.status(200).json({
+        message: "Avatar updated successfully",
+        data: { avatarUrl: updatedUser.avatarUrl },
+      });
+    } catch (error: any) {
+      if (error.status) {
+        res.status(error.status).json({ message: error.message });
+      } else {
+        next(error);
+      }
+    }
+  };
+
   public delete = async (
     req: Request,
     res: Response,

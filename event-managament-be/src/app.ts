@@ -4,12 +4,17 @@ import morgan from "morgan";
 import { AuthRouter } from "./features/auth/router.js";
 import { UsersRouter } from "./features/users/router.js";
 import { OrganizationsRouter } from "./features/organizations/router.js";
-import { TicketsRouter } from "./features/events/router.js";
+import { EventsRouter } from "./features/events/router.js";
 import { OrdersRouter } from "./features/orders/router.js";
 import { PromotionsRouter } from "./features/promotions/router.js";
 import { ReviewsRouter } from "./features/reviews/router.js";
 import { DashboardRouter } from "./features/dashboard/router.js";
 import { ReferralRouter } from "./features/referral/router.js";
+import { NotificationRouter } from "./features/notifications/router.js";
+import { CartRouter } from "./features/cart/router.js";
+import { ReportRouter } from "./features/report/report.router.js";
+import { UserPointRouter } from "./features/userPoint/route.js";
+import { UserCouponRouter } from "./features/userCoupons/router.js";
 
 class App {
   private app: Application;
@@ -24,9 +29,21 @@ class App {
   }
 
   private configureMiddlewares = (): void => {
+    const isDevelopment = process.env.NODE_ENV !== 'production';
+    const corsOrigins = isDevelopment
+      ? [
+          "http://localhost:3000",
+          "http://localhost:3001",
+          "http://localhost:8000"
+        ]
+      : [
+          "https://hype-event-alpha.vercel.app",
+          process.env.FRONTEND_URL || "https://hype-event-alpha.vercel.app"
+        ];
+
     this.app.use(cors({
-      origin:"http://localhost:3000",
-      credentials:true
+      origin: corsOrigins,
+      credentials: true
     }));
     this.app.use(express.json());
     this.app.use(morgan("dev"));
@@ -48,18 +65,32 @@ class App {
     this.app.use("/api/auth", new AuthRouter().getRouter());
     this.app.use("/api/users", new UsersRouter().getRouter());
     this.app.use("/api/organizations", new OrganizationsRouter().getRouter());
-    this.app.use("/api/tickets", new TicketsRouter().getRouter());
+    this.app.use("/api/events", new EventsRouter().getRouter());
     this.app.use("/api/orders", new OrdersRouter().getRouter());
     this.app.use("/api/promotions", new PromotionsRouter().getRouter());
     this.app.use("/api/reviews", new ReviewsRouter().getRouter());
     this.app.use("/api/dashboard", new DashboardRouter().getRouter());
     this.app.use("/api/referrals", new ReferralRouter().getRouter());
+    this.app.use("/api/notifications", new NotificationRouter().getRouter());
+    this.app.use("/api/cart", new CartRouter().getRouter());
+    this.app.use("/api/reports", new ReportRouter().getRouter());
+    this.app.use("/api/user-points", new UserPointRouter().getRouter());
+    this.app.use("/api/user-coupons", new UserCouponRouter().getRouter());
   };
 
   private configureErrorHandling = (): void => {
     // Global error handler
     this.app.use(
       (err: any, req: Request, res: Response, next: NextFunction) => {
+        if (err.name === "ZodError") {
+          return res.status(400).json({
+            error: {
+              message: "Validation Error",
+              details: err.errors,
+            },
+          });
+        }
+
         console.error(err.stack);
         res.status(err.status || 500).json({
           error: {

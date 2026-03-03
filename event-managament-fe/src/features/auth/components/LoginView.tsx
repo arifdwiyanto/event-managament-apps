@@ -2,7 +2,7 @@
 
 import React from "react";
 import LoginForm from "./LoginForm";
-import AuthLayout from "./AuthLayout";
+import AuthLayout from "../../../components/layouts/auth/AuthLayout";
 
 const LoginView: React.FC = () => {
   return (

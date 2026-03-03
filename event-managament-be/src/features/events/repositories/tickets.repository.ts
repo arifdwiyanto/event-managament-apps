@@ -1,4 +1,4 @@
-﻿import { prisma } from "src/config/prisma.js";
+import { prisma } from "src/config/prisma.js";
 import { Prisma } from "@prisma/client";
 
 export class TicketsRepository {
@@ -7,7 +7,7 @@ export class TicketsRepository {
     tx?: Prisma.TransactionClient,
   ): Promise<any> => {
     const client = tx || prisma;
-    return await client.event.create({
+    return await client.ticketType.create({
       data,
     });
   };
@@ -18,56 +18,59 @@ export class TicketsRepository {
     take?: number,
   ): Promise<{ data: any[]; total: number }> => {
     const [data, total] = await prisma.$transaction([
-      prisma.event.findMany({
+      prisma.ticketType.findMany({
         where: filters,
         include: {
-          category: true,
-          organizer: true,
+          event: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
         },
         skip,
         take,
-        orderBy: { createdAt: "desc" },
+        orderBy: { name: "desc" },
       }),
-      prisma.event.count({ where: filters }),
+      prisma.ticketType.count({ where: filters }),
     ]);
 
     return { data, total };
   };
 
-  public findById = async (id: any): Promise<any> => {
-    return await prisma.event.findUnique({
+  public findById = async (
+    id: string,
+    tx?: Prisma.TransactionClient,
+  ): Promise<any> => {
+    const client = tx || prisma;
+    return await client.ticketType.findUnique({
       where: { id },
       include: {
-        category: true,
-        organizer: true,
-        ticketTypes: true,
-        promotions: {
-            include: {
-                promotion: true
-            }
-        }
+        event: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     });
   };
 
-  public findTicketTypeById = async (id: string, tx?: Prisma.TransactionClient): Promise<any> => {
+  public updateTicketQuota = async (
+    id: string,
+    qty: number,
+    tx?: Prisma.TransactionClient,
+  ) => {
     const client = tx || prisma;
-    return await client.ticketType.findUnique({
+    return await client.ticketType.update({
       where: { id },
+      data: {
+        quota: {
+          decrement: qty,
+        },
+      },
     });
   };
-
-  public updateTicketQuota = async (id: string, qty: number, tx?: Prisma.TransactionClient) => {
-      const client = tx || prisma;
-      return await client.ticketType.update({
-          where: { id },
-          data: {
-              quota: {
-                  decrement: qty
-              }
-          }
-      })
-  }
 
   public update = async (
     id: string,
@@ -75,14 +78,14 @@ export class TicketsRepository {
     tx?: Prisma.TransactionClient,
   ): Promise<any> => {
     const client = tx || prisma;
-    return await client.event.update({
+    return await client.ticketType.update({
       where: { id },
       data,
     });
   };
 
   public delete = async (id: any): Promise<any> => {
-    return await prisma.event.delete({
+    return await prisma.ticketType.delete({
       where: { id },
     });
   };

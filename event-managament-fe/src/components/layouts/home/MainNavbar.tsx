@@ -2,10 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { useMobileMenu } from "@/features/home/hooks";
-import { useStoreLogin } from "@/features/auth/store/useAuthStore";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useMainNavbar } from "./useMainNavbar";
 
 // MUI Components
 import Avatar from "@mui/material/Avatar";
@@ -21,80 +18,41 @@ import Logout from "@mui/icons-material/Logout";
 import Person from "@mui/icons-material/Person";
 import Settings from "@mui/icons-material/Settings";
 import Campaign from "@mui/icons-material/Campaign";
+import NotificationBell from "../../../features/notifications/components/NotificationBell";
+import CartDrawer from "@/features/cart/components/CartDrawer";
+import { ShoppingCartIcon, Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import Badge from "@mui/material/Badge";
+import { motion, AnimatePresence } from "framer-motion";
 
 // Hamburger Icon
-const MenuIcon = () => (
-  <svg
-    className="w-5 h-5 md:w-6 md:h-6"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-    />
-  </svg>
-);
+const MenuIcon = () => <Bars3Icon className="w-5 h-5 md:w-6 md:h-6" />;
 
 // Close Icon
-const CloseIcon = () => (
-  <svg
-    className="w-5 h-5 md:w-6 md:h-6"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M6 18 18 6M6 6l12 12"
-    />
-  </svg>
-);
+const CloseIcon = () => <XMarkIcon className="w-5 h-5 md:w-6 md:h-6" />;
 
 const MainNavbar: React.FC = () => {
-  const router = useRouter();
-  const { isOpen, toggle, close } = useMobileMenu();
-  const { isAuthenticated, signOut, user } = useStoreLogin();
+  const {
+    pathname,
+    isOpen,
+    toggle,
+    close,
+    isAuthenticated,
+    user,
+    isOrganizer,
+    isDark,
+    anchorEl,
+    open,
+    handleClick,
+    handleClose,
+    handleLogout,
+    cartOpen,
+    setCartOpen,
+    cartItemsCount,
+  } = useMainNavbar();
 
-  const isOrganizer = user?.roles?.includes("ORGANIZER") ?? false;
-
-  // Detect Tailwind dark mode
-  const [isDark, setIsDark] = useState(false);
-  useEffect(() => {
-    const html = document.documentElement;
-    const check = () => setIsDark(html.classList.contains("dark"));
-    check();
-    const observer = new MutationObserver(check);
-    observer.observe(html, { attributes: true, attributeFilter: ["class"] });
-    return () => observer.disconnect();
-  }, []);
-
-  // State untuk Menu Dropdown
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  // Handle Logout
-  const handleLogout = async () => {
-    handleClose();
-    await signOut();
-    router.push("/login");
-  };
   return (
     <>
-      <header className="flex items-center justify-between whitespace-nowrap border-b border-gray-200 dark:border-[#333] px-3 md:px-6 lg:px-10 py-2 md:py-3 bg-white/80 dark:bg-black/80 backdrop-blur-md sticky top-0 z-50">
+      <header className="flex items-center justify-between whitespace-nowrap border-b border-gray-200 dark:border-[#333] px-3 md:px-6 lg:px-10 py-3 md:py-4 bg-white/80 dark:bg-black/80 backdrop-blur-md sticky top-0 z-50">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-1.5 md:gap-3">
           <div className="size-7 md:size-9 lg:size-10 text-[#ee2b8c] dark:text-[#FF00FF] animate-pulse">
@@ -119,27 +77,79 @@ const MainNavbar: React.FC = () => {
         <div className="hidden md:flex items-center gap-4 lg:gap-8">
           <nav className="flex items-center gap-4 lg:gap-8 font-display tracking-wide uppercase text-[10px] lg:text-xs font-bold">
             <Link
+              href="/"
+              className={`${
+                pathname === "/" 
+                  ? "text-[#ee2b8c] dark:text-[#FF00FF] drop-shadow-[0_0_5px_currentColor]" 
+                  : "text-gray-600 dark:text-gray-300 hover:text-[#ee2b8c] dark:hover:text-[#FF00FF]"
+              } transition-all`}
+            >
+              Home
+            </Link>
+            <Link
               href="/events"
-              className="text-[#ee2b8c] dark:text-[#00FFFF] hover:drop-shadow-[0_0_5px_currentColor] transition-all"
+              className={`${
+                pathname.startsWith("/events") 
+                  ? "text-[#ee2b8c] dark:text-[#FF00FF] drop-shadow-[0_0_5px_currentColor]" 
+                  : "text-gray-600 dark:text-gray-300 hover:text-[#ee2b8c] dark:hover:text-[#FF00FF]"
+              } transition-all`}
             >
               Events
             </Link>
             <Link
               href="/marketplace"
-              className="text-gray-600 dark:text-gray-300 hover:text-[#ee2b8c] dark:hover:text-[#FF00FF] transition-colors"
+              className={`${
+                pathname.startsWith("/marketplace") 
+                  ? "text-[#ee2b8c] dark:text-[#FF00FF] drop-shadow-[0_0_5px_currentColor]" 
+                  : "text-gray-600 dark:text-gray-300 hover:text-[#ee2b8c] dark:hover:text-[#FF00FF]"
+              } transition-all`}
             >
               Marketplace
             </Link>
             <Link
               href="/community"
-              className="text-gray-600 dark:text-gray-300 hover:text-[#ee2b8c] dark:hover:text-[#FF00FF] transition-colors"
+              className={`${
+                pathname.startsWith("/community") 
+                  ? "text-[#ee2b8c] dark:text-[#FF00FF] drop-shadow-[0_0_5px_currentColor]" 
+                  : "text-gray-600 dark:text-gray-300 hover:text-[#ee2b8c] dark:hover:text-[#FF00FF]"
+              } transition-all`}
             >
               Community
             </Link>
           </nav>
 
           {isAuthenticated ? (
-            <>
+            <div className="flex items-center gap-2 lg:gap-4">
+              {/* Cart Icon */}
+              <Tooltip title="View Cart">
+                <IconButton 
+                  onClick={() => setCartOpen(true)}
+                  sx={{ 
+                    color: isDark ? "#fff" : "#1a1a1a",
+                    "&:hover": { color: "#ee2b8c" }
+                  }}
+                >
+                  <Badge 
+                    badgeContent={cartItemsCount} 
+                    color="primary"
+                    sx={{
+                      "& .MuiBadge-badge": {
+                        bgcolor: "#ee2b8c",
+                        color: "white",
+                        fontWeight: "bold",
+                        borderRadius: 0,
+                        border: "1px solid black"
+                      }
+                    }}
+                  >
+                    <ShoppingCartIcon className="size-6" />
+                  </Badge>
+                </IconButton>
+              </Tooltip>
+
+              {/* Notification Bell */}
+              <NotificationBell />
+              
               {/* Avatar Button */}
               <Tooltip title="Account settings">
                 <IconButton
@@ -158,7 +168,7 @@ const MainNavbar: React.FC = () => {
                 >
                   <Avatar
                     alt={user?.name || "User"}
-                    src="/static/images/avatar/1.jpg"
+                    src={user?.avatarUrl}
                     sx={{ width: 32, height: 32, borderRadius: 0 }}
                   />
                 </IconButton>
@@ -237,7 +247,7 @@ const MainNavbar: React.FC = () => {
                 >
                   <Avatar
                     alt={user?.name || "User"}
-                    src="/static/images/avatar/1.jpg"
+                    src={user?.avatarUrl}
                     sx={{
                       width: 42,
                       height: 42,
@@ -358,6 +368,17 @@ const MainNavbar: React.FC = () => {
                   Settings
                 </MenuItem>
 
+                <MenuItem
+                  onClick={handleClose}
+                  component="a"
+                  href="/user/orders"
+                >
+                  <ListItemIcon>
+                    <ShoppingCartIcon className="w-5 h-5" />
+                  </ListItemIcon>
+                  My Vibes
+                </MenuItem>
+
                 {!isOrganizer && (
                   <MenuItem
                     onClick={handleClose}
@@ -399,7 +420,7 @@ const MainNavbar: React.FC = () => {
                   Logout
                 </MenuItem>
               </Menu>
-            </>
+            </div>
           ) : (
             <div className="flex items-center gap-2 lg:gap-3">
               <Link
@@ -418,169 +439,234 @@ const MainNavbar: React.FC = () => {
           )}
         </div>
 
-        {/* Mobile Menu Button */}
-        <button
-          onClick={toggle}
-          className="md:hidden text-gray-800 dark:text-white p-1.5 hover:text-[#ee2b8c] dark:hover:text-[#FF00FF] transition-colors"
-          aria-label="Toggle menu"
-        >
-          {isOpen ? <CloseIcon /> : <MenuIcon />}
-        </button>
+        {/* Mobile Actions */}
+        <div className="md:hidden flex items-center gap-1.5">
+          {isAuthenticated && (
+            <>
+              <IconButton 
+                size="small"
+                onClick={() => setCartOpen(true)}
+                sx={{ color: isDark ? "#fff" : "#1a1a1a" }}
+              >
+                <Badge badgeContent={cartItemsCount} color="primary" sx={{ "& .MuiBadge-badge": { borderRadius: 0 } }}>
+                  <ShoppingCartIcon className="size-5" />
+                </Badge>
+              </IconButton>
+              <NotificationBell />
+            </>
+          )}
+          <button
+            onClick={toggle}
+            className="text-gray-800 dark:text-white p-1.5 hover:text-[#ee2b8c] dark:hover:text-[#FF00FF] transition-colors"
+            aria-label="Toggle menu"
+          >
+            {isOpen ? <CloseIcon /> : <MenuIcon />}
+          </button>
+        </div>
       </header>
 
       {/* Mobile Menu Overlay */}
-      {isOpen && (
-        <div className="md:hidden fixed inset-0 top-[49px] z-40 bg-white/95 dark:bg-black/95 backdrop-blur-lg overflow-y-auto">
-          <nav className="flex flex-col items-center gap-3 py-6 px-5">
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="md:hidden fixed inset-0 top-[49px] z-40 bg-white/95 dark:bg-black/95 backdrop-blur-lg overflow-y-auto"
+          >
+            <nav className="flex flex-col items-center gap-3 py-6 px-5">
+              {/* User Profile Card (authenticated) */}
+              {isAuthenticated && (
+                <div className="w-full max-w-[280px] border-2 border-[#ee2b8c] dark:border-[#FF00FF] p-4 mb-2 shadow-[4px_4px_0px_0px_#ee2b8c] dark:shadow-[4px_4px_0px_0px_#FF00FF] bg-white dark:bg-[#0a0a0a]">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-11 h-11 border-2 border-[#ee2b8c] dark:border-[#FF00FF] shadow-[3px_3px_0px_0px_#ee2b8c] dark:shadow-[3px_3px_0px_0px_#FF00FF] overflow-hidden flex-shrink-0">
+                      <img
+                        src={user?.avatarUrl}
+                        alt={user?.name || "User"}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = "none";
+                        }}
+                      />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-black text-sm uppercase tracking-wide text-gray-900 dark:text-white truncate">
+                        {user?.name || "User"}
+                      </p>
+                      <p className="text-[10px] font-semibold text-gray-500 dark:text-gray-500 truncate">
+                        {user?.email || ""}
+                      </p>
+                    </div>
+                  </div>
 
-            {/* User Profile Card (authenticated) */}
-            {isAuthenticated && (
-              <div className="w-full max-w-[280px] border-2 border-[#ee2b8c] dark:border-[#FF00FF] p-4 mb-2 shadow-[4px_4px_0px_0px_#ee2b8c] dark:shadow-[4px_4px_0px_0px_#FF00FF] bg-white dark:bg-[#0a0a0a]">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-11 h-11 border-2 border-[#ee2b8c] dark:border-[#FF00FF] shadow-[3px_3px_0px_0px_#ee2b8c] dark:shadow-[3px_3px_0px_0px_#FF00FF] overflow-hidden flex-shrink-0">
-                    <img
-                      src="/static/images/avatar/1.jpg"
-                      alt={user?.name || "User"}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = "none";
-                      }}
-                    />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="font-black text-sm uppercase tracking-wide text-gray-900 dark:text-white truncate">
-                      {user?.name || "User"}
-                    </p>
-                    <p className="text-[10px] font-semibold text-gray-500 dark:text-gray-500 truncate">
-                      {user?.email || ""}
-                    </p>
-                  </div>
+                  {/* Organizer Store Card */}
+                  {isOrganizer && user?.organizer && (
+                    <Link
+                      href="/dashboard"
+                      onClick={close}
+                      className="flex items-center gap-3 p-2.5 bg-purple-50 dark:bg-[#A855F7]/10 border border-dashed border-[#A855F7]/40 hover:border-[#A855F7] transition-all group"
+                    >
+                      <div className="w-9 h-9 bg-[#A855F7] border-2 border-[#A855F7] shadow-[2px_2px_0px_0px_#7C3AED] flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        {user.organizer.logoUrl ? (
+                          <img
+                            src={user.organizer.logoUrl}
+                            alt={user.organizer.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <span className="text-white font-black text-sm">
+                            {user.organizer.name.charAt(0).toUpperCase()}
+                          </span>
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[9px] font-extrabold uppercase tracking-widest text-[#A855F7]">
+                          ⚡ My Event Organizer
+                        </p>
+                        <p className="text-xs font-bold text-gray-800 dark:text-white truncate group-hover:text-[#A855F7] transition-colors">
+                          {user.organizer.name}
+                        </p>
+                      </div>
+                      <span className="text-gray-400 text-xs">→</span>
+                    </Link>
+                  )}
                 </div>
+              )}
 
-                {/* Organizer Store Card */}
-                {isOrganizer && user?.organizer && (
+              {/* Navigation Links */}
+              <Link
+                href="/"
+                onClick={close}
+                className={`${
+                  pathname === "/"
+                    ? "text-[#ee2b8c] dark:text-[#FF00FF]"
+                    : "text-gray-800 dark:text-white"
+                } text-xl font-display font-bold uppercase tracking-wide transition-colors`}
+              >
+                Home
+              </Link>
+              <Link
+                href="/events"
+                onClick={close}
+                className={`${
+                  pathname.startsWith("/events")
+                    ? "text-[#ee2b8c] dark:text-[#FF00FF]"
+                    : "text-gray-800 dark:text-white"
+                } text-xl font-display font-bold uppercase tracking-wide hover:text-[#ee2b8c] dark:hover:text-[#FF00FF] transition-colors`}
+              >
+                Events
+              </Link>
+              <Link
+                href="/marketplace"
+                onClick={close}
+                className={`${
+                  pathname.startsWith("/marketplace")
+                    ? "text-[#ee2b8c] dark:text-[#FF00FF]"
+                    : "text-gray-800 dark:text-white"
+                } text-xl font-display font-bold uppercase tracking-wide hover:text-[#ee2b8c] dark:hover:text-[#FF00FF] transition-colors`}
+              >
+                Marketplace
+              </Link>
+              <Link
+                href="/community"
+                onClick={close}
+                className={`${
+                  pathname.startsWith("/community")
+                    ? "text-[#ee2b8c] dark:text-[#FF00FF]"
+                    : "text-gray-800 dark:text-white"
+                } text-xl font-display font-bold uppercase tracking-wide hover:text-[#ee2b8c] dark:hover:text-[#FF00FF] transition-colors`}
+              >
+                Community
+              </Link>
+
+              {/* Authenticated Action Links */}
+              {isAuthenticated && (
+                <div className="w-full max-w-[280px] flex flex-col gap-1.5 mt-3 border-t-2 border-dashed border-gray-200 dark:border-gray-800 pt-4">
                   <Link
-                    href="/dashboard"
+                    href="/user-referral"
                     onClick={close}
-                    className="flex items-center gap-3 p-2.5 bg-purple-50 dark:bg-[#A855F7]/10 border border-dashed border-[#A855F7]/40 hover:border-[#A855F7] transition-all group"
+                    className="flex items-center gap-3 px-3 py-2.5 text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-gray-300 hover:text-[#ee2b8c] dark:hover:text-[#ee2b8c] hover:bg-[#ee2b8c]/5 transition-all"
                   >
-                    <div className="w-9 h-9 bg-[#A855F7] border-2 border-[#A855F7] shadow-[2px_2px_0px_0px_#7C3AED] flex items-center justify-center flex-shrink-0 overflow-hidden">
-                      {user.organizer.logoUrl ? (
-                        <img
-                          src={user.organizer.logoUrl}
-                          alt={user.organizer.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <span className="text-white font-black text-sm">
-                          {user.organizer.name.charAt(0).toUpperCase()}
-                        </span>
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-[9px] font-extrabold uppercase tracking-widest text-[#A855F7]">
-                        ⚡ My Event Organizer
-                      </p>
-                      <p className="text-xs font-bold text-gray-800 dark:text-white truncate group-hover:text-[#A855F7] transition-colors">
-                        {user.organizer.name}
-                      </p>
-                    </div>
-                    <span className="text-gray-400 text-xs">→</span>
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                    </svg>
+                    Profile
                   </Link>
-                )}
-              </div>
-            )}
-
-            {/* Navigation Links */}
-            <Link
-              href="/events"
-              onClick={close}
-              className="text-[#ee2b8c] dark:text-[#00FFFF] text-xl font-display font-bold uppercase tracking-wide"
-            >
-              Events
-            </Link>
-            <Link
-              href="/marketplace"
-              onClick={close}
-              className="text-gray-800 dark:text-white text-xl font-display font-bold uppercase tracking-wide hover:text-[#ee2b8c] dark:hover:text-[#FF00FF] transition-colors"
-            >
-              Marketplace
-            </Link>
-            <Link
-              href="/community"
-              onClick={close}
-              className="text-gray-800 dark:text-white text-xl font-display font-bold uppercase tracking-wide hover:text-[#ee2b8c] dark:hover:text-[#FF00FF] transition-colors"
-            >
-              Community
-            </Link>
-
-            {/* Authenticated Action Links */}
-            {isAuthenticated && (
-              <div className="w-full max-w-[280px] flex flex-col gap-1.5 mt-3 border-t-2 border-dashed border-gray-200 dark:border-gray-800 pt-4">
-                <Link
-                  href="/user-referral"
-                  onClick={close}
-                  className="flex items-center gap-3 px-3 py-2.5 text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-gray-300 hover:text-[#ee2b8c] dark:hover:text-[#ee2b8c] hover:bg-[#ee2b8c]/5 transition-all"
-                >
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                  Profile
-                </Link>
-                <Link
-                  href="/settings"
-                  onClick={close}
-                  className="flex items-center gap-3 px-3 py-2.5 text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-gray-300 hover:text-[#ee2b8c] dark:hover:text-[#ee2b8c] hover:bg-[#ee2b8c]/5 transition-all"
-                >
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-                  Settings
-                </Link>
-
-                {!isOrganizer && (
                   <Link
-                    href="/become-organizer"
+                    href="/settings"
                     onClick={close}
-                    className="flex items-center gap-3 px-3 py-2.5 text-xs font-bold uppercase tracking-wider text-[#A855F7] hover:bg-[#A855F7]/10 transition-all"
+                    className="flex items-center gap-3 px-3 py-2.5 text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-gray-300 hover:text-[#ee2b8c] dark:hover:text-[#ee2b8c] hover:bg-[#ee2b8c]/5 transition-all"
                   >
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18 11v2h-2v-2h2zm-4 2v-2H6v2h8zM4 5h16v14H4V5zm0-2c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H4z"/></svg>
-                    Become Organizer
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" />
+                    </svg>
+                    Settings
                   </Link>
-                )}
 
-                <button
-                  onClick={() => {
-                    close();
-                    handleLogout();
-                  }}
-                  className="flex items-center gap-3 px-3 py-2.5 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-500/5 transition-all mt-1 border-t border-dashed border-gray-200 dark:border-gray-800 pt-3 w-full"
-                >
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
-                  Logout
-                </button>
-              </div>
-            )}
+                  <Link
+                    href="/user/orders"
+                    onClick={close}
+                    className="flex items-center gap-3 px-3 py-2.5 text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-gray-300 hover:text-[#ee2b8c] dark:hover:text-[#ee2b8c] hover:bg-[#ee2b8c]/5 transition-all"
+                  >
+                    <ShoppingCartIcon className="w-4 h-4" />
+                    My Vibes
+                  </Link>
 
-            {/* Guest Login/SignUp */}
-            {!isAuthenticated && (
-              <div className="flex flex-col gap-2 mt-4 w-full max-w-[200px]">
-                <Link
-                  href="/login"
-                  onClick={close}
-                  className="w-full text-center py-2.5 border-2 border-gray-800 dark:border-white text-gray-800 dark:text-white font-bold uppercase tracking-wider text-xs"
-                >
-                  Log In
-                </Link>
-                <Link
-                  href="/register"
-                  onClick={close}
-                  className="w-full text-center py-2.5 bg-[#ee2b8c] dark:bg-[#FF00FF] text-white dark:text-black font-bold uppercase tracking-wider text-xs shadow-[3px_3px_0px_0px_#d61f7a] dark:shadow-[3px_3px_0px_0px_#B026FF]"
-                >
-                  Sign Up
-                </Link>
-              </div>
-            )}
-          </nav>
-        </div>
-      )}
+                  {!isOrganizer && (
+                    <Link
+                      href="/become-organizer"
+                      onClick={close}
+                      className="flex items-center gap-3 px-3 py-2.5 text-xs font-bold uppercase tracking-wider text-[#A855F7] hover:bg-[#A855F7]/10 transition-all"
+                    >
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M18 11v2h-2v-2h2zm-4 2v-2H6v2h8zM4 5h16v14H4V5zm0-2c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H4z" />
+                      </svg>
+                      Become Organizer
+                    </Link>
+                  )}
 
+                  <button
+                    onClick={() => {
+                      close();
+                      handleLogout();
+                    }}
+                    className="flex items-center gap-3 px-3 py-2.5 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-500/5 transition-all mt-1 border-t border-dashed border-gray-200 dark:border-gray-800 pt-3 w-full"
+                  >
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" />
+                    </svg>
+                    Logout
+                  </button>
+                </div>
+              )}
+
+              {/* Guest Login/SignUp */}
+              {!isAuthenticated && (
+                <div className="flex flex-col gap-2 mt-4 w-full max-w-[200px]">
+                  <Link
+                    href="/login"
+                    onClick={close}
+                    className="w-full text-center py-2.5 border-2 border-gray-800 dark:border-white text-gray-800 dark:text-white font-bold uppercase tracking-wider text-xs"
+                  >
+                    Log In
+                  </Link>
+                  <Link
+                    href="/register"
+                    onClick={close}
+                    className="w-full text-center py-2.5 bg-[#ee2b8c] dark:bg-[#FF00FF] text-white dark:text-black font-bold uppercase tracking-wider text-xs shadow-[3px_3px_0px_0px_#d61f7a] dark:shadow-[3px_3px_0px_0px_#B026FF]"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
+              )}
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Cart Drawer */}
+      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
     </>
   );
 };

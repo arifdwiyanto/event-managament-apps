@@ -8,6 +8,7 @@ import PointsBalanceCard from "./PointsBalanceCard";
 import ReferralCrewCard from "./ReferralCrewCard";
 import RecentActivityCard from "./RecentActivityCard";
 import YourStashCard from "./YourStashCard";
+import { ImageCropperModal } from "@/features/imageCropper/components/ImageCropperModal";
 
 export const UserReferralView: React.FC = () => {
   const {
@@ -19,7 +20,14 @@ export const UserReferralView: React.FC = () => {
     couponDisplayCount,
     activityLoading,
     couponLoading,
+    isUploadingAvatar,
+    uploadProgress,
+    imageToCrop,
+    isCropperOpen,
     handleCopyCode,
+    handleAvatarChange,
+    handleCropComplete,
+    handleCropperClose,
     loadMoreActivities,
     loadMoreCoupons
   } = useUserReferralView();
@@ -51,7 +59,13 @@ export const UserReferralView: React.FC = () => {
 
       <div className="flex flex-col gap-4 md:gap-10">
         {/* Profile Header */}
-        <ProfileHeader profile={data.profile} onCopyCode={handleCopyCode} />
+        <ProfileHeader 
+          profile={data.profile} 
+          onCopyCode={handleCopyCode} 
+          onAvatarChange={handleAvatarChange}
+          isUploadingAvatar={isUploadingAvatar}
+          uploadProgress={uploadProgress}
+        />
 
         {/* Top Row - Balance & Referral */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-8 md:items-stretch">
@@ -89,6 +103,15 @@ export const UserReferralView: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <ImageCropperModal
+        open={isCropperOpen}
+        imageSrc={imageToCrop}
+        onClose={handleCropperClose}
+        onCropComplete={handleCropComplete}
+        title="Crop Your Avatar"
+        aspectRatio={1} // Square crop
+      />
     </div>
   );
 };

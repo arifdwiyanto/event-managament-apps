@@ -5,15 +5,16 @@ export interface IOrdersRepositoryProps {
   invoice: string;
   totalPrice: number;
   pointUsed: number;
-  customerId: string; 
+  customerId: string;
   eventId: string;
-  paymentMethod: string; 
+  paymentMethod: string;
   voucherId?: string;
+  promotionId?: string;
   items: {
-    ticketTypeId: string; 
+    ticketTypeId: string;
     qty: number;
     subTotal: number;
-    pricePerUnit?: number; 
+    pricePerUnit?: number;
     totalPrice?: number;
   }[];
 }
@@ -27,19 +28,22 @@ export class OrdersRepository {
     return await client.transaction.create({
       data: {
         invoice: data.invoice,
-        totalFinalPrice: data.totalPrice, 
-        totalOriginalPrice: data.totalPrice + (data.pointUsed || 0), 
+        totalFinalPrice: data.totalPrice,
+        totalOriginalPrice: data.totalPrice + (data.pointUsed || 0),
         pointsUsed: data.pointUsed,
-        userId: data.customerId, 
+        userId: data.customerId,
         eventId: data.eventId,
-        paymentMethod: data.paymentMethod, 
+        paymentMethod: data.paymentMethod,
         userCouponId: data.voucherId,
+        promotionId: data.promotionId,
         items: {
           create: data.items.map((item) => ({
-            ticketType: { connect: { id: item.ticketTypeId } }, 
+            ticketType: { connect: { id: item.ticketTypeId } },
             quantity: item.qty,
             totalPrice: item.subTotal,
-            pricePerUnit: item.pricePerUnit || (item.qty > 0 ? item.subTotal / item.qty : 0),
+            pricePerUnit:
+              item.pricePerUnit ||
+              (item.qty > 0 ? item.subTotal / item.qty : 0),
           })),
         },
       } as any,
@@ -54,9 +58,18 @@ export class OrdersRepository {
     skip?: number,
     take?: number,
   ): Promise<{ data: any[]; total: number }> => {
+    const { organizerId, ...restFilters } = filters;
+    const where: any = { ...restFilters };
+
+    if (organizerId) {
+      where.event = {
+        organizerId: organizerId,
+      };
+    }
+
     const [data, total] = await prisma.$transaction([
       prisma.transaction.findMany({
-        where: filters,
+        where,
         include: {
           user: true,
           event: true,
@@ -70,7 +83,7 @@ export class OrdersRepository {
         take,
         orderBy: { transactionDate: "desc" },
       }),
-      prisma.transaction.count({ where: filters }),
+      prisma.transaction.count({ where }),
     ]);
 
     return { data, total };
@@ -81,7 +94,12 @@ export class OrdersRepository {
       where: { id },
       include: {
         user: true,
-        event: true,
+        event: {
+          include: {
+            organizer: true,
+          },
+        },
+        promotion: true,
         items: {
           include: {
             ticketType: true,
