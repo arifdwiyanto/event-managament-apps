@@ -58,7 +58,10 @@ const EventDetailView: React.FC<EventDetailViewProps> = ({ eventId }) => {
                 <div className="w-2 h-2 rounded-full bg-neon-cyan shadow-[0_0_8px_#00FFDD]"></div>
                 Organizer
               </h3>
-              <Link href={`/organizer/${event.organizerId}`} className="flex items-center gap-5 hover:opacity-80 transition-opacity">
+              <Link
+                href={`/organizer/${event.organizerId}`}
+                className="flex items-center gap-5 hover:opacity-80 transition-opacity"
+              >
                 <div className="size-16 rounded-xl bg-gradient-to-br from-neon-purple to-neon-magenta flex items-center justify-center border border-white/20 shadow-xl overflow-hidden relative group/org">
                   <div className="absolute inset-0 bg-black/20 group-hover/org:bg-transparent transition-colors"></div>
                   <span className="font-black text-xl text-white relative z-10 drop-shadow-md">
@@ -75,7 +78,7 @@ const EventDetailView: React.FC<EventDetailViewProps> = ({ eventId }) => {
                     4.8 Rating
                   </p>
                 </div>
-              </div>
+              </Link>
             </div>
           </div>
         </div>
