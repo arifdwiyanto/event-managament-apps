@@ -5,8 +5,11 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import { ReactNode, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ThemeProvider as HypeThemeProvider, FloatingThemeToggle } from "@/features/theme";
-
+import {
+  ThemeProvider as HypeThemeProvider,
+  FloatingThemeToggle,
+} from "@/features/theme";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const theme = createTheme({
@@ -56,14 +59,17 @@ const theme = createTheme({
 });
 
 export default function AppProvider({ children }: { children: ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient({
-    defaultOptions: {
-      queries: {
-        refetchOnWindowFocus: false,
-        retry: 1,
-      },
-    },
-  }));
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            refetchOnWindowFocus: false,
+            retry: 1,
+          },
+        },
+      }),
+  );
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -78,7 +84,11 @@ export default function AppProvider({ children }: { children: ReactNode }) {
                 exit={{ opacity: 0, y: 10 }}
                 transition={{ duration: 0.3 }}
               >
-                {children}
+                <GoogleOAuthProvider
+                  clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}
+                >
+                  {children}
+                </GoogleOAuthProvider>
               </motion.div>
             </AnimatePresence>
             <FloatingThemeToggle />
@@ -88,4 +98,3 @@ export default function AppProvider({ children }: { children: ReactNode }) {
     </QueryClientProvider>
   );
 }
-

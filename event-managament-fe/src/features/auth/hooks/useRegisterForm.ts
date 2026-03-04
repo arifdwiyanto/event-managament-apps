@@ -35,7 +35,7 @@ export const useRegisterForm = () => {
       organizerName: "",
       organizerDescription: "",
     },
-    validationSchema: registerSchema, // Changed to use registerSchema
+    validationSchema: registerSchema,
     onSubmit: async (values) => {
       setIsLoading(true);
       try {
@@ -50,9 +50,11 @@ export const useRegisterForm = () => {
             router.push("/login");
           }, 2000);
         } else {
-             setToast({
+          setToast({
             open: true,
-            message: useStoreLogin.getState().error || "Registration failed. Please try again.",
+            message:
+              useStoreLogin.getState().error ||
+              "Registration failed. Please try again.",
             severity: "error",
           });
         }

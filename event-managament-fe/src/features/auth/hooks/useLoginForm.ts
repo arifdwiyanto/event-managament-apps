@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { loginSchema } from "../validations/auth.validation";
@@ -15,7 +14,7 @@ export const useLoginForm = () => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { signIn, accessToken, refreshToken, error } = useStoreLogin();
+  const { signIn, accessToken } = useStoreLogin();
   const [toast, setToast] = useState({
     open: false,
     message: "",
@@ -45,7 +44,9 @@ export const useLoginForm = () => {
         } else {
           setToast({
             open: true,
-            message: useStoreLogin.getState().error || "Login Failed, please verify your email and password",
+            message:
+              useStoreLogin.getState().error ||
+              "Login Failed, please verify your email and password",
             severity: "error",
           });
         }

@@ -17,7 +17,7 @@ export interface SignIn {
 export interface AuthUser {
   id: string;
   name: string;
-  avatarUrl:string;
+  avatarUrl: string;
   email: string;
   roles: string[];
   organizer?: {
@@ -25,8 +25,8 @@ export interface AuthUser {
     name: string;
     description?: string;
     logoUrl?: string;
-    createdAt:string;
-    isVerified:boolean;
+    createdAt: string;
+    isVerified: boolean;
     teams?: {
       role: string;
       user: {
@@ -37,6 +37,15 @@ export interface AuthUser {
   } | null;
 }
 
+export interface GoogleLoginResponseData {
+  user: AuthUser;
+  accessToken: string;
+  refreshToken: string;
+}
+export interface ApiResponse<T> {
+  message: string;
+  data: T;
+}
 export interface AuthState {
   user: AuthUser | null;
   accessToken: string | null;
@@ -44,6 +53,7 @@ export interface AuthState {
   error: string | null;
   isAuthenticated: boolean;
 
+  googleSignIn: (idToken: string) => Promise<boolean>;
   signUp: (data: SignUp) => Promise<boolean>;
   signIn: (data: SignIn) => Promise<boolean>;
   me: () => Promise<AuthUser | null>;

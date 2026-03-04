@@ -61,7 +61,23 @@ export class AuthController {
       next(error);
     }
   };
+  public googleLogin = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
+    try {
+      const { idToken } = req.body as { idToken: string };
+      const result = await this.authService.googleLogin(idToken);
 
+      res.status(200).json({
+        message: "successfully Login By google",
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
   public me = async (
     req: Request,
     res: Response,

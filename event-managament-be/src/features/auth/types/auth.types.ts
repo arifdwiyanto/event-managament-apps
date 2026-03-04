@@ -26,3 +26,23 @@ export interface User {
   roles: string[];
   referralCode?: string;
 }
+export interface UpsertUserGoogleRequest {
+  email: string;
+  name: string;
+  avatarUrl?: string;
+}
+export interface TokenPayload {
+  id: string;
+  email: string;
+  name: string;
+  roles: string[];
+}
+
+export interface TokenResponse {
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface GoogleLoginResponse extends TokenResponse {
+  user: User;
+}

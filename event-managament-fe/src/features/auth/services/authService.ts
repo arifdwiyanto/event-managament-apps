@@ -1,5 +1,10 @@
 import apiFetch from "../../../services/apiFetch";
-import { SignUp, SignIn } from "../types/auth.types";
+import {
+  SignUp,
+  SignIn,
+  ApiResponse,
+  GoogleLoginResponseData,
+} from "../types/auth.types";
 
 export const signUp = async (data: SignUp) => {
   const response = await apiFetch.post("/auth/register", data);
@@ -8,6 +13,16 @@ export const signUp = async (data: SignUp) => {
 
 export const signIn = async (data: SignIn) => {
   const response = await apiFetch.post("/auth/login", data);
+  return response.data;
+};
+
+export const googleLogin = async (
+  idToken: string,
+): Promise<ApiResponse<GoogleLoginResponseData>> => {
+  const response = await apiFetch.post<ApiResponse<GoogleLoginResponseData>>(
+    "/auth/google-login",
+    { idToken },
+  );
   return response.data;
 };
 export const signOut = async () => {
@@ -20,9 +35,9 @@ export const getMe = async () => {
 };
 
 export const updateUserAvatar = async (
-  id: string, 
+  id: string,
   formData: FormData,
-  onUploadProgress?: (progressEvent: any) => void
+  onUploadProgress?: (progressEvent: any) => void,
 ) => {
   const response = await apiFetch.patch(`/users/${id}/avatar`, formData, {
     headers: {

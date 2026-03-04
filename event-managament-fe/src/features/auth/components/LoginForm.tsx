@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { useLoginForm } from "../hooks";
+import { useGoogleLogin, useLoginForm } from "../hooks";
 import {
   BoltIcon,
   EmailIcon,
@@ -15,6 +15,7 @@ import {
 } from "./ui/Icons";
 import { useStoreLogin } from "../store/useAuthStore";
 import { Alert, CircularProgress, Snackbar } from "@mui/material";
+import { GoogleLogin } from "@react-oauth/google";
 
 const LoginForm: React.FC = () => {
   const {
@@ -25,7 +26,13 @@ const LoginForm: React.FC = () => {
     toast,
     handleCloseToast,
   } = useLoginForm();
-  const { isAuthenticated, accessToken } = useStoreLogin();
+
+  const {
+    handleGoogleSuccess,
+    loading: googleLoading,
+    toast: googleToast,
+    handleCloseToast: handleCloseGoogleToast,
+  } = useGoogleLogin();
   return (
     <div className="w-full max-w-[420px] flex flex-col gap-6 relative z-10">
       {/* Header */}
@@ -160,11 +167,19 @@ const LoginForm: React.FC = () => {
       </div>
 
       {/* Social Login */}
-      <div className="flex flex-col gap-4">
-        <button className="flex items-center justify-center gap-2 h-11 border-2 border-gray-200 dark:border-zinc-800 bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors text-black dark:text-white font-bold text-xs uppercase tracking-wide shadow-[2px_2px_0px_0px_#ccc] dark:shadow-[2px_2px_0px_0px_#333] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] w-full">
-          <GoogleIcon />
-          Continue with Google
-        </button>
+      <div className="flex flex-col gap-4 items-center w-full">
+        {googleLoading ? (
+          <CircularProgress size={24} />
+        ) : (
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={() => console.error("Google Login Failed")}
+            useOneTap
+            theme="filled_blue"
+            shape="square"
+            width="100%"
+          />
+        )}
       </div>
 
       {/* Footer CTA */}
@@ -192,6 +207,22 @@ const LoginForm: React.FC = () => {
           sx={{ width: "100%" }}
         >
           {toast.message}
+        </Alert>
+      </Snackbar>
+      {/* Google Login Toast */}
+      <Snackbar
+        open={googleToast.open}
+        autoHideDuration={6000}
+        onClose={handleCloseGoogleToast}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleCloseGoogleToast}
+          severity={googleToast.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {googleToast.message}
         </Alert>
       </Snackbar>
     </div>
