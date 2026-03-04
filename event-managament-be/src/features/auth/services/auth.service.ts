@@ -10,6 +10,8 @@ import { UserPointRepository } from "../../userPoint/repositories/userPoint.repo
 import { prisma } from "../../../config/prisma.js";
 import { UserCouponRepository } from "../../userCoupons/repositories/voucher.repository.js";
 import { NotificationService } from "../../notifications/services/notification.service.js";
+import { googleClient } from "src/config/google.js";
+import { GoogleLoginResponse, TokenPayload } from "../types/auth.types.js";
 
 export class AuthService {
   private UserPointRepository = new UserPointRepository();
@@ -56,28 +58,29 @@ export class AuthService {
         // Give Points to Referrer (10,000 pts, 3 months exp)
         const pointExpiresAt = new Date();
         pointExpiresAt.setMonth(pointExpiresAt.getMonth() + 3);
-        
+
         await this.UserPointRepository.addPoint(
-            referrerId,
-            10000,
-            pointExpiresAt,
-            tx
+          referrerId,
+          10000,
+          pointExpiresAt,
+          tx,
         );
 
         // Give Coupon to Referee (10% discount, 3 months exp)
         const couponExpiresAt = new Date();
         couponExpiresAt.setMonth(couponExpiresAt.getMonth() + 3);
-        const couponCode = `REF-${newUser.id.substring(0, 5)}-${Math.random().toString(36).substring(2, 5)}`.toUpperCase();
-        
+        const couponCode =
+          `REF-${newUser.id.substring(0, 5)}-${Math.random().toString(36).substring(2, 5)}`.toUpperCase();
+
         await this.UserCouponRepository.createUserCoupon(
-            {
-                userId: newUser.id,
-                code: couponCode,
-                discountPercentage: 10,
-                expiresAt: couponExpiresAt,
-                isUsed: false
-            },
-                tx
+          {
+            userId: newUser.id,
+            code: couponCode,
+            discountPercentage: 10,
+            expiresAt: couponExpiresAt,
+            isUsed: false,
+          },
+          tx,
         );
 
         // Notify Referrer
@@ -85,10 +88,11 @@ export class AuthService {
           referrerId,
           {
             title: "Bonus Referral! 🎁",
-            message: "Selamat! Kamu baru saja mendapatkan 10.000 poin karena temanmu menggunakan kode referralmu.",
+            message:
+              "Selamat! Kamu baru saja mendapatkan 10.000 poin karena temanmu menggunakan kode referralmu.",
             type: "EARN_REFERRAL",
           },
-          tx
+          tx,
         );
 
         // Notify Referee
@@ -96,10 +100,11 @@ export class AuthService {
           newUser.id,
           {
             title: "Selamat Datang! ✨",
-            message: "Kamu baru saja mendapatkan kupon diskon 10% karena menggunakan kode referral. Selamat berbelanja!",
+            message:
+              "Kamu baru saja mendapatkan kupon diskon 10% karena menggunakan kode referral. Selamat berbelanja!",
             type: "REWARD",
           },
-          tx
+          tx,
         );
       }
 
@@ -144,32 +149,32 @@ export class AuthService {
     let organizer = null;
     if (roles.includes("ORGANIZER")) {
       organizer = await prisma.organizer.findFirst({
-        where: { 
+        where: {
           teams: {
             some: {
-              userId: user.id
-            }
-          }
+              userId: user.id,
+            },
+          },
         },
-        select: { 
-          id: true, 
-          name: true, 
-          description: true, 
+        select: {
+          id: true,
+          name: true,
+          description: true,
           logoUrl: true,
-          createdAt:true,
-          isVerified:true,
-          owner:true,
+          createdAt: true,
+          isVerified: true,
+          owner: true,
           teams: {
             select: {
               role: true,
               user: {
                 select: {
                   id: true,
-                  name: true
-                }
-              }
-            }
-          } 
+                  name: true,
+                },
+              },
+            },
+          },
         },
       });
     }
@@ -177,7 +182,7 @@ export class AuthService {
     return {
       user: {
         id: user.id,
-        avatarUrl:user.avatarUrl,
+        avatarUrl: user.avatarUrl,
         name: user.name,
         email: user.email,
         roles,
@@ -185,6 +190,44 @@ export class AuthService {
       },
       ...token,
     };
+  };
+
+  public googleLogin = async (idToken: string): Promise<any> => {
+    try {
+      const ticket = await googleClient.verifyIdToken({
+        idToken,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+
+      const payload = ticket.getPayload();
+
+      if (!payload || !payload.email) {
+        throw new Error("Invalid Google Token");
+      }
+
+      const user = await this.AuthRepository.upsertUserGoogle({
+        email: payload.email,
+        name: payload.name || "Google User",
+        avatarUrl: payload.picture,
+      });
+
+      const roles = user.roles.map((r) => r.role);
+      const tokens = await this.generateTokens({ ...user, roles });
+
+      return {
+        user: {
+          id: user.id,
+          avatarUrl: user.avatarUrl,
+          name: user.email,
+          email: user.email,
+          roles,
+        },
+        ...tokens,
+      };
+    } catch (error) {
+      console.error("Google Verify error:", error);
+      throw new Error("Google login failed");
+    }
   };
 
   public getMe = async (id: string): Promise<any> => {
@@ -199,17 +242,17 @@ export class AuthService {
     let organizer = null;
     if (roles.includes("ORGANIZER")) {
       organizer = await prisma.organizer.findFirst({
-        where: { 
+        where: {
           teams: {
             some: {
-              userId: id
-            }
-          }
+              userId: id,
+            },
+          },
         },
-        select: { 
-          id: true, 
-          name: true, 
-          description: true, 
+        select: {
+          id: true,
+          name: true,
+          description: true,
           logoUrl: true,
           isVerified: true,
           createdAt: true,
@@ -220,18 +263,18 @@ export class AuthService {
               user: {
                 select: {
                   id: true,
-                  name: true
-                }
-              }
-            }
-          }
+                  name: true,
+                },
+              },
+            },
+          },
         },
       });
     }
 
     return {
       id: user.id,
-      avatarUrl:user.avatarUrl,
+      avatarUrl: user.avatarUrl,
       name: user.name,
       email: user.email,
       referralCode: user.referralCode,

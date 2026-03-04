@@ -1,6 +1,12 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { signIn, signUp, getMe, signOut } from "../services/authService";
+import {
+  signIn,
+  signUp,
+  getMe,
+  signOut,
+  googleLogin,
+} from "../services/authService";
 import Cookies from "js-cookie";
 import { AuthState, SignIn, SignUp } from "../types/auth.types";
 
@@ -12,7 +18,33 @@ export const useStoreLogin = create<AuthState>()(
       refreshToken: null,
       error: null,
       isAuthenticated: false,
+      googleSignIn: async (idToken: string): Promise<boolean> => {
+        try {
+          const res = await googleLogin(idToken);
+          const { user, accessToken, refreshToken } = res.data;
 
+          Cookies.set("token", accessToken);
+          Cookies.set("refreshToken", refreshToken);
+
+          set({
+            user,
+            accessToken,
+            refreshToken,
+            error: null,
+            isAuthenticated: true,
+          });
+          return true;
+        } catch (error) {
+          console.error("Login By Google Failed", error);
+          const errorMessage =
+            error instanceof Error ? error.message : "Google Login Failed";
+          set({
+            error: errorMessage,
+            isAuthenticated: false,
+          });
+          return false;
+        }
+      },
       signIn: async (data: SignIn) => {
         try {
           const res = await signIn(data);
@@ -52,7 +84,7 @@ export const useStoreLogin = create<AuthState>()(
           return true;
         } catch (error: any) {
           console.error("Registration failed", error);
-           const errorMessage =
+          const errorMessage =
             error.response?.data?.message ||
             error.error?.message ||
             error.message ||

@@ -1,9 +1,17 @@
 import React, { useState, useCallback } from "react";
 import Cropper from "react-easy-crop";
 import { Area } from "react-easy-crop";
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Slider, Typography, Box } from "@mui/material";
-import {ImageCropperModalProps} from "../types"
-
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Slider,
+  Typography,
+  Box,
+} from "@mui/material";
+import { ImageCropperModalProps } from "../types";
 
 import { useImageCropper } from "../hooks/useImageCropper";
 
@@ -13,7 +21,7 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
   onClose,
   onCropComplete,
   title = "Crop Image",
-  aspectRatio = 1,
+  aspectRatio = 3 / 4,
 }) => {
   const {
     crop,
@@ -29,7 +37,10 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>{title}</DialogTitle>
-      <DialogContent dividers sx={{ p: 0, position: "relative", height: 400, bgcolor: "#333" }}>
+      <DialogContent
+        dividers
+        sx={{ p: 0, position: "relative", height: 400, bgcolor: "#333" }}
+      >
         {imageSrc && (
           <Cropper
             image={imageSrc}
@@ -42,7 +53,15 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
           />
         )}
       </DialogContent>
-      <DialogActions sx={{ flexDirection: "column", px: 3, py: 2, alignItems: "stretch", gap: 2 }}>
+      <DialogActions
+        sx={{
+          flexDirection: "column",
+          px: 3,
+          py: 2,
+          alignItems: "stretch",
+          gap: 2,
+        }}
+      >
         <Box sx={{ width: "100%", px: 2 }}>
           <Typography gutterBottom variant="caption">
             Zoom
@@ -56,11 +75,23 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
             onChange={(e, zoom) => setZoom(Number(zoom))}
           />
         </Box>
-        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1, width: "100%" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: 1,
+            width: "100%",
+          }}
+        >
           <Button onClick={onClose} disabled={isProcessing} color="inherit">
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={isProcessing || !imageSrc} variant="contained" color="primary">
+          <Button
+            onClick={handleSave}
+            disabled={isProcessing || !imageSrc}
+            variant="contained"
+            color="primary"
+          >
             {isProcessing ? "Processing..." : "Crop & Save"}
           </Button>
         </Box>

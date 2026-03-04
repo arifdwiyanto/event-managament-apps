@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { useRegisterForm } from "../hooks";
+import { useGoogleLogin, useRegisterForm } from "../hooks";
 import {
   UserIcon,
   EmailIcon,
@@ -14,6 +14,7 @@ import {
   GoogleIcon,
 } from "./ui/Icons";
 import { Snackbar, Alert, CircularProgress } from "@mui/material";
+import { GoogleLogin } from "@react-oauth/google";
 
 const RegisterForm: React.FC = () => {
   const {
@@ -24,7 +25,12 @@ const RegisterForm: React.FC = () => {
     toast,
     handleCloseToast,
   } = useRegisterForm();
-
+  const {
+    handleGoogleSuccess,
+    loading: googleLoading,
+    toast: googleToast,
+    handleCloseToast: handleCloseGoogleToast,
+  } = useGoogleLogin();
   return (
     <div className="w-full max-w-[440px] flex flex-col gap-6 relative z-10">
       <div className="flex flex-col gap-1 mb-2">
@@ -35,7 +41,7 @@ const RegisterForm: React.FC = () => {
           Start earning rewards and get exclusive access.
         </p>
       </div>
-      
+
       {/* Role Selection */}
       <div className="flex gap-4 mb-2">
         <label className="flex-1 cursor-pointer group">
@@ -299,11 +305,19 @@ const RegisterForm: React.FC = () => {
       </div>
 
       {/* Social Login */}
-      <div className="flex flex-col gap-4">
-        <button className="flex items-center justify-center gap-2 h-11 border-2 border-gray-200 dark:border-zinc-800 bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors text-black dark:text-white font-bold text-xs uppercase tracking-wide shadow-[2px_2px_0px_0px_#ccc] dark:shadow-[2px_2px_0px_0px_#333] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] w-full">
-          <GoogleIcon />
-          Continue with Google
-        </button>
+      <div className="flex flex-col gap-4 items-center w-full">
+        {googleLoading ? (
+          <CircularProgress size={24} />
+        ) : (
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={() => console.error("Google Login Failed")}
+            useOneTap
+            theme="filled_blue"
+            shape="square"
+            width="100%"
+          />
+        )}
       </div>
 
       {/* Snackbar for Feedback */}
@@ -320,6 +334,22 @@ const RegisterForm: React.FC = () => {
           sx={{ width: "100%" }}
         >
           {toast.message}
+        </Alert>
+      </Snackbar>
+      {/* Google Login Toast */}
+      <Snackbar
+        open={googleToast.open}
+        autoHideDuration={6000}
+        onClose={handleCloseGoogleToast}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleCloseGoogleToast}
+          severity={googleToast.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {googleToast.message}
         </Alert>
       </Snackbar>
     </div>
