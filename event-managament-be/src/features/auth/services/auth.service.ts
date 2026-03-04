@@ -10,7 +10,7 @@ import { UserPointRepository } from "../../userPoint/repositories/userPoint.repo
 import { prisma } from "../../../config/prisma.js";
 import { UserCouponRepository } from "../../userCoupons/repositories/voucher.repository.js";
 import { NotificationService } from "../../notifications/services/notification.service.js";
-import { googleClient } from "src/config/google.js";
+import { googleClient } from "../../../config/google.js";
 import { GoogleLoginResponse, TokenPayload } from "../types/auth.types.js";
 
 export class AuthService {
