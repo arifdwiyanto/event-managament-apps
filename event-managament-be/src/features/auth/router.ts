@@ -18,6 +18,7 @@ export class AuthRouter {
     this.router.post("/logout", this.authController.logout);
     this.router.get("/me", verifyToken, this.authController.me);
     this.router.post("/refresh-token", this.authController.refreshToken);
+    this.router.post("/google-login", this.authController.googleLogin);
   };
 
   public getRouter = (): Router => {
