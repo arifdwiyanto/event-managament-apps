@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useFormik } from "formik";
 import CreateEventBasics from "./createForm/CreateEventBasic";
 import CreateEventDateTimeLocation from "./createForm/CreateEventDateTimeLocation";
 import CreateEventHeader from "./createForm/CreateEventHeader";
@@ -11,6 +12,7 @@ import CreateEventTickets, {
 import { useRouter } from "next/navigation";
 import { useStoreLogin } from "@/features/auth/store/useAuthStore";
 import { useManageEventsData } from "../hooks/useManageEventsData";
+import { createEventValidationSchema } from "../schemas/createEvent.schemas";
 import {
   Alert,
   Box,
@@ -33,15 +35,24 @@ const CreateEventView = () => {
     createError,
   } = useManageEventsData();
 
-  const [name, setName] = useState("");
-  const [categoryId, setCategoryId] = useState("");
-  const [description, setDescription] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [location, setLocation] = useState("");
-  const [tickets, setTickets] = useState<TicketTier[]>([]);
-
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      categoryId: "",
+      description: "",
+      startDate: "",
+      endDate: "",
+      location: "",
+      tickets: [] as TicketTier[],
+      imageFile: null as File | null,
+    },
+    validationSchema: createEventValidationSchema,
+    validateOnChange: true,
+    validateOnBlur: true,
+    onSubmit: async (values) => {
+      handlePublish(values);
+    },
+  });
 
   // Snackbar State
   const [snackbar, setSnackbar] = useState<{
@@ -59,10 +70,10 @@ const CreateEventView = () => {
   };
 
   useEffect(() => {
-    if (!categoryId && categories.length > 0) {
-      setCategoryId(categories[0].id);
+    if (!formik.values.categoryId && categories.length > 0) {
+      formik.setFieldValue("categoryId", categories[0].id);
     }
-  }, [categories, categoryId]);
+  }, [categories, formik.values.categoryId]);
 
   const handleCancel = () => {
     router.push("/dashboard/events");
@@ -72,14 +83,19 @@ const CreateEventView = () => {
     console.log("Draft saved");
   };
 
-  const handlePublish = async () => {
-    if (!name || !categoryId || !startDate || !endDate || !location) {
-      setSnackbar({
-        open: true,
-        message: "Please fill in all required basic details.",
-        severity: "warning",
-      });
-
+  const handlePublish = async (values: typeof formik.values) => {
+    // Validate at submit time
+    try {
+      await createEventValidationSchema.validate(values, { abortEarly: false });
+    } catch (error: any) {
+      if (error.inner && error.inner.length > 0) {
+        const firstError = error.inner[0];
+        setSnackbar({
+          open: true,
+          message: firstError.message,
+          severity: "warning",
+        });
+      }
       return;
     }
 
@@ -90,7 +106,6 @@ const CreateEventView = () => {
         message: "Error: Only organizers can create events.",
         severity: "error",
       });
-
       return;
     }
 
@@ -98,21 +113,21 @@ const CreateEventView = () => {
       await createEvent(
         {
           organizerId,
-          categoryId,
-          name,
-          description,
-          location,
-          startDate: new Date(startDate).toISOString(),
-          endDate: new Date(endDate).toISOString(),
-          isPaid: tickets.some((t) => Number(t.price) > 0),
-          ticketTypes: tickets.map((t) => ({
+          categoryId: values.categoryId,
+          name: values.name,
+          description: values.description,
+          location: values.location,
+          startDate: new Date(values.startDate).toISOString(),
+          endDate: new Date(values.endDate).toISOString(),
+          isPaid: values.tickets.some((t) => Number(t.price) > 0),
+          ticketTypes: values.tickets.map((t) => ({
             name: t.name || "Regular",
             price: Number(t.price) || 0,
             quota: Number(t.quantity) || 0,
             description: t.description || undefined,
           })),
         },
-        imageFile || undefined,
+        values.imageFile || undefined,
       );
 
       setSnackbar({
@@ -189,37 +204,19 @@ const CreateEventView = () => {
               boxShadow: 2,
             }}
           >
-            <CreateEventBasics
-              name={name}
-              setName={setName}
-              categoryId={categoryId}
-              setCategoryId={setCategoryId}
-              description={description}
-              setDescription={setDescription}
-              categories={categories}
-            />
+            <CreateEventBasics formik={formik} categories={categories} />
 
             <Divider sx={{ my: 5 }} />
 
-            <CreateEventDateTimeLocation
-              startDate={startDate}
-              setStartDate={setStartDate}
-              endDate={endDate}
-              setEndDate={setEndDate}
-              location={location}
-              setLocation={setLocation}
-            />
+            <CreateEventDateTimeLocation formik={formik} />
 
             <Divider sx={{ my: 5 }} />
 
-            <CreateEventTickets tickets={tickets} setTickets={setTickets} />
+            <CreateEventTickets formik={formik} />
 
             <Divider sx={{ my: 5 }} />
 
-            <CreateEventMedia
-              imageFile={imageFile}
-              setImageFile={setImageFile}
-            />
+            <CreateEventMedia formik={formik} />
           </Box>
 
           {/* Publish Action */}
@@ -241,8 +238,8 @@ const CreateEventView = () => {
               </Alert>
             )}
             <Button
-              onClick={handlePublish}
-              disabled={isCreating}
+              onClick={() => formik.handleSubmit()}
+              disabled={isCreating || !formik.isValid}
               variant="contained"
               fullWidth
               size="large"

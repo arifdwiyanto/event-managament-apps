@@ -1,25 +1,16 @@
 import { Category } from "@/features/events/types/event.types";
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
-import { Box, Chip, Paper, Stack, TextField, Typography } from "@mui/material";
+import { Box, Chip, Paper, Stack, TextField, Typography, FormHelperText } from "@mui/material";
 import * as React from "react";
+import { FormikProps } from "formik";
 
 interface ICreateEventBasicsProps {
-  name: string;
-  setName: (val: string) => void;
-  categoryId: string;
-  setCategoryId: (val: string) => void;
-  description: string;
-  setDescription: (val: string) => void;
+  formik: FormikProps<any>;
   categories: Category[];
 }
 
 const CreateEventBasics: React.FC<ICreateEventBasicsProps> = ({
-  name,
-  setName,
-  categoryId,
-  setCategoryId,
-  description,
-  setDescription,
+  formik,
   categories,
 }) => {
   return (
@@ -40,12 +31,16 @@ const CreateEventBasics: React.FC<ICreateEventBasicsProps> = ({
             color="text.secondary"
             sx={{ display: "block", mb: 1 }}
           >
-            Event Name
+            Event Name *
           </Typography>
           <TextField
             fullWidth
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            name="name"
+            value={formik.values.name}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.name && Boolean(formik.errors.name)}
+            helperText={formik.touched.name && typeof formik.errors.name === 'string' ? formik.errors.name : ''}
             placeholder="e.g. Summer Vibes Festival 2024"
             variant="outlined"
             sx={{
@@ -65,18 +60,18 @@ const CreateEventBasics: React.FC<ICreateEventBasicsProps> = ({
             color="text.secondary"
             sx={{ display: "block", mb: 1 }}
           >
-            Category
+            Category *
           </Typography>
           <Stack direction="row" flexWrap="wrap" gap={1}>
             {categories.map((cat) => (
               <Chip
                 key={cat.id}
                 label={cat.name}
-                onClick={() => setCategoryId(cat.id)}
+                onClick={() => formik.setFieldValue("categoryId", cat.id)}
                 sx={{
                   fontWeight: "bold",
                   borderRadius: 0.5,
-                  ...(categoryId === cat.id
+                  ...(formik.values.categoryId === cat.id
                     ? {
                         bgcolor: "#ee2b8c",
                         color: "white",
@@ -87,6 +82,11 @@ const CreateEventBasics: React.FC<ICreateEventBasicsProps> = ({
               />
             ))}
           </Stack>
+          {formik.touched.categoryId && formik.errors.categoryId && (
+            <FormHelperText sx={{ color: "error.main", mt: 1 }}>
+              {typeof formik.errors.categoryId === 'string' ? formik.errors.categoryId : ''}
+            </FormHelperText>
+          )}
         </Box>
 
         {/* Description */}
@@ -101,15 +101,22 @@ const CreateEventBasics: React.FC<ICreateEventBasicsProps> = ({
           </Typography>
           <Paper
             variant="outlined"
-            sx={{ borderRadius: 1, overflow: "hidden" }}
+            sx={{ 
+              borderRadius: 1, 
+              overflow: "hidden",
+              borderColor: formik.touched.description && formik.errors.description ? "#d32f2f" : "inherit",
+            }}
           >
             {/* Textarea */}
             <TextField
               fullWidth
               multiline
               rows={4}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              name="description"
+              value={formik.values.description}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.description && Boolean(formik.errors.description)}
               placeholder="Tell people what makes your event special..."
               variant="standard"
               slotProps={{
@@ -120,6 +127,11 @@ const CreateEventBasics: React.FC<ICreateEventBasicsProps> = ({
               }}
             />
           </Paper>
+          {formik.touched.description && formik.errors.description && (
+            <FormHelperText sx={{ color: "error.main", mt: 1 }}>
+              {typeof formik.errors.description === 'string' ? formik.errors.description : ''}
+            </FormHelperText>
+          )}
         </Box>
       </Stack>
     </Box>

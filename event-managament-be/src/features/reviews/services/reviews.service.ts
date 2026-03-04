@@ -1,4 +1,4 @@
-﻿import { OrdersItemRepository } from "src/features/orders/repositories/ordersItem.repository.js";
+﻿import { OrdersItemRepository } from "../../orders/repositories/ordersItem.repository.js";
 import { ReviewsRepository } from "../repositories/reviews.repository.js";
 
 export class ReviewsService {
@@ -10,11 +10,14 @@ export class ReviewsService {
     this.ordersItemRepository = new OrdersItemRepository();
   }
 
-  public create = async (data: {
-    rating: number;
-    feedback?: string;
-    transactionItemId: string;
-  }): Promise<any> => {
+  public create = async (
+    data: {
+      rating: number;
+      feedback?: string;
+      transactionItemId: string;
+    },
+    userId: string,
+  ): Promise<any> => {
     const item = await this.ordersItemRepository.findById(
       data.transactionItemId,
     );
@@ -24,21 +27,37 @@ export class ReviewsService {
     }
 
     const eventId = item.ticketType?.event?.id;
-    const userId = item.transaction?.user?.id;
+    const itemUserId = item.transaction?.userId;
 
-    if (!eventId || !userId) {
-        throw new Error("Invalid transaction item data for review");
+    if (!eventId || !itemUserId) {
+      throw new Error("Invalid transaction item data for review");
+    }
+
+    if (itemUserId !== userId) {
+      throw new Error("Unauthorized to review this item");
+    }
+
+    if (item.transaction?.status !== "PAID") {
+      throw new Error("Can only review paid orders");
     }
 
     if (data.rating < 1 || data.rating > 5) {
       throw new Error("Rating must be between 1 and 5");
     }
 
+    const existingReview = await this.reviewsRepository.findByUserAndEvent(
+      userId,
+      eventId,
+    );
+    if (existingReview) {
+      throw new Error("You have already reviewed this event");
+    }
+
     return await this.reviewsRepository.create({
       rating: data.rating,
       comment: data.feedback,
       userId: userId,
-      eventId: eventId
+      eventId: eventId,
     });
   };
 

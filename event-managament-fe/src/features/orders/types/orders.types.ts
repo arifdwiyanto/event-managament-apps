@@ -25,6 +25,7 @@ export interface Order {
   promotionId: string | null;
   status: "PENDING" | "PAID" | "CANCELED" | "REFUNDED";
   paymentMethod: string;
+  paymentProofUrl?: string;
   transactionDate: string;
   items: OrderItem[];
   user?: {

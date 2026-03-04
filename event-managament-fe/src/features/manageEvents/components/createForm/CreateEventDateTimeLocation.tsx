@@ -5,27 +5,17 @@ import {
   Stack,
   TextField,
   Typography,
+  FormHelperText,
 } from "@mui/material";
+import { FormikProps } from "formik";
 
 interface ICreateEventDateTimeLocationProps {
-  startDate: string;
-  setStartDate: (val: string) => void;
-  endDate: string;
-  setEndDate: (val: string) => void;
-  location: string;
-  setLocation: (val: string) => void;
+  formik: FormikProps<any>;
 }
 
 const CreateEventDateTimeLocation: React.FC<
   ICreateEventDateTimeLocationProps
-> = ({
-  startDate,
-  setStartDate,
-  endDate,
-  setEndDate,
-  location,
-  setLocation,
-}) => {
+> = ({ formik }) => {
   return (
     <Box sx={{ mb: 4 }}>
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 3 }}>
@@ -51,13 +41,17 @@ const CreateEventDateTimeLocation: React.FC<
               color="text.secondary"
               sx={{ display: "block", mb: 1 }}
             >
-              Starts
+              Starts *
             </Typography>
             <TextField
               fullWidth
+              name="startDate"
               type="datetime-local"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
+              value={formik.values.startDate}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.startDate && Boolean(formik.errors.startDate)}
+              helperText={formik.touched.startDate && typeof formik.errors.startDate === 'string' ? formik.errors.startDate : ''}
               variant="outlined"
               slotProps={{
                 inputLabel: {
@@ -81,13 +75,17 @@ const CreateEventDateTimeLocation: React.FC<
               color="text.secondary"
               sx={{ display: "block", mb: 1 }}
             >
-              Ends
+              Ends *
             </Typography>
             <TextField
               fullWidth
+              name="endDate"
               type="datetime-local"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
+              value={formik.values.endDate}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.endDate && Boolean(formik.errors.endDate)}
+              helperText={formik.touched.endDate && typeof formik.errors.endDate === 'string' ? formik.errors.endDate : ''}
               variant="outlined"
               slotProps={{
                 inputLabel: {
@@ -112,12 +110,16 @@ const CreateEventDateTimeLocation: React.FC<
             color="text.secondary"
             sx={{ display: "block", mb: 1 }}
           >
-            Location
+            Location *
           </Typography>
           <TextField
             fullWidth
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
+            name="location"
+            value={formik.values.location}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.location && Boolean(formik.errors.location)}
+            helperText={formik.touched.location && typeof formik.errors.location === 'string' ? formik.errors.location : ''}
             placeholder="Location"
             variant="outlined"
             slotProps={{

@@ -1,5 +1,5 @@
 ﻿import { Prisma } from "@prisma/client";
-import { prisma } from "src/config/prisma.js";
+import { prisma } from "../../../config/prisma.js";
 
 export class ReviewsRepository {
   public create = async (
@@ -9,6 +9,18 @@ export class ReviewsRepository {
     const client = tx || prisma;
     return await client.review.create({
       data,
+    });
+  };
+
+  public findByUserAndEvent = async (
+    userId: string,
+    eventId: string,
+  ): Promise<any> => {
+    return await prisma.review.findFirst({
+      where: {
+        userId,
+        eventId,
+      },
     });
   };
 
@@ -76,7 +88,7 @@ export class ReviewsRepository {
       prisma.review.findMany({
         where: filters,
         include: {
-            user: true
+          user: true,
         },
         skip,
         take,

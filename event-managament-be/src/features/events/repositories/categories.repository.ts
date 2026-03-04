@@ -1,4 +1,4 @@
-import { prisma } from "src/config/prisma.js";
+import { prisma } from "../../../config/prisma.js";
 
 export class CategoriesRepository {
   public findMany = async (

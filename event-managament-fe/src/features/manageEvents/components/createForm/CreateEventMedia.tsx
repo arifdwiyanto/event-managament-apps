@@ -1,36 +1,47 @@
 import { PhotoIcon } from "@heroicons/react/24/outline";
 import { Box, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
-
 import { useRef } from "react";
+import { FormikProps } from "formik";
 
 interface ICreateEventMediaProps {
-  imageFile: File | null;
-  setImageFile: React.Dispatch<React.SetStateAction<File | null>>;
+  formik: FormikProps<any>;
 }
 
-const CreateEventMedia: React.FC<ICreateEventMediaProps> = ({
-  imageFile,
-  setImageFile,
-}) => {
+const CreateEventMedia: React.FC<ICreateEventMediaProps> = ({ formik }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      setImageFile(e.target.files[0]);
+      const file = e.target.files[0];
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        formik.setFieldError("imageFile", "File size must not exceed 5MB");
+        return;
+      }
+      // Validate file type
+      if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+        formik.setFieldError(
+          "imageFile",
+          "Only JPG, PNG, and WebP formats are allowed"
+        );
+        return;
+      }
+      formik.setFieldValue("imageFile", file);
+      formik.setFieldError("imageFile", "");
     }
   };
 
   useEffect(() => {
-    if (imageFile) {
-      const url = URL.createObjectURL(imageFile);
+    if (formik.values.imageFile) {
+      const url = URL.createObjectURL(formik.values.imageFile);
       setPreviewUrl(url);
       return () => URL.revokeObjectURL(url);
     } else {
       setPreviewUrl(null);
     }
-  }, [imageFile]);
+  }, [formik.values.imageFile]);
   return (
     <Box sx={{ mb: 4 }}>
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 3 }}>
@@ -45,7 +56,7 @@ const CreateEventMedia: React.FC<ICreateEventMediaProps> = ({
         sx={{
           width: "100%",
           border: "2px dashed",
-          borderColor: "divider",
+          borderColor: formik.errors.imageFile ? "#d32f2f" : "divider",
           borderRadius: 1,
           p: 4,
           display: "flex",
@@ -69,7 +80,7 @@ const CreateEventMedia: React.FC<ICreateEventMediaProps> = ({
           style={{ display: "none" }}
         />
 
-        {imageFile && previewUrl ? (
+        {formik.values.imageFile && previewUrl ? (
           <Box
             sx={{
               display: "flex",
@@ -110,7 +121,7 @@ const CreateEventMedia: React.FC<ICreateEventMediaProps> = ({
               fontWeight="medium"
               gutterBottom
             >
-              {imageFile.name}
+              {formik.values.imageFile.name}
             </Typography>
             <Typography
               variant="caption"
@@ -157,6 +168,15 @@ const CreateEventMedia: React.FC<ICreateEventMediaProps> = ({
           </>
         )}
       </Box>
+      {formik.errors.imageFile && (
+        <Typography
+          variant="caption"
+          color="error"
+          sx={{ mt: 1, display: "block" }}
+        >
+          {typeof formik.errors.imageFile === "string" ? formik.errors.imageFile : ""}
+        </Typography>
+      )}
     </Box>
   );
 };

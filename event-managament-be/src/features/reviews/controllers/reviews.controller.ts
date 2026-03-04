@@ -14,7 +14,10 @@ export class ReviewsController {
     next: NextFunction,
   ): Promise<void> => {
     try {
-      const review = await this.reviewsService.create(req.body);
+      if (!req.user?.id) {
+        throw new Error("Unauthorized");
+      }
+      const review = await this.reviewsService.create(req.body, req.user.id);
       res.status(201).send(review);
     } catch (error) {
       next(error);

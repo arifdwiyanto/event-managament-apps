@@ -1,8 +1,8 @@
-﻿import { prisma } from "src/config/prisma.js";
+﻿import { prisma } from "../../../config/prisma.js";
 import { PromotionsRepository } from "../repositories/promotions.repository.js";
 import { Prisma } from "@prisma/client";
-import { EventsRepository } from "src/features/events/repositories/events.repository.js";
-import { OrdersRepository } from "src/features/orders/repositories/orders.repository.js";
+import { EventsRepository } from "../../events/repositories/events.repository.js";
+import { OrdersRepository } from "../../orders/repositories/orders.repository.js";
 
 export class PromotionsService {
   private promotionsRepository: PromotionsRepository;
@@ -15,7 +15,8 @@ export class PromotionsService {
 
   public create = async (data: any): Promise<any> => {
     return await prisma.$transaction(async (tx) => {
-      const eventId = data.eventId || data.ticketId;
+      const eventId =
+        data.eventId || data.ticketId || data.events?.create[0]?.eventId;
       const event = await this.eventsRepository.findById(eventId);
 
       if (!event) {
