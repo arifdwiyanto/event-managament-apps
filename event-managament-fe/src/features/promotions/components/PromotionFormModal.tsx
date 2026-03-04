@@ -232,7 +232,7 @@ const PromotionFormModal = ({
               fullWidth
               slotProps={{ input: { inputProps: { min: 1, max: 100 } } }}
               value={formik.values.discountPercentage}
-              onChange={(e) => formik.handleChange}
+              onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               error={
                 formik.touched.discountPercentage &&
