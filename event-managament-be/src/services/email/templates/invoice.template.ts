@@ -149,7 +149,7 @@ export const generateInvoiceHtml = (data: InvoiceTemplateData): string => {
           </div>
           <div style="text-align: right;">
             <p style="font-size: 12px; color: #888; text-transform: uppercase; margin-bottom: 4px; font-weight: bold;">Transaction Date</p>
-            <p style="margin: 0;">${format(new Date(data.transactionDate), "dd MMM yyyy HH:mm")}</p>
+            <p style="margin: 0;">${new Intl.DateTimeFormat("id-ID", { timeZone: "Asia/Jakarta", day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(data.transactionDate)).replace(",", "")} WIB</p>
           </div>
         </div>
         
