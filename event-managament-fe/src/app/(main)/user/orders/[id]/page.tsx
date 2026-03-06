@@ -1,61 +1,44 @@
-"use client";
-
 import React from "react";
-import { useParams, useRouter } from "next/navigation";
-import { Typography } from "@mui/material";
-import { useGetOrder } from "@/features/orders/hooks/useOrders";
-import { ArrowLeftIcon } from "@heroicons/react/24/outline";
-import OrderDetail from "@/features/orders/components/OrderDetail";
+import { ordersRepository } from "@/features/orders/repositories/orders.repository";
+import UserOrderDetailView from "@/features/orders/components/UserOrderDetailView";
+import { cookies } from "next/headers";
+import { Metadata } from "next";
 
-export default function UserOrderDetailPage() {
-  const params = useParams();
-  const router = useRouter();
-  const orderId = params.id as string;
+export const metadata: Metadata = {
+  title: "Order Detail | Event Management",
+  description: "View your order details and payment status.",
+};
 
-  const { data: order, isLoading, error } = useGetOrder(orderId);
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center p-12">
-        <Typography className="font-display font-black uppercase text-xl animate-pulse">
-          Loading vibe details...
-        </Typography>
-      </div>
-    );
-  }
+export default async function UserOrderDetailPage({ params }: PageProps) {
+  const { id: orderId } = await params;
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
 
-  if (error || !order) {
+  try {
+    const order = await ordersRepository.getOrderById(orderId, token);
+
+    if (!order) {
+      return (
+        <div className="flex justify-center p-12">
+          <div className="font-display font-black uppercase text-xl animate-pulse text-neon-pink">
+            Vibe not found...
+          </div>
+        </div>
+      );
+    }
+
+    return <UserOrderDetailView order={order} />;
+  } catch (error) {
     return (
       <div className="max-w-4xl mx-auto p-8">
-        <div className="p-6 border-4 border-red-500 bg-red-50 text-red-600 font-bold uppercase text-center mb-6">
-          Failed to load order. It might not exist or you don't have permission.
+        <div className="p-6 border-4 border-neon-magenta bg-neon-magenta/10 text-neon-magenta font-black uppercase text-center mb-6 shadow-[8px_8px_0_0_#000]">
+          Failed to load order. The vibe might be missing or you're uninvited.
         </div>
-        <button
-          onClick={() => router.push("/user/orders")}
-          className="border-2 border-black px-6 py-2 font-black uppercase"
-        >
-          Back to Orders
-        </button>
       </div>
     );
   }
-
-  return (
-    <div className="max-w-6xl mx-auto p-4 md:p-8">
-      <button
-        onClick={() => router.push("/user/orders")}
-        className="flex items-center gap-2 mb-8 text-gray-500 hover:text-black dark:hover:text-white transition-colors group"
-      >
-        <ArrowLeftIcon
-          className="size-4 group-hover:-translate-x-1 transition-transform"
-          strokeWidth={2.5}
-        />
-        <span className="font-black uppercase text-xs tracking-widest">
-          Back to vibes
-        </span>
-      </button>
-
-      <OrderDetail order={order} />
-    </div>
-  );
 }
