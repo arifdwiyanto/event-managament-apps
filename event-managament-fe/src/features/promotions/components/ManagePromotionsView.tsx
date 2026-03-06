@@ -297,10 +297,12 @@ const ManagePromotionsView = () => {
                       >
                         <Box component="span" display="block">
                           Start:{" "}
-                          {format(new Date(promo.startDate), "MMM d, yyyy")}
+                          {/* {format(new Date(promo.startDate), "MMM d, yyyy")} */}
+                          {new Intl.DateTimeFormat("id-ID", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(promo.startDate))}
                         </Box>
                         <Box component="span" display="block">
-                          End: {format(new Date(promo.endDate), "MMM d, yyyy")}
+                          {/* End: {format(new Date(promo.endDate), "MMM d, yyyy")} */}
+                          End: {new Intl.DateTimeFormat("id-ID", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(promo.endDate))}
                         </Box>
                       </Typography>
                     </TableCell>

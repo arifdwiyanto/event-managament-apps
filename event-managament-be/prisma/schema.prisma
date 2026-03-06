@@ -265,6 +265,7 @@ model Transaction {
   paymentMethod      String            @map("payment_method")
   paymentProofUrl    String?           @map("payment_proof_url")
   transactionDate    DateTime          @default(now()) @map("transaction_date")
+  snapToken          String?           @map("snap_token")
 
   user       User              @relation(fields: [userId], references: [id])
   event      Event             @relation(fields: [eventId], references: [id])
