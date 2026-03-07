@@ -3,7 +3,6 @@
 import { Typography, Snackbar, Alert } from "@mui/material";
 import { useCheckout } from "../hooks/useCheckout";
 import { OrderSummary } from "./OrderSummary";
-import { PaymentMethod } from "./PaymentMethod";
 import { CheckoutTotal } from "./CheckoutTotal";
 import { EmptyCart } from "./EmptyCart";
 import { UserPointSelector } from "./UserPointSelector";
@@ -14,8 +13,6 @@ import { PAYMENT_METHODS } from "../constants/paymentMethods";
 export const CheckoutView: React.FC = () => {
   const {
     cart,
-    selectedPayment,
-    setSelectedPayment,
     appliedPromos,
     pointPercentage,
     setPointPercentage,
@@ -96,17 +93,6 @@ export const CheckoutView: React.FC = () => {
               onSelectPercentage={setPointPercentage}
             />
           )}
-
-          <div className="pt-4">
-            <Typography variant="h5" className="font-display font-black uppercase mb-6 text-black dark:text-white">
-              Payment Method
-            </Typography>
-            <PaymentMethod
-              methods={PAYMENT_METHODS}
-              selectedPayment={selectedPayment}
-              onSelect={setSelectedPayment}
-            />
-          </div>
         </div>
 
         <div className="md:col-span-1">

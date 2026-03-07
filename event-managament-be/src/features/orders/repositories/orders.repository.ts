@@ -19,6 +19,8 @@ export interface IOrdersRepositoryProps {
     totalPrice?: number;
     promotionId?: string;
   }[];
+  snapToken?: string;
+  originalPrice: number;
 }
 
 export class OrdersRepository {
@@ -38,6 +40,7 @@ export class OrdersRepository {
         paymentMethod: data.paymentMethod,
         userCouponId: data.voucherId,
         promotionId: data.promotionId,
+        snapToken: data.snapToken,
         items: {
           create: data.items.map((item) => ({
             ticketType: { connect: { id: item.ticketTypeId } },

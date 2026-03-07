@@ -16,6 +16,12 @@ export class OrdersRouter {
   }
 
   private setupRoutes = (): void => {
+    // Midtrans webhook
+    this.router.post(
+      "/midtrans-webhook",
+      this.ordersController.handleMidtransNotification,
+    );
+    
     // All orders routes require authentication
     this.router.use(verifyToken);
 

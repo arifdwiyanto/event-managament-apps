@@ -5,6 +5,7 @@ import { UserPointRepository } from "../../userPoint/repositories/userPoint.repo
 import { UserCouponRepository } from "../../userCoupons/repositories/voucher.repository.js";
 import { generateInvoiceHtml } from "../../../services/email/templates/invoice.template.js";
 import { EmailService } from "../../../services/email/email.service.js";
+import { snap } from "../../../config/midtrans.js";
 
 export interface IOrdersServiceProps {
   customerId: string;
@@ -67,7 +68,9 @@ export class OrdersService {
           });
 
           if (!promotion) {
-            throw new Error(`Invalid promotion code for ticket ${item.ticketId}`);
+            throw new Error(
+              `Invalid promotion code for ticket ${item.ticketId}`,
+            );
           }
 
           const isEventEligible = promotion.events.some(
@@ -75,14 +78,18 @@ export class OrdersService {
           );
 
           if (!isEventEligible) {
-            throw new Error(`Promotion ${promotion.name} is not applicable for this event`);
+            throw new Error(
+              `Promotion ${promotion.name} is not applicable for this event`,
+            );
           }
 
           if (
             promotion.startDate > new Date() ||
             promotion.endDate < new Date()
           ) {
-            throw new Error(`Promotion ${promotion.name} is expired or not yet active`);
+            throw new Error(
+              `Promotion ${promotion.name} is expired or not yet active`,
+            );
           }
 
           if (promotion.maxUsage !== null) {
@@ -92,13 +99,16 @@ export class OrdersService {
             const usageCountItem = await tx.transactionItem.count({
               where: { promotionId: promotion.id },
             });
-            if ((usageCount + usageCountItem) >= promotion.maxUsage) {
-              throw new Error(`Promotion ${promotion.name} usage limit reached`);
+            if (usageCount + usageCountItem >= promotion.maxUsage) {
+              throw new Error(
+                `Promotion ${promotion.name} usage limit reached`,
+              );
             }
           }
 
           if (promotion.discountPercentage) {
-            itemDiscount = (subTotalOriginal * Number(promotion.discountPercentage)) / 100;
+            itemDiscount =
+              (subTotalOriginal * Number(promotion.discountPercentage)) / 100;
           } else if (promotion.discountAmount) {
             itemDiscount = Number(promotion.discountAmount);
           }
@@ -138,20 +148,45 @@ export class OrdersService {
         });
         if (!coupon) throw new Error("Coupon not found");
         if (coupon.isUsed) throw new Error("Coupon has already been used");
-        if (new Date(coupon.expiresAt) < new Date()) throw new Error("Coupon has expired");
-        if (coupon.userId !== data.customerId) throw new Error("Coupon does not belong to this user");
+        if (new Date(coupon.expiresAt) < new Date())
+          throw new Error("Coupon has expired");
+        if (coupon.userId !== data.customerId)
+          throw new Error("Coupon does not belong to this user");
 
-        couponDiscount = ((totalPrice - totalDiscount - (data.pointUsed || 0)) * Number(coupon.discountPercentage)) / 100;
+        couponDiscount =
+          ((totalPrice - totalDiscount - (data.pointUsed || 0)) *
+            Number(coupon.discountPercentage)) /
+          100;
         await this.userCouponRepository.useCouponInTx(data.voucherId, tx);
       }
 
-      let finalPrice = totalPrice - totalDiscount - (data.pointUsed || 0) - couponDiscount;
+      let finalPrice =
+        totalPrice - totalDiscount - (data.pointUsed || 0) - couponDiscount;
 
       if (finalPrice < 0) {
         finalPrice = 0;
       }
 
       const invoice = `INV-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+      let snapToken: string | undefined = undefined;
+
+      if (finalPrice > 0) {
+        const parameter = {
+          transaction_details: {
+            order_id: invoice,
+            gross_amount: finalPrice,
+          },
+        };
+
+        try {
+          const midtransResponse = await snap.createTransaction(parameter);
+          snapToken = midtransResponse.token;
+        } catch (error) {
+          console.error("Midtrans Error:", error);
+          throw new Error("Failed to generate payment link");
+        }
+      }
 
       const orderData = {
         invoice,
@@ -162,7 +197,9 @@ export class OrdersService {
         eventId: isSingleEvent ? firstEventId : null,
         paymentMethod: data.paymentMethod,
         voucherId: data.voucherId,
+        snapToken,
         items: orderItems,
+        originalPrice: totalPrice,
       };
 
       return await this.ordersRepository.create(orderData, tx);
@@ -234,21 +271,74 @@ export class OrdersService {
 
     // Send Invoice Email
     if (order.user?.email) {
+      let promoData;
+      const appliedPromos = new Map<string, number>();
+
+      if (order.items && Array.isArray(order.items)) {
+        order.items.forEach((item: any) => {
+          if (item.promotion) {
+            const promoCode = item.promotion.code;
+            const origSubTotal = Number(item.pricePerUnit || 0) * item.quantity;
+            const finalSubTotal = Number(item.totalPrice || 0);
+            const diff = origSubTotal - finalSubTotal;
+
+            if (diff > 0) {
+              appliedPromos.set(
+                promoCode,
+                (appliedPromos.get(promoCode) || 0) + diff,
+              );
+            }
+          }
+        });
+      }
+
+      const totalItemDiscount = Array.from(appliedPromos.values()).reduce(
+        (a, b) => a + b,
+        0,
+      );
+
+      if (order.userCoupon) {
+        const couponAmount =
+          Number(order.totalOriginalPrice) -
+          Number(order.totalFinalPrice) -
+          order.pointsUsed -
+          totalItemDiscount;
+        if (couponAmount > 0) {
+          appliedPromos.set(
+            order.userCoupon.code,
+            (appliedPromos.get(order.userCoupon.code) || 0) + couponAmount,
+          );
+        }
+      }
+
+      if (appliedPromos.size > 0) {
+        const codes = Array.from(appliedPromos.keys()).join(", ");
+        const totalAmount = Array.from(appliedPromos.values()).reduce(
+          (a, b) => a + b,
+          0,
+        );
+        promoData = {
+          code: codes,
+          amount: totalAmount,
+        };
+      }
+
       const emailHtml = generateInvoiceHtml({
         invoice: order.invoice,
         transactionDate: order.transactionDate,
         status: "PAID",
         paymentMethod: updatedOrder.paymentMethod || order.paymentMethod,
-        totalOriginalPrice: order.totalOriginalPrice,
+        totalOriginalPrice: Number(order.totalOriginalPrice),
         pointsUsed: order.pointsUsed,
-        totalFinalPrice: order.totalFinalPrice,
+        totalFinalPrice: Number(order.totalFinalPrice),
         customerName: order.user.name,
         eventName: order.event?.name || "Event",
+        promoData: promoData,
         items: order.items.map((item: any) => ({
           ticketName: item.ticketType.name,
           qty: item.quantity,
-          price: item.pricePerUnit || item.totalPrice / item.quantity,
-          subTotal: item.totalPrice,
+          price: Number(item.pricePerUnit || item.totalPrice / item.quantity),
+          subTotal: Number(item.totalPrice),
         })),
       });
 

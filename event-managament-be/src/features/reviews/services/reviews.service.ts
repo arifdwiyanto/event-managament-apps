@@ -26,7 +26,8 @@ export class ReviewsService {
       throw new Error("Transaction item not found");
     }
 
-    const eventId = item.ticketType?.event?.id;
+    const event = item.ticketType?.event;
+    const eventId = event?.id;
     const itemUserId = item.transaction?.userId;
 
     if (!eventId || !itemUserId) {
@@ -39,6 +40,10 @@ export class ReviewsService {
 
     if (item.transaction?.status !== "PAID") {
       throw new Error("Can only review paid orders");
+    }
+
+    if (event.endDate && new Date() < new Date(event.endDate)) {
+      throw new Error("Cannot review an event that has not yet ended");
     }
 
     if (data.rating < 1 || data.rating > 5) {

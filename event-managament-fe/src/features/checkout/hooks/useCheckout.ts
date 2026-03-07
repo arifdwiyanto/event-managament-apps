@@ -6,7 +6,6 @@ import { useStoreLogin } from "@/features/auth/store/useAuthStore";
 import { useCreateOrder } from "@/features/orders/hooks/useOrders";
 import { useValidatePromotion } from "@/features/promotions/hooks/usePromotions";
 import { AppliedPromo, AppliedCoupon } from "../types/checkout.types";
-import { PAYMENT_METHODS } from "../constants/paymentMethods";
 import { groupCartItemsByOrganizer } from "@/features/cart/utils/groupItems";
 import { useUserPoints } from "@/features/userPoint/hooks/useUserPoints";
 import { UserCoupon } from "../services/userCouponService";
@@ -20,12 +19,15 @@ export const useCheckout = () => {
   const createOrderMutation = useCreateOrder();
   const validatePromoMutation = useValidatePromotion();
 
-  const [selectedPayment, setSelectedPayment] = useState(PAYMENT_METHODS[0].id);
   const [promoCodes, setPromoCodes] = useState<Record<string, string>>({});
-  const [appliedPromos, setAppliedPromos] = useState<Record<string, AppliedPromo>>({});
+  const [appliedPromos, setAppliedPromos] = useState<
+    Record<string, AppliedPromo>
+  >({});
   const [promoErrors, setPromoErrors] = useState<Record<string, string>>({});
   const [pointPercentage, setPointPercentage] = useState<number>(0);
-  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(
+    null,
+  );
   const [toast, setToast] = useState({
     open: false,
     message: "",
@@ -57,10 +59,17 @@ export const useCheckout = () => {
   }, [subtotalPerGroup]);
 
   // Apply promo directly from selector (no validation call needed — already validated by backend)
-  const handleApplyPromoFromSelector = useCallback((organizerId: string, promo: AppliedPromo) => {
-    setAppliedPromos((prev) => ({ ...prev, [organizerId]: promo }));
-    setToast({ open: true, message: `Promo "${promo.code}" applied!`, severity: "success" });
-  }, []);
+  const handleApplyPromoFromSelector = useCallback(
+    (organizerId: string, promo: AppliedPromo) => {
+      setAppliedPromos((prev) => ({ ...prev, [organizerId]: promo }));
+      setToast({
+        open: true,
+        message: `Promo "${promo.code}" applied!`,
+        severity: "success",
+      });
+    },
+    [],
+  );
 
   const handleApplyPromo = async (organizerId: string, eventId: string) => {
     const code = promoCodes[organizerId];
@@ -79,9 +88,10 @@ export const useCheckout = () => {
         const promo = result.promotion;
         const groupSubtotal = subtotalPerGroup[organizerId] || 0;
         let discountVal = 0;
-        
+
         if (promo.discountPercentage) {
-          discountVal = (groupSubtotal * Number(promo.discountPercentage)) / 100;
+          discountVal =
+            (groupSubtotal * Number(promo.discountPercentage)) / 100;
         } else if (promo.discountAmount) {
           discountVal = Number(promo.discountAmount);
         }
@@ -98,10 +108,15 @@ export const useCheckout = () => {
           },
         }));
         setPromoCodes((prev) => ({ ...prev, [organizerId]: "" }));
-        setToast({ open: true, message: "Promo code applied!", severity: "success" });
+        setToast({
+          open: true,
+          message: "Promo code applied!",
+          severity: "success",
+        });
       }
     } catch (error: any) {
-      const msg = error?.response?.data?.message || error.message || "Invalid promo code";
+      const msg =
+        error?.response?.data?.message || error.message || "Invalid promo code";
       setPromoErrors((prev) => ({ ...prev, [organizerId]: msg }));
       setToast({ open: true, message: msg, severity: "error" });
     }
@@ -120,12 +135,23 @@ export const useCheckout = () => {
       setAppliedCoupon(null);
       return;
     }
-    setAppliedCoupon({ id: coupon.id, code: coupon.code, discountPercentage: coupon.discountPercentage });
-    setToast({ open: true, message: `Coupon "${coupon.code}" applied!`, severity: "success" });
+    setAppliedCoupon({
+      id: coupon.id,
+      code: coupon.code,
+      discountPercentage: coupon.discountPercentage,
+    });
+    setToast({
+      open: true,
+      message: `Coupon "${coupon.code}" applied!`,
+      severity: "success",
+    });
   }, []);
 
   const totalPromoDiscount = useMemo(() => {
-    return Object.values(appliedPromos).reduce((acc, promo) => acc + promo.discount, 0);
+    return Object.values(appliedPromos).reduce(
+      (acc, promo) => acc + promo.discount,
+      0,
+    );
   }, [appliedPromos]);
 
   const pointDiscount = useMemo(() => {
@@ -135,15 +161,25 @@ export const useCheckout = () => {
 
   const couponDiscount = useMemo(() => {
     if (!appliedCoupon) return 0;
-    const afterPromoAndPoints = Math.max(0, totalOriginal - totalPromoDiscount - pointDiscount);
+    const afterPromoAndPoints = Math.max(
+      0,
+      totalOriginal - totalPromoDiscount - pointDiscount,
+    );
     return (afterPromoAndPoints * appliedCoupon.discountPercentage) / 100;
   }, [appliedCoupon, totalOriginal, totalPromoDiscount, pointDiscount]);
 
-  const finalTotal = Math.max(0, totalOriginal - totalPromoDiscount - pointDiscount - couponDiscount);
+  const finalTotal = Math.max(
+    0,
+    totalOriginal - totalPromoDiscount - pointDiscount - couponDiscount,
+  );
 
   const handleCreateOrder = async () => {
     if (!user || !user.id) {
-      setToast({ open: true, message: "Hype Failed! Please login first", severity: "error" });
+      setToast({
+        open: true,
+        message: "Hype Failed! Please login first",
+        severity: "error",
+      });
       return;
     }
 
@@ -156,17 +192,18 @@ export const useCheckout = () => {
       const items = cart.items.map((item) => {
         const organizerId = item.ticketType.event?.organizerId || "";
         const promo = appliedPromos[organizerId];
-        
+
         return {
           ticketId: item.ticketTypeId,
           qty: item.quantity,
-          promotionId: promo?.eventId === item.ticketType.eventId ? promo.id : undefined,
+          promotionId:
+            promo?.eventId === item.ticketType.eventId ? promo.id : undefined,
         };
       });
 
       const payload = {
         customerId: user.id,
-        paymentMethod: selectedPayment,
+        paymentMethod: "MIDTRANS",
         pointUsed: pointDiscount,
         voucherId: appliedCoupon?.id,
         items,
@@ -177,22 +214,65 @@ export const useCheckout = () => {
       await clearCart();
       queryClient.invalidateQueries({ queryKey: ["userPoints", "balance"] });
       queryClient.invalidateQueries({ queryKey: ["userCoupons"] });
-      setToast({ open: true, message: "Vibe Secured! Order created successfully.", severity: "success" });
-      
-      setTimeout(() => {
-        router.push(`/user/orders/${newOrder.id}`);
-      }, 1500);
+
+      if (newOrder.snapToken) {
+        (window as any).snap.pay(newOrder.snapToken, {
+          onSuccess: function (result: any) {
+            setToast({
+              open: true,
+              message: "Payment success!",
+              severity: "success",
+            });
+            router.push(`/user/orders/${newOrder.id}`);
+          },
+          onPending: function (result: any) {
+            setToast({
+              open: true,
+              message: "Payment pending!",
+              severity: "success",
+            });
+            router.push(`/user/orders/${newOrder.id}`);
+          },
+          onError: function (result: any) {
+            setToast({
+              open: true,
+              message: "Payment failed!",
+              severity: "error",
+            });
+            router.push(`/user/orders/${newOrder.id}`);
+          },
+          onClose: function () {
+            setToast({
+              open: true,
+              message: "Payment popup closed",
+              severity: "error",
+            });
+            router.push(`/user/orders/${newOrder.id}`);
+          },
+        });
+      } else {
+        setToast({
+          open: true,
+          message: "Vibe Secured! Order created successfully.",
+          severity: "success",
+        });
+        setTimeout(() => {
+          router.push(`/user/orders/${newOrder.id}`);
+        }, 1500);
+      }
     } catch (error: any) {
       console.error("Failed to create order", error);
-      setToast({ open: true, message: `Hype Failed! ${error.message || "Unknown error"}`, severity: "error" });
+      setToast({
+        open: true,
+        message: `Hype Failed! ${error.message || "Unknown error"}`,
+        severity: "error",
+      });
     }
   };
 
   return {
     cart,
     user,
-    selectedPayment,
-    setSelectedPayment,
     promoCodes,
     setPromoCodes,
     appliedPromos,

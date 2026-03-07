@@ -14,6 +14,7 @@ export interface OrderItem {
     event?: {
       id: string;
       name: string;
+      endDate?: string;
       organizerId: string;
       organizer?: {
         id: string;
@@ -43,6 +44,7 @@ export interface Order {
   status: "PENDING" | "PAID" | "CANCELED" | "REFUNDED";
   paymentMethod: string;
   paymentProofUrl?: string;
+  snapToken?: string;
   transactionDate: string;
   items: OrderItem[];
   user?: {
