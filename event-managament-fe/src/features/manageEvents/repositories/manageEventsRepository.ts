@@ -42,4 +42,18 @@ export const manageEventsRepository = {
     const response = await apiFetch.post(`/events/${eventId}/tickets`, data);
     return response.data;
   },
+
+  updateTicketTier: async (
+    eventId: string,
+    ticketId: string,
+    data: { name?: string; price?: number; quota?: number; description?: string },
+  ) => {
+    const response = await apiFetch.patch(`/events/${eventId}/tickets/${ticketId}`, data);
+    return response.data;
+  },
+
+  deleteTicketTier: async (eventId: string, ticketId: string) => {
+    const response = await apiFetch.delete(`/events/${eventId}/tickets/${ticketId}`);
+    return response.data;
+  },
 };

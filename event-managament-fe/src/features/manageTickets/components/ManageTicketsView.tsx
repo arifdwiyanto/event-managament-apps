@@ -15,8 +15,6 @@ import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import Link from "next/link";
 import EventSummaryHeader from "./EventSummaryHeader";
 import TicketTiersList from "./TicketTiersList";
-import SalesPerformanceCard from "./SalesPerformanceCard";
-import QuickActionsCard from "./QuickActionsCard";
 
 interface IManageTicketsViewProps {
   eventId: string;
@@ -87,28 +85,12 @@ const ManageTicketsView: React.FC<IManageTicketsViewProps> = ({ eventId }) => {
               }}
             >
               {/* Left Column */}
-              <Box sx={{ flex: { xs: "1 1 auto", lg: "0 0 65%" } }}>
+              <Box sx={{ flex: { xs: "1 1 auto", } }}>
                 <TicketTiersList
                   eventId={eventId}
                   tiersData={data.ticketTiers}
                   onTierAdded={refetch}
                 />
-              </Box>
-
-              {/* Right Column*/}
-              <Box
-                sx={{
-                  flex: { xs: "1 1 auto", lg: "0 0 33%" },
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 4,
-                }}
-              >
-                <SalesPerformanceCard
-                  ticketsSold={data.ticketsSoldTotal}
-                  goal={data.ticketsTotalCapacity}
-                />
-                <QuickActionsCard />
               </Box>
             </Box>
           </>

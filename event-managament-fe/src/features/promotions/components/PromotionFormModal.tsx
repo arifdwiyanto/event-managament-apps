@@ -23,7 +23,7 @@ import {
 } from "@mui/material";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useFormik } from "formik";
-import { promotionValidationSchema } from "../schemas/promotions.schemas";
+import { promotionValidationSchema } from "../validations/promotions.schemas";
 
 interface Props {
   isOpen: boolean;
@@ -144,9 +144,15 @@ const PromotionFormModal = ({
       onClose={onClose}
       maxWidth="sm"
       fullWidth
+      fullScreen={typeof window !== 'undefined' && window.innerWidth < 640} // Approximately 'sm' breakpoint
       slotProps={{
         paper: {
-          sx: { borderRadius: 1, p: 1 },
+          sx: { 
+            borderRadius: { xs: 0, sm: 4 }, 
+            p: { xs: 0, sm: 1 },
+            bgcolor: "background.paper",
+            backgroundImage: "none",
+          },
         },
       }}
     >

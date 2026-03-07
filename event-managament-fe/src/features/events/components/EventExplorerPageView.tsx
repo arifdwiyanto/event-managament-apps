@@ -3,12 +3,12 @@
 import React from "react";
 import EventFilters from "./EventFilters";
 import EventInfiniteGrid from "./EventInfiniteGrid";
-import { 
-  AdjustmentsHorizontalIcon, 
+import {
+  AdjustmentsHorizontalIcon,
   XMarkIcon,
   SunIcon,
   MoonIcon,
-  SparklesIcon
+  SparklesIcon,
 } from "@heroicons/react/24/outline";
 import { motion, AnimatePresence } from "framer-motion";
 import { useThemeStore } from "@/features/theme/stores/themeStore";
@@ -33,38 +33,51 @@ const EventExplorerPageView: React.FC = () => {
   };
 
   const actions = [
-    { 
-      icon: <AdjustmentsHorizontalIcon className="size-5" />, 
-      name: 'Filters', 
+    {
+      icon: <AdjustmentsHorizontalIcon className="size-5" />,
+      name: "Filters",
       onClick: () => {
         setIsFilterOpen(true);
         setIsMenuOpen(false);
       },
-      color: 'var(--neon-cyan)'
+      color: "var(--neon-cyan)",
     },
-    { 
-      icon: resolvedTheme === 'dark' ? <SunIcon className="size-5" /> : <MoonIcon className="size-5" />, 
-      name: 'Theme', 
+    {
+      icon:
+        resolvedTheme === "dark" ? (
+          <SunIcon className="size-5" />
+        ) : (
+          <MoonIcon className="size-5" />
+        ),
+      name: "Theme",
       onClick: () => {
         toggleTheme();
         setIsMenuOpen(false);
       },
-      color: 'var(--neon-purple)'
+      color: "var(--neon-purple)",
     },
   ];
 
   const menuVariants = {
-    closed: { opacity: 0, scale: 0.8, transition: { staggerChildren: 0.05, staggerDirection: -1 } },
-    open: { opacity: 1, scale: 1, transition: { staggerChildren: 0.07, delayChildren: 0.1 } }
+    closed: {
+      opacity: 0,
+      scale: 0.8,
+      transition: { staggerChildren: 0.05, staggerDirection: -1 },
+    },
+    open: {
+      opacity: 1,
+      scale: 1,
+      transition: { staggerChildren: 0.07, delayChildren: 0.1 },
+    },
   };
 
   const itemVariants = {
     closed: { opacity: 0, x: 20, scale: 0.8 },
-    open: { opacity: 1, x: 0, scale: 1 }
+    open: { opacity: 1, x: 0, scale: 1 },
   };
 
   return (
-    <main className="flex-1 flex flex-col w-full max-w-[1600px] mx-auto bg-background text-foreground transition-colors duration-300 selection:bg-neon-pink selection:text-black min-h-screen">
+    <main className="flex-1 flex flex-col w-full max-w-[1600px] mx-auto text-foreground transition-colors duration-300 selection:bg-neon-pink selection:text-black min-h-screen">
       {/* Hero Section */}
       <section className="px-5 md:px-8 lg:px-10 pt-8 md:pt-16 pb-6 md:pb-10 overflow-hidden relative">
         <div className="absolute top-0 right-0 w-64 h-64 bg-neon-cyan/5 blur-[100px] -z-10 rounded-full md:hidden"></div>
@@ -79,17 +92,22 @@ const EventExplorerPageView: React.FC = () => {
       {/* Explorer Layout */}
       <div className="flex flex-col lg:flex-row px-5 md:px-8 lg:px-10 gap-8 lg:gap-10 pb-20 relative">
         {/* Mobile Filter Overlay */}
-        <div 
+        <div
           className={`fixed inset-0 bg-black/80 backdrop-blur-md z-[60] lg:hidden transition-all duration-300 ${isFilterOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
           onClick={() => setIsFilterOpen(false)}
         >
-          <div 
+          <div
             className={`absolute right-0 top-0 h-full w-full bg-background border-l-2 border-neon-cyan/30 p-6 overflow-y-auto transition-transform duration-300 transform ${isFilterOpen ? "translate-x-0" : "translate-x-full"}`}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-8">
-              <h2 className="font-display font-black text-2xl uppercase italic text-neon-cyan">Filters</h2>
-              <button onClick={() => setIsFilterOpen(false)} className="p-2 bg-gray-100 dark:bg-gray-800 rounded-none border-2 border-gray-200 dark:border-gray-700">
+              <h2 className="font-display font-black text-2xl uppercase italic text-neon-cyan">
+                Filters
+              </h2>
+              <button
+                onClick={() => setIsFilterOpen(false)}
+                className="p-2 bg-gray-100 dark:bg-gray-800 rounded-none border-2 border-gray-200 dark:border-gray-700"
+              >
                 <XMarkIcon className="size-6" />
               </button>
             </div>
@@ -111,7 +129,7 @@ const EventExplorerPageView: React.FC = () => {
         <div className="lg:hidden fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4">
           <AnimatePresence>
             {isMenuOpen && (
-              <motion.div 
+              <motion.div
                 initial="closed"
                 animate="open"
                 exit="closed"
@@ -128,11 +146,14 @@ const EventExplorerPageView: React.FC = () => {
                     <span className="bg-black text-white dark:bg-white dark:text-black py-1.5 px-3 text-[10px] font-black uppercase tracking-widest border border-white/10 dark:border-black/10 shadow-[4px_4px_0_0_rgba(0,0,0,1)] dark:shadow-[4px_4px_0_0_rgba(0,255,255,0.2)]">
                       {action.name}
                     </span>
-                    <div 
+                    <div
                       className="size-12 rounded-none bg-background border-2 flex items-center justify-center shadow-[4px_4px_0_0_rgba(0,0,0,1)] transition-transform active:translate-x-0.5 active:translate-y-0.5"
                       style={{ borderColor: action.color }}
                     >
-                      <div className="transition-colors group-hover:text-white" style={{ color: action.color }}>
+                      <div
+                        className="transition-colors group-hover:text-white"
+                        style={{ color: action.color }}
+                      >
                         {action.icon}
                       </div>
                     </div>
@@ -145,8 +166,8 @@ const EventExplorerPageView: React.FC = () => {
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className={`size-14 rounded-none flex items-center justify-center transition-all duration-300 border-2 shadow-[6px_6px_0_0_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1 ${
-              isMenuOpen 
-                ? "bg-neon-pink border-black text-black rotate-90" 
+              isMenuOpen
+                ? "bg-neon-pink border-black text-black rotate-90"
                 : "bg-neon-cyan border-black text-black"
             }`}
           >
@@ -163,11 +184,11 @@ const EventExplorerPageView: React.FC = () => {
       <Snackbar
         open={toast.open}
         autoHideDuration={4000}
-        onClose={() => setToast(prev => ({ ...prev, open: false }))}
+        onClose={() => setToast((prev) => ({ ...prev, open: false }))}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
         <Alert
-          onClose={() => setToast(prev => ({ ...prev, open: false }))}
+          onClose={() => setToast((prev) => ({ ...prev, open: false }))}
           severity={toast.severity}
           variant="filled"
           sx={{
@@ -178,8 +199,14 @@ const EventExplorerPageView: React.FC = () => {
             fontWeight: "900",
             textTransform: "uppercase",
             fontSize: "12px",
-            bgcolor: toast.severity === "success" ? "#00FFDD !important" : "#FF0055 !important",
-            color: toast.severity === "success" ? "black !important" : "white !important",
+            bgcolor:
+              toast.severity === "success"
+                ? "#00FFDD !important"
+                : "#FF0055 !important",
+            color:
+              toast.severity === "success"
+                ? "black !important"
+                : "white !important",
           }}
         >
           {toast.message}

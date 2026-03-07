@@ -53,415 +53,400 @@ const MainNavbar: React.FC = () => {
   return (
     <>
       <header className="flex items-center justify-between whitespace-nowrap border-b border-gray-200 dark:border-[#333] px-3 md:px-6 lg:px-10 py-3 md:py-4 bg-white/80 dark:bg-black/80 backdrop-blur-md sticky top-0 z-50">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-1.5 md:gap-3">
-          <div className="size-7 md:size-9 lg:size-10 text-[#ee2b8c] dark:text-[#FF00FF] animate-pulse">
-            <svg
-              className="w-full h-full drop-shadow-[0_0_8px_rgba(238,43,140,0.5)] dark:drop-shadow-[0_0_8px_rgba(255,0,255,0.8)]"
-              fill="none"
-              viewBox="0 0 48 48"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z"
-                fill="currentColor"
-              ></path>
-            </svg>
-          </div>
-          <h2 className="text-lg md:text-2xl lg:text-3xl font-display font-bold tracking-tighter uppercase italic bg-clip-text text-transparent bg-gradient-to-r from-[#ee2b8c] to-[#d61f7a] dark:from-[#FF00FF] dark:to-[#B026FF] pr-1 pb-1">
-            Hype
-          </h2>
-        </Link>
+        {/* Left: Logo */}
+        <div className="flex-1 flex items-center justify-start">
+          <Link href="/" className="flex items-center gap-1.5 md:gap-3">
+            <div className="size-7 md:size-9 lg:size-10 text-[#ee2b8c] dark:text-[#FF00FF] animate-pulse">
+              <svg
+                className="w-full h-full drop-shadow-[0_0_8px_rgba(238,43,140,0.5)] dark:drop-shadow-[0_0_8px_rgba(255,0,255,0.8)]"
+                fill="none"
+                viewBox="0 0 48 48"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z"
+                  fill="currentColor"
+                ></path>
+              </svg>
+            </div>
+            <h2 className="text-lg md:text-2xl lg:text-3xl font-display font-bold tracking-tighter uppercase italic bg-clip-text text-transparent bg-gradient-to-r from-[#ee2b8c] to-[#d61f7a] dark:from-[#FF00FF] dark:to-[#B026FF] pr-1 pb-1">
+              Hype
+            </h2>
+          </Link>
+        </div>
 
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center gap-4 lg:gap-8">
-          <nav className="flex items-center gap-4 lg:gap-8 font-display tracking-wide uppercase text-[10px] lg:text-xs font-bold">
-            <Link
-              href="/"
-              className={`${
-                pathname === "/" 
-                  ? "text-[#ee2b8c] dark:text-[#FF00FF] drop-shadow-[0_0_5px_currentColor]" 
-                  : "text-gray-600 dark:text-gray-300 hover:text-[#ee2b8c] dark:hover:text-[#FF00FF]"
-              } transition-all`}
-            >
-              Home
-            </Link>
-            <Link
-              href="/events"
-              className={`${
-                pathname.startsWith("/events") 
-                  ? "text-[#ee2b8c] dark:text-[#FF00FF] drop-shadow-[0_0_5px_currentColor]" 
-                  : "text-gray-600 dark:text-gray-300 hover:text-[#ee2b8c] dark:hover:text-[#FF00FF]"
-              } transition-all`}
-            >
-              Events
-            </Link>
-            <Link
-              href="/marketplace"
-              className={`${
-                pathname.startsWith("/marketplace") 
-                  ? "text-[#ee2b8c] dark:text-[#FF00FF] drop-shadow-[0_0_5px_currentColor]" 
-                  : "text-gray-600 dark:text-gray-300 hover:text-[#ee2b8c] dark:hover:text-[#FF00FF]"
-              } transition-all`}
-            >
-              Marketplace
-            </Link>
-            <Link
-              href="/community"
-              className={`${
-                pathname.startsWith("/community") 
-                  ? "text-[#ee2b8c] dark:text-[#FF00FF] drop-shadow-[0_0_5px_currentColor]" 
-                  : "text-gray-600 dark:text-gray-300 hover:text-[#ee2b8c] dark:hover:text-[#FF00FF]"
-              } transition-all`}
-            >
-              Community
-            </Link>
-          </nav>
+        {/* Center/Right: Desktop Links and Actions */}
+        <nav className="hidden md:flex items-center justify-center gap-4 lg:gap-8 font-display tracking-wide uppercase text-[10px] lg:text-xs font-bold">
+          <Link
+            href="/"
+            className={`${
+              pathname === "/" 
+                ? "text-[#ee2b8c] dark:text-[#FF00FF] drop-shadow-[0_0_5px_currentColor]" 
+                : "text-gray-600 dark:text-gray-300 hover:text-[#ee2b8c] dark:hover:text-[#FF00FF]"
+            } transition-all`}
+          >
+            Home
+          </Link>
+          <Link
+            href="/events"
+            className={`${
+              pathname.startsWith("/events") 
+                ? "text-[#ee2b8c] dark:text-[#FF00FF] drop-shadow-[0_0_5px_currentColor]" 
+                : "text-gray-600 dark:text-gray-300 hover:text-[#ee2b8c] dark:hover:text-[#FF00FF]"
+            } transition-all`}
+          >
+            Events
+          </Link>
+        </nav>
 
-          {isAuthenticated ? (
-            <div className="flex items-center gap-2 lg:gap-4">
-              {/* Cart Icon */}
-              <Tooltip title="View Cart">
-                <IconButton 
-                  onClick={() => setCartOpen(true)}
-                  sx={{ 
-                    color: isDark ? "#fff" : "#1a1a1a",
-                    "&:hover": { color: "#ee2b8c" }
-                  }}
-                >
-                  <Badge 
-                    badgeContent={cartItemsCount} 
-                    color="primary"
-                    sx={{
-                      "& .MuiBadge-badge": {
-                        bgcolor: "#ee2b8c",
-                        color: "white",
-                        fontWeight: "bold",
-                        borderRadius: 0,
-                        border: "1px solid black"
-                      }
+        <div className="flex-1 flex items-center justify-end gap-1.5 md:gap-4 lg:gap-8">
+          {/* Desktop Only Actions */}
+          <div className="hidden md:flex items-center gap-4 lg:gap-8">
+            {isAuthenticated ? (
+              <div className="flex items-center gap-2 lg:gap-4">
+                {/* Cart Icon */}
+                <Tooltip title="View Cart">
+                  <IconButton 
+                    onClick={() => setCartOpen(true)}
+                    sx={{ 
+                      color: isDark ? "#fff" : "#1a1a1a",
+                      "&:hover": { color: "#ee2b8c" }
                     }}
                   >
-                    <ShoppingCartIcon className="size-6" />
-                  </Badge>
-                </IconButton>
-              </Tooltip>
-
-              {/* Notification Bell */}
-              <NotificationBell />
-              
-              {/* Avatar Button */}
-              <Tooltip title="Account settings">
-                <IconButton
-                  onClick={handleClick}
-                  size="small"
-                  aria-controls={open ? "account-menu" : undefined}
-                  aria-haspopup="true"
-                  aria-expanded={open ? "true" : undefined}
-                  sx={{
-                    border: "2px solid",
-                    borderColor: open ? "#ee2b8c" : "transparent",
-                    borderRadius: 0,
-                    transition: "all 0.2s",
-                    "&:hover": { borderColor: "#ee2b8c" },
-                  }}
-                >
-                  <Avatar
-                    alt={user?.name || "User"}
-                    src={user?.avatarUrl}
-                    sx={{ width: 32, height: 32, borderRadius: 0 }}
-                  />
-                </IconButton>
-              </Tooltip>
-
-              {/* Dropdown Menu — Neon Hype Style */}
-              <Menu
-                anchorEl={anchorEl}
-                id="account-menu"
-                open={open}
-                onClose={handleClose}
-                PaperProps={{
-                  elevation: 0,
-                  sx: {
-                    overflow: "visible",
-                    bgcolor: isDark ? "#0a0a0a" : "#ffffff",
-                    color: isDark ? "#fff" : "#111",
-                    border: "2px solid #ee2b8c",
-                    borderRadius: 0,
-                    boxShadow: "6px 6px 0px 0px #ee2b8c",
-                    mt: 1.5,
-                    minWidth: 260,
-                    "& .MuiMenuItem-root": {
-                      borderRadius: 0,
-                      fontSize: 12,
-                      fontWeight: 700,
-                      textTransform: "uppercase",
-                      letterSpacing: "0.05em",
-                      color: isDark ? "#ccc" : "#555",
-                      py: 1.2,
-                      "&:hover": {
-                        bgcolor: isDark ? "rgba(238, 43, 140, 0.1)" : "rgba(238, 43, 140, 0.06)",
-                        color: "#ee2b8c",
-                      },
-                    },
-                    "& .MuiListItemIcon-root": {
-                      color: isDark ? "#888" : "#999",
-                      minWidth: 36,
-                    },
-                    "& .MuiMenuItem-root:hover .MuiListItemIcon-root": {
-                      color: "#ee2b8c",
-                    },
-                    "& .MuiDivider-root": {
-                      borderColor: isDark ? "#222" : "#eee",
-                      my: 0.5,
-                    },
-                    "&:before": {
-                      content: '""',
-                      display: "block",
-                      position: "absolute",
-                      top: 0,
-                      right: 14,
-                      width: 10,
-                      height: 10,
-                      bgcolor: isDark ? "#0a0a0a" : "#ffffff",
-                      border: "2px solid #ee2b8c",
-                      borderBottom: "none",
-                      borderLeft: "none",
-                      transform: "translateY(-50%) rotate(-45deg)",
-                      zIndex: 0,
-                    },
-                  },
-                }}
-                transformOrigin={{ horizontal: "right", vertical: "top" }}
-                anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-              >
-                {/* User Profile Header */}
-                <div
-                  style={{
-                    padding: "14px 16px",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 12,
-                    borderBottom: isDark ? "1px dashed #333" : "1px dashed #ddd",
-                  }}
-                >
-                  <Avatar
-                    alt={user?.name || "User"}
-                    src={user?.avatarUrl}
-                    sx={{
-                      width: 42,
-                      height: 42,
-                      borderRadius: 0,
-                      border: "2px solid #ee2b8c",
-                      boxShadow: "3px 3px 0px 0px #ee2b8c",
-                    }}
-                  />
-                  <div style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
-                    <span
-                      style={{
-                        fontWeight: 900,
-                        fontSize: 14,
-                        lineHeight: 1.3,
-                        color: isDark ? "#fff" : "#111",
-                        textTransform: "uppercase",
-                        letterSpacing: "0.02em",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
+                    <Badge 
+                      badgeContent={cartItemsCount} 
+                      color="primary"
+                      sx={{
+                        "& .MuiBadge-badge": {
+                          bgcolor: "#ee2b8c",
+                          color: "white",
+                          fontWeight: "bold",
+                          borderRadius: 0,
+                          border: "1px solid black"
+                        }
                       }}
                     >
-                      {user?.name || "User"}
-                    </span>
-                    <span
-                      style={{
-                        fontSize: 10,
-                        color: "#888",
-                        fontWeight: 600,
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {user?.email || ""}
-                    </span>
-                  </div>
-                </div>
+                      <ShoppingCartIcon className="size-6" />
+                    </Badge>
+                  </IconButton>
+                </Tooltip>
 
-                {/* Organizer Store Section */}
-                {isOrganizer && user?.organizer && (
-                  <MenuItem
-                    component="a"
-                    href="/dashboard"
-                    onClick={handleClose}
+                {/* Notification Bell */}
+                <NotificationBell />
+                
+                {/* Avatar Button */}
+                <Tooltip title="Account settings">
+                  <IconButton
+                    onClick={handleClick}
+                    size="small"
+                    aria-controls={open ? "account-menu" : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={open ? "true" : undefined}
                     sx={{
-                      py: "12px !important",
-                      px: "16px !important",
-                      bgcolor: "rgba(168, 85, 247, 0.08) !important",
-                      borderBottom: isDark ? "1px dashed #333" : "1px dashed #ddd",
-                      gap: 1.5,
-                      "&:hover": {
-                        bgcolor: "rgba(168, 85, 247, 0.18) !important",
-                        color: "#A855F7 !important",
-                      },
+                      border: "2px solid",
+                      borderColor: open ? "#ee2b8c" : "transparent",
+                      borderRadius: 0,
+                      transition: "all 0.2s",
+                      "&:hover": { borderColor: "#ee2b8c" },
                     }}
                   >
                     <Avatar
-                      src={user.organizer.logoUrl || undefined}
-                      sx={{
-                        width: 34,
-                        height: 34,
+                      alt={user?.name || "User"}
+                      src={user?.avatarUrl}
+                      sx={{ width: 32, height: 32, borderRadius: 0 }}
+                    />
+                  </IconButton>
+                </Tooltip>
+
+                {/* Dropdown Menu — Neon Hype Style */}
+                <Menu
+                  anchorEl={anchorEl}
+                  id="account-menu"
+                  open={open}
+                  onClose={handleClose}
+                  PaperProps={{
+                    elevation: 0,
+                    sx: {
+                      overflow: "visible",
+                      bgcolor: isDark ? "#0a0a0a" : "#ffffff",
+                      color: isDark ? "#fff" : "#111",
+                      border: "2px solid #ee2b8c",
+                      borderRadius: 0,
+                      boxShadow: "6px 6px 0px 0px #ee2b8c",
+                      mt: 1.5,
+                      minWidth: 260,
+                      "& .MuiMenuItem-root": {
                         borderRadius: 0,
-                        bgcolor: "#A855F7",
-                        fontSize: 15,
-                        fontWeight: 900,
-                        border: "2px solid #A855F7",
-                        boxShadow: "3px 3px 0px 0px #7C3AED",
+                        fontSize: 12,
+                        fontWeight: 700,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em",
+                        color: isDark ? "#ccc" : "#555",
+                        py: 1.2,
+                        "&:hover": {
+                          bgcolor: isDark ? "rgba(238, 43, 140, 0.1)" : "rgba(238, 43, 140, 0.06)",
+                          color: "#ee2b8c",
+                        },
+                      },
+                      "& .MuiListItemIcon-root": {
+                        color: isDark ? "#888" : "#999",
+                        minWidth: 36,
+                      },
+                      "& .MuiMenuItem-root:hover .MuiListItemIcon-root": {
+                        color: "#ee2b8c",
+                      },
+                      "& .MuiDivider-root": {
+                        borderColor: isDark ? "#222" : "#eee",
+                        my: 0.5,
+                      },
+                      "&:before": {
+                        content: '""',
+                        display: "block",
+                        position: "absolute",
+                        top: 0,
+                        right: 14,
+                        width: 10,
+                        height: 10,
+                        bgcolor: isDark ? "#0a0a0a" : "#ffffff",
+                        border: "2px solid #ee2b8c",
+                        borderBottom: "none",
+                        borderLeft: "none",
+                        transform: "translateY(-50%) rotate(-45deg)",
+                        zIndex: 0,
+                      },
+                    },
+                  }}
+                  transformOrigin={{ horizontal: "right", vertical: "top" }}
+                  anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+                >
+                  {/* User Profile Header */}
+                  <div
+                    style={{
+                      padding: "14px 16px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 12,
+                      borderBottom: isDark ? "1px dashed #333" : "1px dashed #ddd",
+                    }}
+                  >
+                    <Avatar
+                      alt={user?.name || "User"}
+                      src={user?.avatarUrl}
+                      sx={{
+                        width: 42,
+                        height: 42,
+                        borderRadius: 0,
+                        border: "2px solid #ee2b8c",
+                        boxShadow: "3px 3px 0px 0px #ee2b8c",
                       }}
-                    >
-                      {user.organizer.name.charAt(0).toUpperCase()}
-                    </Avatar>
-                    <div style={{ display: "flex", flexDirection: "column", minWidth: 0, flex: 1 }}>
+                    />
+                    <div style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
                       <span
                         style={{
-                          fontSize: 9,
-                          fontWeight: 800,
-                          textTransform: "uppercase",
-                          letterSpacing: "0.1em",
-                          color: "#A855F7",
-                        }}
-                      >
-                        ⚡ My Event Organizer
-                      </span>
-                      <span
-                        style={{
-                          fontWeight: 800,
-                          fontSize: 13,
+                          fontWeight: 900,
+                          fontSize: 14,
+                          lineHeight: 1.3,
                           color: isDark ? "#fff" : "#111",
-                          textTransform: "none",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.02em",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
                           whiteSpace: "nowrap",
                         }}
                       >
-                        {user.organizer.name}
+                        {user?.name || "User"}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: 10,
+                          color: "#888",
+                          fontWeight: 600,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {user?.email || ""}
                       </span>
                     </div>
-                    <span style={{ fontSize: 10, color: "#555" }}>→</span>
-                  </MenuItem>
-                )}
+                  </div>
 
-                <MenuItem
-                  onClick={handleClose}
-                  component="a"
-                  href="/user-referral"
-                >
-                  <ListItemIcon>
-                    <Person fontSize="small" />
-                  </ListItemIcon>
-                  Profile
-                </MenuItem>
+                  {/* Organizer Store Section */}
+                  {isOrganizer && user?.organizer && (
+                    <MenuItem
+                      component="a"
+                      href="/dashboard"
+                      onClick={handleClose}
+                      sx={{
+                        py: "12px !important",
+                        px: "16px !important",
+                        bgcolor: "rgba(168, 85, 247, 0.08) !important",
+                        borderBottom: isDark ? "1px dashed #333" : "1px dashed #ddd",
+                        gap: 1.5,
+                        "&:hover": {
+                          bgcolor: "rgba(168, 85, 247, 0.18) !important",
+                          color: "#A855F7 !important",
+                        },
+                      }}
+                    >
+                      <Avatar
+                        src={user.organizer.logoUrl || undefined}
+                        sx={{
+                          width: 34,
+                          height: 34,
+                          borderRadius: 0,
+                          bgcolor: "#A855F7",
+                          fontSize: 15,
+                          fontWeight: 900,
+                          border: "2px solid #A855F7",
+                          boxShadow: "3px 3px 0px 0px #7C3AED",
+                        }}
+                      >
+                        {user.organizer.name.charAt(0).toUpperCase()}
+                      </Avatar>
+                      <div style={{ display: "flex", flexDirection: "column", minWidth: 0, flex: 1 }}>
+                        <span
+                          style={{
+                            fontSize: 9,
+                            fontWeight: 800,
+                            textTransform: "uppercase",
+                            letterSpacing: "0.1em",
+                            color: "#A855F7",
+                          }}
+                        >
+                          ⚡ My Event Organizer
+                        </span>
+                        <span
+                          style={{
+                            fontWeight: 800,
+                            fontSize: 13,
+                            color: isDark ? "#fff" : "#111",
+                            textTransform: "none",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {user.organizer.name}
+                        </span>
+                      </div>
+                      <span style={{ fontSize: 10, color: "#555" }}>→</span>
+                    </MenuItem>
+                  )}
 
-                <MenuItem onClick={handleClose}>
-                  <ListItemIcon>
-                    <Settings fontSize="small" />
-                  </ListItemIcon>
-                  Settings
-                </MenuItem>
-
-                <MenuItem
-                  onClick={handleClose}
-                  component="a"
-                  href="/user/orders"
-                >
-                  <ListItemIcon>
-                    <ShoppingCartIcon className="w-5 h-5" />
-                  </ListItemIcon>
-                  My Vibes
-                </MenuItem>
-
-                {!isOrganizer && (
                   <MenuItem
                     onClick={handleClose}
                     component="a"
-                    href="/become-organizer"
+                    href="/user/referral"
+                  >
+                    <ListItemIcon>
+                      <Person fontSize="small" />
+                    </ListItemIcon>
+                    Profile
+                  </MenuItem>
+
+                  <MenuItem onClick={handleClose}>
+                    <ListItemIcon>
+                      <Settings fontSize="small" />
+                    </ListItemIcon>
+                    Settings
+                  </MenuItem>
+
+                  <MenuItem
+                    onClick={handleClose}
+                    component="a"
+                    href="/user/orders"
+                  >
+                    <ListItemIcon>
+                      <ShoppingCartIcon className="w-5 h-5" />
+                    </ListItemIcon>
+                    My Vibes
+                  </MenuItem>
+
+                  {!isOrganizer && (
+                    <MenuItem
+                      onClick={handleClose}
+                      component="a"
+                      href="/become-organizer"
+                      sx={{
+                        color: "#A855F7 !important",
+                        "&:hover": {
+                          bgcolor: "rgba(168, 85, 247, 0.12) !important",
+                        },
+                      }}
+                    >
+                      <ListItemIcon>
+                        <Campaign fontSize="small" sx={{ color: "#A855F7 !important" }} />
+                      </ListItemIcon>
+                      Become Organizer
+                    </MenuItem>
+                  )}
+
+                  <Divider />
+
+                  <MenuItem
+                    onClick={handleLogout}
                     sx={{
-                      color: "#A855F7 !important",
                       "&:hover": {
-                        bgcolor: "rgba(168, 85, 247, 0.12) !important",
+                        color: "#ef4444 !important",
+                      },
+                      "& .MuiListItemIcon-root": {
+                        color: "#666",
+                      },
+                      "&:hover .MuiListItemIcon-root": {
+                        color: "#ef4444 !important",
                       },
                     }}
                   >
                     <ListItemIcon>
-                      <Campaign fontSize="small" sx={{ color: "#A855F7 !important" }} />
+                      <Logout fontSize="small" />
                     </ListItemIcon>
-                    Become Organizer
+                    Logout
                   </MenuItem>
-                )}
-
-                <Divider />
-
-                <MenuItem
-                  onClick={handleLogout}
-                  sx={{
-                    "&:hover": {
-                      color: "#ef4444 !important",
-                    },
-                    "& .MuiListItemIcon-root": {
-                      color: "#666",
-                    },
-                    "&:hover .MuiListItemIcon-root": {
-                      color: "#ef4444 !important",
-                    },
-                  }}
+                </Menu>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 lg:gap-3">
+                <Link
+                  href="/login"
+                  className="flex min-w-[60px] lg:min-w-[70px] cursor-pointer items-center justify-center rounded-none h-7 md:h-8 lg:h-9 px-2 md:px-3 lg:px-4 bg-transparent border-2 border-gray-800 dark:border-white text-gray-800 dark:text-white hover:bg-gray-800 dark:hover:bg-white hover:text-white dark:hover:text-black transition-all text-[10px] lg:text-xs font-bold uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,0.2)] lg:shadow-[3px_3px_0px_0px_rgba(0,0,0,0.2)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.3)] lg:dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,0.3)]"
                 >
-                  <ListItemIcon>
-                    <Logout fontSize="small" />
-                  </ListItemIcon>
-                  Logout
-                </MenuItem>
-              </Menu>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2 lg:gap-3">
-              <Link
-                href="/login"
-                className="flex min-w-[60px] lg:min-w-[70px] cursor-pointer items-center justify-center rounded-none h-7 md:h-8 lg:h-9 px-2 md:px-3 lg:px-4 bg-transparent border-2 border-gray-800 dark:border-white text-gray-800 dark:text-white hover:bg-gray-800 dark:hover:bg-white hover:text-white dark:hover:text-black transition-all text-[10px] lg:text-xs font-bold uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,0.2)] lg:shadow-[3px_3px_0px_0px_rgba(0,0,0,0.2)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.3)] lg:dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,0.3)]"
-              >
-                Log In
-              </Link>
-              <Link
-                href="/register"
-                className="flex min-w-[60px] lg:min-w-[70px] cursor-pointer items-center justify-center rounded-none h-7 md:h-8 lg:h-9 px-2 md:px-3 lg:px-4 bg-[#ee2b8c] dark:bg-[#FF00FF] text-white dark:text-black hover:bg-[#d61f7a] dark:hover:bg-[#00FFFF] transition-colors text-[10px] lg:text-xs font-bold uppercase tracking-wider shadow-[2px_2px_0px_0px_#d61f7a] lg:shadow-[3px_3px_0px_0px_#d61f7a] dark:shadow-[2px_2px_0px_0px_#B026FF] lg:dark:shadow-[3px_3px_0px_0px_#B026FF]"
-              >
-                Sign Up
-              </Link>
-            </div>
-          )}
-        </div>
+                  Log In
+                </Link>
+                <Link
+                  href="/register"
+                  className="flex min-w-[60px] lg:min-w-[70px] cursor-pointer items-center justify-center rounded-none h-7 md:h-8 lg:h-9 px-2 md:px-3 lg:px-4 bg-[#ee2b8c] dark:bg-[#FF00FF] text-white dark:text-black hover:bg-[#d61f7a] dark:hover:bg-[#00FFFF] transition-colors text-[10px] lg:text-xs font-bold uppercase tracking-wider shadow-[2px_2px_0px_0px_#d61f7a] lg:shadow-[3px_3px_0px_0px_#d61f7a] dark:shadow-[2px_2px_0px_0px_#B026FF] lg:dark:shadow-[3px_3px_0px_0px_#B026FF]"
+                >
+                  Sign Up
+                </Link>
+              </div>
+            )}
+          </div>
 
-        {/* Mobile Actions */}
-        <div className="md:hidden flex items-center gap-1.5">
-          {isAuthenticated && (
-            <>
-              <IconButton 
-                size="small"
-                onClick={() => setCartOpen(true)}
-                sx={{ color: isDark ? "#fff" : "#1a1a1a" }}
-              >
-                <Badge badgeContent={cartItemsCount} color="primary" sx={{ "& .MuiBadge-badge": { borderRadius: 0 } }}>
-                  <ShoppingCartIcon className="size-5" />
-                </Badge>
-              </IconButton>
-              <NotificationBell />
-            </>
-          )}
-          <button
-            onClick={toggle}
-            className="text-gray-800 dark:text-white p-1.5 hover:text-[#ee2b8c] dark:hover:text-[#FF00FF] transition-colors"
-            aria-label="Toggle menu"
-          >
-            {isOpen ? <CloseIcon /> : <MenuIcon />}
-          </button>
+          {/* Mobile Actions Overlay Trigger */}
+          <div className="md:hidden flex items-center gap-1.5">
+            {isAuthenticated && (
+              <>
+                <IconButton 
+                  size="small"
+                  onClick={() => setCartOpen(true)}
+                  sx={{ color: isDark ? "#fff" : "#1a1a1a" }}
+                >
+                  <Badge badgeContent={cartItemsCount} color="primary" sx={{ "& .MuiBadge-badge": { borderRadius: 0 } }}>
+                    <ShoppingCartIcon className="size-5" />
+                  </Badge>
+                </IconButton>
+                <NotificationBell />
+              </>
+            )}
+            <button
+              onClick={toggle}
+              className="text-gray-800 dark:text-white p-1.5 hover:text-[#ee2b8c] dark:hover:text-[#FF00FF] transition-colors"
+              aria-label="Toggle menu"
+            >
+              {isOpen ? <CloseIcon /> : <MenuIcon />}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -584,7 +569,7 @@ const MainNavbar: React.FC = () => {
               {isAuthenticated && (
                 <div className="w-full max-w-[280px] flex flex-col gap-1.5 mt-3 border-t-2 border-dashed border-gray-200 dark:border-gray-800 pt-4">
                   <Link
-                    href="/user-referral"
+                    href="/user/referral"
                     onClick={close}
                     className="flex items-center gap-3 px-3 py-2.5 text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-gray-300 hover:text-[#ee2b8c] dark:hover:text-[#ee2b8c] hover:bg-[#ee2b8c]/5 transition-all"
                   >

@@ -11,6 +11,7 @@ import {
 
 import { ManageEventItem } from "../types/manageEvent.types";
 import Link from "next/link";
+import { Tooltip } from "@mui/material";
 
 interface ManageEventCardProps {
   event: ManageEventItem;
@@ -60,9 +61,9 @@ const ManageEventCard: React.FC<ManageEventCardProps> = ({ event }) => {
     progressColor = "bg-gray-200 dark:bg-gray-700";
 
   return (
-    <div className="flex flex-col md:flex-row gap-5 p-4 md:p-6 bg-white dark:bg-[#111] border border-gray-100 dark:border-white/5 rounded-2xl md:rounded-3xl shadow-sm hover:shadow-md transition-shadow">
+    <div className="flex flex-col md:flex-row gap-4 md:gap-5 p-4 md:p-6 bg-white dark:bg-[#221019] border border-gray-100 dark:border-[#3a1d2e] rounded-2xl md:rounded-3xl shadow-sm hover:shadow-md transition-shadow">
       {/* Event Image */}
-      <div className="relative w-full md:w-56 h-40 md:h-auto rounded-xl md:rounded-2xl overflow-hidden bg-gray-100 dark:bg-white/5 flex-shrink-0 flex items-center justify-center">
+      <div className="relative w-full md:w-56 h-48 sm:h-56 md:h-auto rounded-xl md:rounded-2xl overflow-hidden bg-gray-100 dark:bg-white/5 flex-shrink-0 flex items-center justify-center">
         {event.image ? (
           <Image
             src={event.image}
@@ -85,14 +86,16 @@ const ManageEventCard: React.FC<ManageEventCardProps> = ({ event }) => {
       {/* Event Info */}
       <div className="flex-1 flex flex-col justify-between pt-1">
         <div>
-          <div className="flex justify-between items-start gap-4 mb-2">
-            <h3 className="text-lg md:text-xl font-black font-display tracking-tight text-foreground line-clamp-1">
-              {event.title}
-            </h3>
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-between sm:items-start gap-2 sm:gap-4 mb-2">
+            <Tooltip title={event.title} placement="top-start" enterTouchDelay={0}>
+              <h3 className="text-xl md:text-xl font-black font-display tracking-tight text-foreground line-clamp-2 md:line-clamp-1 cursor-help">
+                {event.title}
+              </h3>
+            </Tooltip>
 
             {/* Status Badge */}
             <span
-              className={`px-3 py-1 text-xs font-bold rounded-full border flex-shrink-0 ${status.bg} ${status.color} ${status.border}`}
+              className={`px-3 py-1 text-xs font-bold rounded-full border self-start sm:self-auto flex-shrink-0 ${status.bg} ${status.color} ${status.border}`}
             >
               ● {status.label}
             </span>
@@ -111,9 +114,9 @@ const ManageEventCard: React.FC<ManageEventCardProps> = ({ event }) => {
         </div>
 
         {/* Footer */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-5 md:gap-6 mt-2 md:mt-0">
           {/* Ticket Progress */}
-          <div className="flex-1 max-w-sm">
+          <div className="flex-1 w-full max-w-full xl:max-w-sm">
             <div className="flex justify-between items-center text-xs font-bold mb-2">
               <span className="text-gray-500 uppercase tracking-widest text-[10px]">
                 Tickets Sold
@@ -138,25 +141,12 @@ const ManageEventCard: React.FC<ManageEventCardProps> = ({ event }) => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-2 md:gap-3">
-            <button
-              className="p-2 md:p-2.5 text-gray-400 hover:text-foreground hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors"
-              title="Edit Event"
-            >
-              <PencilIcon className="w-5 h-5" />
-            </button>
-            <button
-              className="p-2 md:p-2.5 text-gray-400 hover:text-foreground hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors"
-              title="View Analytics"
-            >
-              <ChartBarIcon className="w-5 h-5" />
-            </button>
-
+          <div className="flex items-center gap-2 md:gap-3 w-full xl:w-auto mt-2 xl:mt-0">
             {/* Primary Action */}
             {event.status === "completed" ? (
               <button
                 disabled
-                className="ml-2 flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-white/5 text-gray-400 rounded-full text-sm font-bold cursor-not-allowed"
+                className="ml-auto flex items-center justify-center gap-2 px-4 py-2 w-full sm:w-auto bg-gray-50 dark:bg-white/5 text-gray-400 rounded-full text-sm font-bold cursor-not-allowed"
               >
                 <svg
                   className="w-4 h-4"
@@ -174,8 +164,8 @@ const ManageEventCard: React.FC<ManageEventCardProps> = ({ event }) => {
                 Archived
               </button>
             ) : (
-              <Link href={`/dashboard/events/${event.id}/tickets`} passHref>
-                <button className="ml-2 flex items-center gap-2 px-5 py-2.5 bg-foreground text-background dark:bg-white dark:text-black rounded-full text-sm font-bold hover:bg-neon-pink hover:text-white dark:hover:bg-neon-pink transition-colors">
+              <Link href={`/dashboard/events/${event.id}/tickets`} passHref className="ml-auto w-full sm:w-auto">
+                <button className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-foreground text-background dark:bg-white dark:text-black rounded-full text-xs font-bold hover:bg-neon-pink hover:text-white dark:hover:bg-neon-pink transition-colors">
                   <TicketIcon className="w-5 h-5 flex-shrink-0" />
                   Manage Tickets
                 </button>

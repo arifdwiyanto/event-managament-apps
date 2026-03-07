@@ -19,7 +19,7 @@ const QuickActionsCard = () => {
     <Paper
       elevation={0}
       sx={{
-        p: { xs: 3, md: 4 },
+        p: { xs: 2.5, md: 3 },
         borderRadius: 1,
         border: "1px solid",
         borderColor: "divider",
@@ -27,7 +27,7 @@ const QuickActionsCard = () => {
     >
       <Typography
         variant="h6"
-        sx={{ fontWeight: 800, mb: 3, color: "text.primary" }}
+        sx={{ fontWeight: 800, mb: 2.5, color: "text.primary" }}
       >
         Quick Actions
       </Typography>

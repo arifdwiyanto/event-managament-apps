@@ -10,6 +10,15 @@ export interface OrderItem {
     name: string;
     price: string | number;
     description: string | null;
+    event?: {
+      id: string;
+      name: string;
+      organizerId: string;
+      organizer?: {
+        id: string;
+        name: string;
+      };
+    };
   };
 }
 

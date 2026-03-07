@@ -39,7 +39,10 @@ export const useManageTicketsData = (eventId: string) => {
     const fetchEventData = async () => {
       if (!eventId) return;
 
-      setIsLoading(true);
+      // Only show full loading spinner on initial fetch
+      if (refreshTicket === 0) {
+        setIsLoading(true);
+      }
       setError(null);
 
       try {
@@ -83,6 +86,8 @@ export const useManageTicketsData = (eventId: string) => {
             sold,
             total: capacity,
             colorHex: tierColors[index % tierColors.length],
+            price: priceNum,
+            description: t.description || "",
           };
         });
 

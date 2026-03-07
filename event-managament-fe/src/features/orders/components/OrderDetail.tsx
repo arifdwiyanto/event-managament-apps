@@ -12,6 +12,7 @@ import {
 import { format } from "date-fns";
 import { useUploadPaymentProof } from "../hooks/useOrders";
 import ReviewModal from "@/features/reviews/components/ReviewModal";
+import { groupOrderItemsByOrganizer } from "../utils/groupOrders";
 
 interface IOrderDetailProps {
   order: Order;
@@ -130,80 +131,94 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
             </Typography>
             <Divider className="!border-black dark:!border-neon-cyan !border-[1.5px] mb-6" />
 
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-              {order.items.map((item) => (
-                <Box
-                  key={item.id}
-                  className="border-2 border-dashed !border-gray-300 dark:!border-neon-purple p-4"
-                  sx={{ 
-                    display: "flex", 
-                    flexDirection: { xs: "column", sm: "row" },
-                    gap: 2 
-                  }}
-                >
-                  <Box
-                    sx={{ flex: 1, display: "flex", flexDirection: "column" }}
-                  >
-                    <Typography className="font-black uppercase text-[10px] md:text-sm mb-1 text-black dark:text-white leading-tight">
-                      {order.event?.name}
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              {groupOrderItemsByOrganizer(order.items).map((group) => (
+                <Box key={group.organizerId} sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                    <Box sx={{ height: "2px", flex: 1, backgroundColor: "rgba(0,0,0,0.1)", dark: { backgroundColor: "rgba(255,255,255,0.1)" } }} className="bg-black/10 dark:bg-white/10" />
+                    <Typography className="font-display font-black uppercase text-[10px] tracking-widest text-neon-purple dark:text-neon-cyan whitespace-nowrap">
+                      EO: {group.organizerName}
                     </Typography>
-                    <Typography className="text-neon-purple dark:text-neon-cyan font-black uppercase text-[8px] md:text-[10px] tracking-widest">
-                      {item.ticketType.name}
-                    </Typography>
-                    <Typography className="text-gray-500 dark:text-gray-400 font-bold mt-1 md:mt-2 text-[8px] md:text-xs">
-                      Price: IDR{" "}
-                      {Number(item.ticketType.price).toLocaleString("id-ID")}
-                    </Typography>
+                    <Box sx={{ height: "2px", flex: 1, backgroundColor: "rgba(0,0,0,0.1)", dark: { backgroundColor: "rgba(255,255,255,0.1)" } }} className="bg-black/10 dark:bg-white/10" />
                   </Box>
 
-                  <Box
-                    sx={{
-                      textAlign: { xs: "left", sm: "right" },
-                      display: "flex",
-                      flexDirection: { xs: "row", sm: "column" },
-                      justifyContent: "space-between",
-                      alignItems: { xs: "center", sm: "flex-end" },
-                      pt: { xs: 2, sm: 0 },
-                      borderTop: { xs: "1px dashed #eee", sm: "none" },
-                    }}
-                    className="dark:!border-t-neon-cyan/50 sm:dark:!border-t-0"
-                  >
-                    <Box>
-                      <Typography className="font-black text-[10px] md:text-sm text-black dark:text-white inline-block mr-2 sm:block sm:mr-0">
-                        x {item.quantity}
-                      </Typography>
-                      <Typography className="font-display font-black text-sm md:text-lg text-black dark:text-neon-cyan sm:mt-1">
-                        IDR{" "}
-                        {(
-                          Number(item.ticketType.price) * item.quantity
-                        ).toLocaleString("id-ID")}
-                      </Typography>
-                    </Box>
-                    {order.status === "PAID" && !isOrganizerView && (
-                        <Button
-                        size="small"
-                        onClick={() => setIsReviewOpen(true)}
-                        className="bg-neon-magenta text-white sm:mt-4 brutalist-button hover:shadow-neon-pink"
-                        sx={{
-                          py: 0.5,
-                          px: 1.5,
-                          fontSize: "0.6rem",
-                          fontWeight: 900,
-                          textTransform: "uppercase",
-                          letterSpacing: "0.05em",
-                          boxShadow: "3px 3px 0 0 #000",
-                          border: "2px solid black",
-                          borderRadius: 0,
-                          "&:hover": {
-                            backgroundColor: "#ff008a",
-                            transform: "translate(-2px, -2px)",
-                            color: "white",
-                          },
+                  <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                    {group.items.map((item) => (
+                      <Box
+                        key={item.id}
+                        className="border-2 border-dashed !border-gray-300 dark:!border-neon-purple p-4"
+                        sx={{ 
+                          display: "flex", 
+                          flexDirection: { xs: "column", sm: "row" },
+                          gap: 2 
                         }}
                       >
-                        Review Vibe
-                      </Button>
-                    )}
+                        <Box
+                          sx={{ flex: 1, display: "flex", flexDirection: "column" }}
+                        >
+                          <Typography className="font-black uppercase text-[10px] md:text-sm mb-1 text-black dark:text-white leading-tight">
+                            {item.ticketType.event?.name || order.event?.name}
+                          </Typography>
+                          <Typography className="text-neon-purple dark:text-neon-cyan font-black uppercase text-[8px] md:text-[10px] tracking-widest">
+                            {item.ticketType.name}
+                          </Typography>
+                          <Typography className="text-gray-500 dark:text-gray-400 font-bold mt-1 md:mt-2 text-[8px] md:text-xs">
+                            Price: IDR{" "}
+                            {Number(item.ticketType.price).toLocaleString("id-ID")}
+                          </Typography>
+                        </Box>
+
+                        <Box
+                          sx={{
+                            textAlign: { xs: "left", sm: "right" },
+                            display: "flex",
+                            flexDirection: { xs: "row", sm: "column" },
+                            justifyContent: "space-between",
+                            alignItems: { xs: "center", sm: "flex-end" },
+                            pt: { xs: 2, sm: 0 },
+                            borderTop: { xs: "1px dashed #eee", sm: "none" },
+                          }}
+                          className="dark:!border-t-neon-cyan/50 sm:dark:!border-t-0"
+                        >
+                          <Box>
+                            <Typography className="font-black text-[10px] md:text-sm text-black dark:text-white inline-block mr-2 sm:block sm:mr-0">
+                              x {item.quantity}
+                            </Typography>
+                            <Typography className="font-display font-black text-sm md:text-lg text-black dark:text-neon-cyan sm:mt-1">
+                              IDR{" "}
+                              {(
+                                Number(item.ticketType.price) * item.quantity
+                              ).toLocaleString("id-ID")}
+                            </Typography>
+                          </Box>
+                          {order.status === "PAID" && !isOrganizerView && (
+                              <Button
+                              size="small"
+                              onClick={() => setIsReviewOpen(true)}
+                              className="bg-neon-magenta text-white sm:mt-4 brutalist-button hover:shadow-neon-pink"
+                              sx={{
+                                py: 0.5,
+                                px: 1.5,
+                                fontSize: "0.6rem",
+                                fontWeight: 900,
+                                textTransform: "uppercase",
+                                letterSpacing: "0.05em",
+                                boxShadow: "3px 3px 0 0 #000",
+                                border: "2px solid black",
+                                borderRadius: 0,
+                                "&:hover": {
+                                  backgroundColor: "#ff008a",
+                                  transform: "translate(-2px, -2px)",
+                                  color: "white",
+                                },
+                              }}
+                            >
+                              Review Vibe
+                            </Button>
+                          )}
+                        </Box>
+                      </Box>
+                    ))}
                   </Box>
                 </Box>
               ))}

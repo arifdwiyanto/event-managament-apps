@@ -27,7 +27,7 @@ const ManageEventsFilter: React.FC<ManageEventsFilterProps> = ({
   setLocation,
 }) => {
   return (
-    <aside className="w-full lg:w-64 xl:w-72 flex-shrink-0 bg-white dark:bg-[#111] rounded-2xl md:rounded-3xl p-5 md:p-6 shadow-sm border border-gray-100 dark:border-white/5 lg:sticky top-8 self-start">
+    <aside className="w-full lg:w-64 xl:w-72 flex-shrink-0 bg-white dark:bg-[#221019] rounded-2xl md:rounded-3xl p-5 md:p-6 shadow-sm border border-gray-100 dark:border-[#3a1d2e] lg:sticky top-8 self-start">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-black font-display tracking-tight text-foreground">
           Filters
@@ -95,7 +95,7 @@ const ManageEventsFilter: React.FC<ManageEventsFilterProps> = ({
             <select
               value={dateRange}
               onChange={(e) => setDateRange(e.target.value)}
-              className="w-full appearance-none bg-gray-50 dark:bg-black/50 border border-gray-200 dark:border-gray-800 rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:ring-2 focus:ring-neon-pink focus:outline-none focus:border-neon-pink transition-colors pr-10 cursor-pointer"
+              className="w-full appearance-none bg-gray-50 dark:bg-[#1a0c13] border border-gray-200 dark:border-[#3a1d2e] rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:ring-2 focus:ring-neon-pink focus:outline-none focus:border-neon-pink transition-colors pr-10 cursor-pointer"
             >
               <option value="upcoming">Upcoming</option>
               <option value="past">Past</option>
@@ -115,7 +115,7 @@ const ManageEventsFilter: React.FC<ManageEventsFilterProps> = ({
             <select
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              className="w-full appearance-none bg-gray-50 dark:bg-black/50 border border-gray-200 dark:border-gray-800 rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:ring-2 focus:ring-neon-pink focus:outline-none focus:border-neon-pink transition-colors pr-10 cursor-pointer"
+              className="w-full appearance-none bg-gray-50 dark:bg-[#1a0c13] border border-gray-200 dark:border-[#3a1d2e] rounded-xl px-4 py-3 text-sm font-bold text-foreground focus:ring-2 focus:ring-neon-pink focus:outline-none focus:border-neon-pink transition-colors pr-10 cursor-pointer"
             >
               <option value="all">All Locations</option>
               <option value="jakarta">Jakarta</option>

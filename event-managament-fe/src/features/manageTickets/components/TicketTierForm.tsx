@@ -1,6 +1,7 @@
 "use client";
 
 import { manageEventsRepository } from "@/features/manageEvents/repositories/manageEventsRepository";
+import { TicketTierData } from "../types/ticketTierData.types";
 import {
   Alert,
   Box,
@@ -13,21 +14,25 @@ import {
 } from "@mui/material";
 import React, { useState } from "react";
 
-interface ICreateTicketTierFormProps {
+interface ITicketTierFormProps {
   eventId: string;
+  tier?: TicketTierData; // If provided, component operates in Edit mode
   onCancel: () => void;
   onSuccess: () => void;
 }
 
-const CreateTicketTierForm: React.FC<ICreateTicketTierFormProps> = ({
+const TicketTierForm: React.FC<ITicketTierFormProps> = ({
   eventId,
+  tier,
   onCancel,
   onSuccess,
 }) => {
-  const [name, setName] = useState("");
-  const [price, setPrice] = useState("");
-  const [quota, setQuota] = useState("");
-  const [description, setDescription] = useState("");
+  const isEdit = !!tier;
+
+  const [name, setName] = useState(tier?.name || "");
+  const [price, setPrice] = useState(tier?.price?.toString() || "");
+  const [quota, setQuota] = useState(tier?.total?.toString() || "");
+  const [description, setDescription] = useState(tier?.description || "");
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -42,19 +47,28 @@ const CreateTicketTierForm: React.FC<ICreateTicketTierFormProps> = ({
     setError(null);
 
     try {
-      await manageEventsRepository.createTicketTier(eventId, {
-        name,
-        price: Number(price),
-        quota: Number(quota),
-        description,
-      });
+      if (isEdit) {
+        await manageEventsRepository.updateTicketTier(eventId, tier.id, {
+          name,
+          price: Number(price),
+          quota: Number(quota),
+          description,
+        });
+      } else {
+        await manageEventsRepository.createTicketTier(eventId, {
+          name,
+          price: Number(price),
+          quota: Number(quota),
+          description,
+        });
+      }
       onSuccess();
     } catch (error: any) {
-      console.error("Failed to create ticket tier:", error);
+      console.error(`Failed to ${isEdit ? "update" : "create"} ticket tier:`, error);
       setError(
         error?.response?.data?.message ||
           error?.message ||
-          "Failed to create ticket tier.",
+          `Failed to ${isEdit ? "update" : "create"} ticket tier.`,
       );
     } finally {
       setIsLoading(false);
@@ -64,17 +78,18 @@ const CreateTicketTierForm: React.FC<ICreateTicketTierFormProps> = ({
   return (
     <Paper
       elevation={0}
-      sx={{
+      sx={(theme) => ({
         p: 3,
         borderRadius: 1,
         border: "2px solid",
-        borderColor: "#ee2b8c",
-        bgcolor: "rgba(238, 43, 140, 0.02)",
+        borderColor: isEdit ? "divider" : (theme.palette.mode === "dark" ? "#c2185b" : "#ee2b8c"),
+        bgcolor: isEdit ? "background.paper" : (theme.palette.mode === "dark" ? "rgba(238, 43, 140, 0.05)" : "rgba(238, 43, 140, 0.02)"),
         mb: 3,
-      }}
+        mt: isEdit ? 2 : 0,
+      })}
     >
       <Typography variant="h6" sx={{ fontWeight: 800, mb: 3 }}>
-        Create New Ticket Tier
+        {isEdit ? `Edit Ticket Tier: ${tier.name}` : "Create New Ticket Tier"}
       </Typography>
 
       {error && (
@@ -109,12 +124,12 @@ const CreateTicketTierForm: React.FC<ICreateTicketTierFormProps> = ({
             variant="outlined"
             size="small"
             disabled={isLoading}
-            sx={{
+            sx={(theme) => ({
               "& .MuiOutlinedInput-root": {
                 borderRadius: 0.8,
-                bgcolor: "white",
+                bgcolor: isEdit ? "transparent" : (theme.palette.mode === "dark" ? "background.default" : "white"),
               },
-            }}
+            })}
           />
         </Box>
 
@@ -137,12 +152,12 @@ const CreateTicketTierForm: React.FC<ICreateTicketTierFormProps> = ({
             variant="outlined"
             size="small"
             disabled={isLoading}
-            sx={{
+            sx={(theme) => ({
               "& .MuiOutlinedInput-root": {
                 borderRadius: 0.8,
-                bgcolor: "white",
+                bgcolor: isEdit ? "transparent" : (theme.palette.mode === "dark" ? "background.default" : "white"),
               },
-            }}
+            })}
           />
         </Box>
 
@@ -172,12 +187,12 @@ const CreateTicketTierForm: React.FC<ICreateTicketTierFormProps> = ({
                 ),
               },
             }}
-            sx={{
+            sx={(theme) => ({
               "& .MuiOutlinedInput-root": {
                 borderRadius: 0.8,
-                bgcolor: "white",
+                bgcolor: isEdit ? "transparent" : (theme.palette.mode === "dark" ? "background.default" : "white"),
               },
-            }}
+            })}
           />
         </Box>
       </Box>
@@ -202,21 +217,22 @@ const CreateTicketTierForm: React.FC<ICreateTicketTierFormProps> = ({
           variant="outlined"
           size="small"
           disabled={isLoading}
-          sx={{
-              "& .MuiOutlinedInput-root": {
-                borderRadius: 1,
-                bgcolor: "white",
-              },
-            }}
+          sx={(theme) => ({
+            "& .MuiOutlinedInput-root": {
+              borderRadius: 1,
+              bgcolor: isEdit ? "transparent" : (theme.palette.mode === "dark" ? "background.default" : "white"),
+            },
+          })}
         />
       </Box>
 
       {/* Actions */}
-      <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
+      <Box sx={{ display: "flex", flexDirection: { xs: "column-reverse", sm: "row" }, justifyContent: "flex-end", gap: { xs: 1.5, sm: 2 } }}>
         <Button
           onClick={onCancel}
           disabled={isLoading}
-          sx={{ color: "text.secondary", fontWeight: 600 }}
+          fullWidth={true}
+          sx={{ color: "text.secondary", fontWeight: 600, width: { sm: "auto" } }}
         >
           Cancel
         </Button>
@@ -224,17 +240,25 @@ const CreateTicketTierForm: React.FC<ICreateTicketTierFormProps> = ({
           variant="contained"
           onClick={handleSubmit}
           disabled={isLoading}
+          fullWidth={true}
           sx={{
-            bgcolor: "black",
+            bgcolor: "#ee2b8c",
             color: "white",
             borderRadius: 2,
-            px: 4,
+            px: { xs: 2, sm: 4 },
+            py: { xs: 1.5, sm: 1 },
             fontWeight: 700,
-            "&:hover": { bgcolor: "#c2185b" },
+            width: { sm: "auto" },
+            "&:hover": { 
+              bgcolor: "#d6197b",
+              boxShadow: "0 4px 12px rgba(238, 43, 140, 0.2)"
+            },
           }}
         >
           {isLoading ? (
             <CircularProgress size={24} color="inherit" />
+          ) : isEdit ? (
+            "Save Changes"
           ) : (
             "Save Tier"
           )}
@@ -244,4 +268,4 @@ const CreateTicketTierForm: React.FC<ICreateTicketTierFormProps> = ({
   );
 };
 
-export default CreateTicketTierForm;
+export default TicketTierForm;

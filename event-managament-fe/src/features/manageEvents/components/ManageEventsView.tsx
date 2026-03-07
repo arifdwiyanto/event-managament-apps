@@ -9,8 +9,8 @@ import { CalendarDaysIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import ManageEventsCard from "./ManageEventCard";
 
 const ManageEventSkeleton = () => (
-  <div className="flex flex-col md:flex-row gap-5 p-4 md:p-6 bg-white dark:bg-[#111] border border-gray-100 dark:border-white/5 rounded-2xl md:rounded-3xl animate-pulse">
-    <div className="w-full md:w-56 h-40 md:h-36 rounded-xl md:rounded-2xl bg-gray-200 dark:bg-white/10 flex-shrink-0"></div>
+  <div className="flex flex-col md:flex-row gap-5 p-4 md:p-6 bg-white dark:bg-[#221019] border border-gray-100 dark:border-[#3a1d2e] rounded-2xl md:rounded-3xl animate-pulse">
+    <div className="w-full md:w-56 h-40 md:h-36 rounded-xl md:rounded-2xl bg-gray-200 dark:bg-white/5 flex-shrink-0"></div>
     <div className="flex-1 py-1 space-y-3">
       <div className="h-5 bg-gray-200 dark:bg-white/10 rounded w-2/3"></div>
       <div className="h-4 bg-gray-100 dark:bg-white/5 rounded w-1/3"></div>

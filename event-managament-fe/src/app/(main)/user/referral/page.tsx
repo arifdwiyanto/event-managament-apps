@@ -1,5 +1,5 @@
 import { UserReferralView } from "@/features/referral";
 
-export default function UserReferralPage() {
+export default function ReferralPage() {
   return <UserReferralView />;
 }

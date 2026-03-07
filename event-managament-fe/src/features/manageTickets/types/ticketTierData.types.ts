@@ -6,5 +6,7 @@ export interface TicketTierData {
   status: "ACTIVE" | "SOLD OUT" | "PAUSED";
   sold: number;
   total: number;
-  colorHex: number;
+  colorHex: string;
+  price: number;
+  description: string;
 }

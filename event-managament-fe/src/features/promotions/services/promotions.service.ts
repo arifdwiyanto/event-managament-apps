@@ -1,4 +1,4 @@
-import apiFetch from "@/services/apiFetch";
+import { promotionsRepository } from "../repositories/promotions.repository";
 import {
   CreatePromotion,
   PaginatedPromotions,
@@ -6,42 +6,35 @@ import {
   UpdatePromotion,
 } from "../types/promotions.types";
 
-export const getPromotions = async (
+export const getPromotions = (
   params?: Record<string, any>,
 ): Promise<PaginatedPromotions> => {
-  const response = await apiFetch.get("/promotions", { params });
-  return response.data;
+  return promotionsRepository.getAll(params);
 };
 
-export const getPromotion = async (id: string): Promise<Promotion> => {
-  const response = await apiFetch.get(`/promotions/${id}`);
-  return response.data;
+export const getPromotion = (id: string): Promise<Promotion> => {
+  return promotionsRepository.getById(id);
 };
 
-export const createPromotion = async (
-  data: CreatePromotion,
-): Promise<Promotion> => {
-  const response = await apiFetch.post("/promotions", data);
-  return response.data;
+export const createPromotion = (data: CreatePromotion): Promise<Promotion> => {
+  return promotionsRepository.create(data);
 };
 
-export const updatePromotion = async (
+export const updatePromotion = (
   id: string,
   data: UpdatePromotion,
 ): Promise<Promotion> => {
-  const response = await apiFetch.patch(`/promotions/${id}`, data);
-  return response.data;
+  return promotionsRepository.update(id, data);
 };
 
-export const deletePromotion = async (id: string): Promise<void> => {
-  await apiFetch.delete(`/promotions/${id}`);
+export const deletePromotion = (id: string): Promise<void> => {
+  return promotionsRepository.delete(id);
 };
 
-export const validatePromotion = async (payload: {
+export const validatePromotion = (payload: {
   code: string;
   userId?: string;
   eventId?: string;
 }) => {
-  const response = await apiFetch.post("/promotions/validate", payload);
-  return response.data;
+  return promotionsRepository.validate(payload);
 };

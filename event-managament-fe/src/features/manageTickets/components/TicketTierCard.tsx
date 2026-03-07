@@ -6,6 +6,7 @@ import {
   linearProgressClasses,
   Paper,
   Typography,
+  useTheme,
 } from "@mui/material";
 import TuneIcon from "@mui/icons-material/Tune";
 import React from "react";
@@ -13,17 +14,18 @@ import { TicketTierData } from "../types/ticketTierData.types";
 
 interface ITicketTierCardProps {
   tier: TicketTierData;
+  onEdit: () => void;
 }
 
-const TicketTierCard: React.FC<ITicketTierCardProps> = ({ tier }) => {
-  let statusBg = "#e8f5e9";
-  let statusColor = "#2e7d32";
-  if (tier.status === "SOLD OUT") {
-    statusBg = "#fff8e1";
-    statusColor = "#f57f17";
-  } else if (tier.status === "PAUSED") {
-    statusBg = "#fff8e1";
-    statusColor = "#f57f17";
+const TicketTierCard: React.FC<ITicketTierCardProps> = ({ tier, onEdit }) => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
+
+  let statusBg = isDark ? "rgba(46, 125, 50, 0.2)" : "#e8f5e9";
+  let statusColor = isDark ? "#81c784" : "#2e7d32";
+  if (tier.status === "SOLD OUT" || tier.status === "PAUSED") {
+    statusBg = isDark ? "rgba(245, 127, 23, 0.2)" : "#fff8e1";
+    statusColor = isDark ? "#ffb300" : "#f57f17";
   }
 
   const progressPercentage =
@@ -32,7 +34,7 @@ const TicketTierCard: React.FC<ITicketTierCardProps> = ({ tier }) => {
     <Paper
       elevation={0}
       sx={{
-        p: { xs: 2.5, md: 3 },
+        p: { xs: 2, sm: 2, md: 2.5 },
         borderRadius: 1,
         border: "1px solid",
         borderColor: "divider",
@@ -40,11 +42,13 @@ const TicketTierCard: React.FC<ITicketTierCardProps> = ({ tier }) => {
         display: "flex",
         flexDirection: { xs: "column", sm: "row" },
         justifyContent: "space-between",
-        alignItems: { xs: "flex-start", sm: "center" },
-        gap: 3,
+        alignItems: { xs: "stretch", sm: "center" },
+        gap: { xs: 2, sm: 3 },
         transition: "box-shadow 0.2s, border-color 0.2s",
         "&:hover": {
-          boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+          boxShadow: isDark
+            ? "0 4px 20px rgba(0,0,0,0.5)"
+            : "0 4px 20px rgba(0,0,0,0.05)",
           borderColor: "transparent",
         },
       }}
@@ -58,6 +62,7 @@ const TicketTierCard: React.FC<ITicketTierCardProps> = ({ tier }) => {
               fontWeight: 800,
               color: "text.primary",
               letterSpacing: "-0.5px",
+              fontSize: { xs: "1rem", sm: "1.1rem" }
             }}
           >
             {tier.name}
@@ -76,7 +81,7 @@ const TicketTierCard: React.FC<ITicketTierCardProps> = ({ tier }) => {
         </Box>
         <Typography
           variant="body2"
-          sx={{ color: "text.secondary", fontWeight: 600 }}
+          sx={{ color: "text.secondary", fontWeight: 600, fontSize: { xs: "0.8rem", sm: "0.875rem" } }}
         >
           {tier.priceStr} • {tier.subtitle}
         </Typography>
@@ -96,7 +101,7 @@ const TicketTierCard: React.FC<ITicketTierCardProps> = ({ tier }) => {
           <Box
             sx={{
               display: "flex",
-              justifyContent: "flex-end",
+              justifyContent: "space-between",
               alignItems: "baseline",
               mb: 0.5,
             }}
@@ -148,6 +153,7 @@ const TicketTierCard: React.FC<ITicketTierCardProps> = ({ tier }) => {
         {/* Settings Action */}
         <IconButton
           size="small"
+          onClick={onEdit}
           sx={{ color: "text.secondary", display: { xs: "none", sm: "flex" } }}
         >
           <TuneIcon fontSize="small" />
@@ -160,10 +166,10 @@ const TicketTierCard: React.FC<ITicketTierCardProps> = ({ tier }) => {
           display: { xs: "flex", sm: "none" },
           width: "100%",
           justifyContent: "flex-end",
-          mt: -2,
+          mt: 0,
         }}
       >
-        <IconButton size="small" sx={{ color: "text.secondary" }}>
+        <IconButton size="small" onClick={onEdit} sx={{ color: "text.secondary", p: 0.5 }}>
           <TuneIcon fontSize="small" />
         </IconButton>
       </Box>
