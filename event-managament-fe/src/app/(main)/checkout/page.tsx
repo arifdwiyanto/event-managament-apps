@@ -2,20 +2,11 @@
 
 import React, { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Typography,
-  Divider,
-  Button,
-} from "@mui/material";
+import { Typography, Divider, Button } from "@mui/material";
 import { useCartStore } from "@/features/cart/store/useCartStore";
 import { useStoreLogin } from "@/features/auth/store/useAuthStore";
 import { useCreateOrder } from "@/features/orders/hooks/useOrders";
 import { useValidatePromotion } from "@/features/promotions/hooks/usePromotions";
-
-const PAYMENT_METHODS = [
-  { id: "BCA_VIRTUAL_ACCOUNT", label: "BCA Virtual Account" },
-  { id: "MANDIRI_VIRTUAL_ACCOUNT", label: "Mandiri Virtual Account" },
-];
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -24,7 +15,7 @@ export default function CheckoutPage() {
   const createOrderMutation = useCreateOrder();
   const validatePromoMutation = useValidatePromotion();
 
-  const [selectedPayment, setSelectedPayment] = useState(PAYMENT_METHODS[0].id);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [promoCode, setPromoCode] = useState("");
   const [appliedPromo, setAppliedPromo] = useState<{
     id: string;
@@ -96,9 +87,11 @@ export default function CheckoutPage() {
     }
 
     try {
+      setIsProcessing(true);
+
       const payload = {
         customerId: user.id,
-        paymentMethod: selectedPayment,
+        paymentMethod: "MIDTRANS",
         promotionId: appliedPromo ? appliedPromo.id : undefined,
         items: cart.items.map((item) => ({
           ticketId: item.ticketTypeId,
@@ -110,10 +103,30 @@ export default function CheckoutPage() {
 
       await clearCart();
 
-      router.push(`/user/orders/${newOrder.id}`);
+      if (newOrder.snapToken && (window as any).snap) {
+        (window as any).snap.pay(newOrder.snapToken, {
+          onSuccess: function () {
+            router.push(`/user/orders/${newOrder.id}`);
+          },
+          onPending: function () {
+            router.push(`/user/orders/${newOrder.id}`);
+          },
+          onError: function () {
+            alert("Payment failed or encountered an error");
+            router.push(`/user/orders/${newOrder.id}`);
+          },
+          onClose: function () {
+            router.push(`/user/orders/${newOrder.id}`);
+          },
+        });
+      } else {
+        router.push(`/user/orders/${newOrder.id}`);
+      }
     } catch (error: any) {
       console.error("Failed to create order", error);
       alert(error.message || "Failed to create order");
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -177,37 +190,6 @@ export default function CheckoutPage() {
                     {(
                       Number(item.ticketType.price) * item.quantity
                     ).toLocaleString("id-ID")}
-                  </Typography>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Payment Method */}
-          <div className="border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-white">
-            <Typography
-              variant="h5"
-              className="font-display font-black uppercase mb-4"
-            >
-              Payment Method
-            </Typography>
-            <Divider className="border-black border-[1.5px] mb-4" />
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {PAYMENT_METHODS.map((method) => (
-                <div
-                  key={method.id}
-                  onClick={() => setSelectedPayment(method.id)}
-                  className={`border-2 p-4 cursor-pointer transition-all ${
-                    selectedPayment === method.id
-                      ? "border-neon-purple shadow-[4px_4px_0_0_var(--neon-purple)]"
-                      : "border-gray-200 hover:border-black"
-                  }`}
-                >
-                  <Typography
-                    className={`font-black uppercase text-sm ${selectedPayment === method.id ? "text-neon-purple" : "text-black"}`}
-                  >
-                    {method.label}
                   </Typography>
                 </div>
               ))}
@@ -322,10 +304,10 @@ export default function CheckoutPage() {
 
             <button
               onClick={handleCreateOrder}
-              disabled={createOrderMutation.isPending}
+              disabled={createOrderMutation.isPending || isProcessing}
               className="w-full py-4 bg-neon-purple text-white font-black uppercase tracking-widest shadow-[4px_4px_0_0_#fff] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#fff] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {createOrderMutation.isPending ? "Processing..." : "Make Payment"}
+              {createOrderMutation.isPending || isProcessing ? "Processing..." : "Make Payment"}
             </button>
           </div>
         </div>

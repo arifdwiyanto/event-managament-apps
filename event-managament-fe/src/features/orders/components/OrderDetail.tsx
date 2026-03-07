@@ -15,8 +15,6 @@ import ReviewModal from "@/features/reviews/components/ReviewModal";
 
 interface IOrderDetailProps {
   order: Order;
-  isPaying?: boolean;
-  onPay?: () => void;
   isOrganizerView?: boolean;
 }
 
@@ -40,31 +38,16 @@ const getStatusColor = (status: string, hasProof: boolean = false) => {
 
 const OrderDetail: React.FC<IOrderDetailProps> = ({
   order,
-  isPaying = false,
-  onPay,
   isOrganizerView = false,
 }) => {
-  const uploadProofMutation = useUploadPaymentProof();
-  const [proofFile, setProofFile] = useState<File | null>(null);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
 
-  // Calculate total discount from vouchers/coupons
   const totalDiscount = React.useMemo(() => {
     const original = Number(order.totalOriginalPrice) || 0;
     const final = Number(order.totalFinalPrice) || 0;
     const points = Number(order.pointsUsed) || 0;
     return Math.max(0, original - final - points);
   }, [order]);
-
-  const handleUploadProof = async () => {
-    if (!proofFile) return;
-    try {
-      await uploadProofMutation.mutateAsync({ id: order.id, file: proofFile });
-      setProofFile(null);
-    } catch (error: any) {
-      alert(error.message || "Failed to upload proof");
-    }
-  };
 
   return (
     <Box
@@ -85,7 +68,10 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
         <Box>
           <Typography className="font-display font-black uppercase tracking-tighter text-base md:text-3xl text-black dark:text-white mb-1 md:mb-2">
             Invoice:{" "}
-            <Box component="span" className="text-neon-magenta select-all drop-shadow-[0_0_5px_rgba(255,0,229,0.3)]">
+            <Box
+              component="span"
+              className="text-neon-magenta select-all drop-shadow-[0_0_5px_rgba(255,0,229,0.3)]"
+            >
               {order.invoice}
             </Box>
           </Typography>
@@ -107,8 +93,8 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
             component="span"
             className={`px-3 md:px-4 py-1.5 font-black text-[8px] md:text-xs uppercase tracking-widest shadow-[4px_4px_0_0_rgba(0,0,0,1)] dark:shadow-[4px_4px_0_0_rgba(0,240,255,0.4)] ${getStatusColor(order.status, !!order.paymentProofUrl)}`}
           >
-            {order.status === "PENDING" && order.paymentProofUrl 
-              ? "AWAITING VALIDATION" 
+            {order.status === "PENDING" && order.paymentProofUrl
+              ? "AWAITING VALIDATION"
               : order.status}
           </Box>
         </Box>
@@ -121,7 +107,12 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
           className="brutalist-card border-[3px] !border-black dark:!border-neon-cyan dark:shadow-[8px_8px_0_0_rgba(0,240,255,0.4)] !bg-white dark:!bg-[#0a0a0a]"
           sx={{ borderRadius: 0 }}
         >
-          <CardContent sx={{ p: { xs: 2, md: 4 }, "&:last-child": { pb: { xs: 2, md: 4 } } }}>
+          <CardContent
+            sx={{
+              p: { xs: 2, md: 4 },
+              "&:last-child": { pb: { xs: 2, md: 4 } },
+            }}
+          >
             <Typography
               variant="h5"
               className="font-display font-black uppercase tracking-tighter mb-4 text-black dark:text-white text-base md:text-2xl"
@@ -135,10 +126,10 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
                 <Box
                   key={item.id}
                   className="border-2 border-dashed !border-gray-300 dark:!border-neon-purple p-4"
-                  sx={{ 
-                    display: "flex", 
+                  sx={{
+                    display: "flex",
                     flexDirection: { xs: "column", sm: "row" },
-                    gap: 2 
+                    gap: 2,
                   }}
                 >
                   <Box
@@ -180,14 +171,14 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
                       </Typography>
                     </Box>
                     {order.status === "PAID" && !isOrganizerView && (
-                        <Button
+                      <Button
                         size="small"
                         onClick={() => setIsReviewOpen(true)}
                         className="bg-neon-magenta text-white sm:mt-4 brutalist-button hover:shadow-neon-pink"
                         sx={{
                           py: 0.5,
                           px: 1.5,
-                          fontSize: "0.6rem",
+                          fontSize: "0.8rem",
                           fontWeight: 900,
                           textTransform: "uppercase",
                           letterSpacing: "0.05em",
@@ -216,7 +207,12 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
           className="brutalist-card border-[3px] !border-black dark:!border-neon-magenta dark:shadow-[8px_8px_0_0_rgba(255,0,229,0.4)] !bg-white dark:!bg-[#0a0a0a]"
           sx={{ borderRadius: 0 }}
         >
-          <CardContent sx={{ p: { xs: 2, md: 4 }, "&:last-child": { pb: { xs: 2, md: 4 } } }}>
+          <CardContent
+            sx={{
+              p: { xs: 2, md: 4 },
+              "&:last-child": { pb: { xs: 2, md: 4 } },
+            }}
+          >
             <Typography
               variant="h5"
               className="font-display font-black uppercase tracking-tighter mb-4 text-black dark:text-white text-base md:text-2xl"
@@ -226,7 +222,7 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
             <Divider className="!border-black dark:!border-neon-magenta !border-[1.5px] mb-6" />
 
             <Box
-              sx={{ display: "flex", flexDirection: "column", gap: 2, mb: 4 }}
+              sx={{ display: "flex", flexDirection: "column", gap: 1, mb: 4, mt: 2 }}
             >
               <Box display="flex" justifyContent="space-between">
                 <Typography className="text-gray-500 dark:text-gray-400 font-bold uppercase text-[8px] md:text-xs">
@@ -241,11 +237,10 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
                   Original Total
                 </Typography>
                 <Typography className="font-black text-[8px] md:text-xs text-black dark:text-white">
-                  IDR{" "}
-                  {Number(order.totalOriginalPrice).toLocaleString("id-ID")}
+                  IDR {Number(order.totalOriginalPrice).toLocaleString("id-ID")}
                 </Typography>
               </Box>
-              
+
               {order.pointsUsed > 0 && (
                 <Box
                   display="flex"
@@ -261,140 +256,110 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
                 </Box>
               )}
 
-              {totalDiscount > 0 && (
+              {order.promotion && (
                 <Box
                   display="flex"
                   justifyContent="space-between"
                   className="text-neon-cyan"
                 >
-                  <Typography className="font-bold uppercase text-[8px] md:text-xs">
-                    Hype Discount
+                  <Typography className="font-bold uppercase text-xs">
+                    Promo ({order.promotion.code})
                   </Typography>
-                  <Typography className="font-black text-[8px] md:text-xs text-neon-cyan">
-                    - IDR {totalDiscount.toLocaleString("id-ID")}
+                  <Typography className="font-black text-xs">
+                    - IDR{" "}
+                    {(
+                      Number(order.totalOriginalPrice) -
+                      Number(order.totalFinalPrice) -
+                      order.pointsUsed
+                    ).toLocaleString("id-ID")}
                   </Typography>
                 </Box>
               )}
-            </Box>
 
-            {order.paymentProofUrl ? (
-              <Box className="mb-6">
-                <Typography className="text-gray-500 dark:text-gray-400 font-bold uppercase text-[8px] md:text-xs mb-2 text-center">
-                  Payment Proof
-                </Typography>
-                <Box className="border-2 !border-black dark:!border-neon-cyan p-1 md:p-2 !bg-gray-50 dark:!bg-[#111] flex justify-center shadow-[4px_4px_0_0_#000] dark:shadow-[4px_4px_0_0_#00f0ff]">
-                  <img
-                    src={order.paymentProofUrl}
-                    alt="Payment Proof"
-                    className="w-full h-auto max-h-64 object-contain filter grayscale hover:grayscale-0 transition-all duration-500"
-                  />
-                </Box>
-              </Box>
-            ) : (
-              order.status === "PENDING" &&
-              !isOrganizerView && (
-                <Box className="mb-6 border-4 border-dashed !border-black dark:!border-neon-purple p-3 md:p-4 bg-neon-purple/5 dark:!bg-[#111]">
-                  <Typography className="font-display font-black uppercase text-[10px] md:text-xs mb-3 text-black dark:!text-neon-cyan text-center tracking-widest">
-                    Upload Proof
-                  </Typography>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      if (e.target.files?.[0]) {
-                        setProofFile(e.target.files[0]);
-                      }
-                    }}
-                    className="w-full mb-4 text-[8px] md:text-[10px] font-bold p-1 md:p-2 file:mr-2 md:file:mr-4 file:py-1 file:px-2 md:file:py-1.5 md:file:px-3 file:border-2 file:!border-black dark:file:!border-neon-cyan file:font-black file:!bg-neon-cyan dark:file:!bg-[#111] file:!text-black dark:file:!text-neon-cyan hover:file:!bg-black hover:dark:file:!bg-neon-cyan hover:file:!text-neon-cyan hover:dark:file:!text-black transition-colors !text-black dark:!text-white"
-                  />
-                  <Button
-                    fullWidth
-                    disabled={!proofFile || uploadProofMutation.isPending}
-                    onClick={handleUploadProof}
-                    className="border-2 !border-black dark:!border-neon-cyan bg-black text-white dark:bg-[#111] dark:!text-neon-cyan brutalist-button"
-                    sx={{
-                      py: 1,
-                      fontSize: { xs: "0.6rem", md: "0.875rem" },
-                      fontWeight: 900,
-                      textTransform: "uppercase",
-                      letterSpacing: "0.1em",
-                      borderRadius: 0,
-                      "&:hover": {
-                        transform: "translate(-2px, -2px)",
-                        boxShadow: "4px 4px 0 0 #00F0FF",
-                      },
-                      "&.Mui-disabled": {
-                        opacity: 0.5,
-                      },
-                    }}
-                  >
-                    {uploadProofMutation.isPending
-                      ? "Hacking..."
-                      : "Submit Vibe"}
-                  </Button>
-                </Box>
-              )
-            )}
+              <Divider className="!border-black dark:!border-neon-magenta border-t-2 border-dashed mb-6" />
 
-            <Divider className="!border-black dark:!border-neon-magenta border-t-2 border-dashed mb-6" />
-
-            <Box
-              display="flex"
-              flexDirection="column"
-              alignItems="flex-end"
-              mb={4}
-            >
-              <Typography className="font-black uppercase text-[8px] md:text-xs text-gray-500 dark:text-gray-400 mb-1">
-                Grand Total
-              </Typography>
-              <Typography className="font-display font-black text-base md:text-3xl text-neon-purple dark:text-neon-cyan tracking-tighter drop-shadow-[0_0_10px_rgba(0,240,255,0.2)]">
-                IDR {Number(order.totalFinalPrice).toLocaleString("id-ID")}
-              </Typography>
-            </Box>
-
-            {order.status === "PENDING" && isOrganizerView && (
-              <Button
-                fullWidth
-                onClick={onPay}
-                disabled={isPaying}
-                className="border-2 border-black dark:border-neon-cyan bg-neon-cyan text-black brutalist-button shadow-[6px_6px_0_0_#000] dark:shadow-[6px_6px_0_0_#00e5ff]"
-                sx={{
-                  py: { xs: 1, md: 2 },
-                  fontSize: { xs: "0.6rem", md: "0.875rem" },
-                  fontWeight: 900,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.1em",
-                  borderRadius: 0,
-                  "&:hover": {
-                    backgroundColor: "#00e5ff",
-                    transform: "translate(-2px, -2px)",
-                    boxShadow: "8px 8px 0 0 #000",
-                  },
-                  transition: "all 0.2s",
-                }}
+              <Box
+                display="flex"
+                flexDirection="column"
+                alignItems="flex-end"
+                mb={4}
               >
-                {isPaying ? "Writing to DB..." : "Confirm Vibe"}
-              </Button>
-            )}
-            {order.status === "PENDING" &&
-              !isOrganizerView &&
-              order.paymentProofUrl && (
-                <Box className="w-full py-2 md:py-3 bg-neon-cyan/20 dark:bg-neon-cyan/10 text-neon-cyan font-black uppercase tracking-widest text-[8px] md:text-xs text-center border-2 border-neon-cyan shadow-neon/20">
-                  Awaiting Validation
-                </Box>
-              )}
-            {order.status === "PENDING" &&
-              !isOrganizerView &&
-              !order.paymentProofUrl && (
-                <Box className="w-full py-2 md:py-3 bg-neon-magenta/20 dark:bg-neon-magenta/10 text-neon-magenta font-black uppercase tracking-widest text-[8px] md:text-xs text-center border-2 border-neon-magenta shadow-neon-pink/20">
-                  Proof Needed
-                </Box>
-              )}
-            {order.status === "PAID" && (
-              <Box className="w-full py-2 md:py-3 bg-black dark:bg-white text-white dark:text-black font-black uppercase tracking-widest text-[8px] md:text-xs text-center border-4 border-black dark:border-neon-cyan shadow-neon/10">
-                Vibe Secured
+                <Typography className="font-black uppercase text-[8px] md:text-xs text-gray-500 dark:text-gray-400 mb-1">
+                  Grand Total
+                </Typography>
+                <Typography className="font-display font-black text-base md:text-3xl text-neon-purple dark:text-neon-cyan tracking-tighter drop-shadow-[0_0_10px_rgba(0,240,255,0.2)]">
+                  IDR {Number(order.totalFinalPrice).toLocaleString("id-ID")}
+                </Typography>
               </Box>
-            )}
+
+              {order.status === "PENDING" && !isOrganizerView && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 2,
+                  }}
+                >
+                  <Box className="w-full py-4 bg-yellow-400 text-black font-black uppercase tracking-widest text-center border-4 border-black dark:border-white">
+                    Waiting for Payment
+                  </Box>
+                  {order.snapToken && (
+                    <Button
+                      fullWidth
+                      onClick={() => {
+                        if ((window as any).snap) {
+                          (window as any).snap.pay(order.snapToken, {
+                            onSuccess: function () {
+                              window.location.reload();
+                            },
+                            onPending: function () {
+                              window.location.reload();
+                            },
+                            onError: function () {
+                              alert("Payment failed or encountered an error.");
+                            },
+                            onClose: function () {
+                              // User closed the popup, do nothing
+                            },
+                          });
+                        } else {
+                          alert(
+                            "Payment processing is not available right now. Please refresh the page.",
+                          );
+                        }
+                      }}
+                      className="border-2 border-black dark:border-neon-cyan bg-neon-cyan text-black brutalist-button shadow-[6px_6px_0_0_#000] dark:shadow-[6px_6px_0_0_#00e5ff]"
+                      sx={{
+                        py: { xs: 1, md: 2 },
+                        fontSize: { xs: "0.6rem", md: "0.875rem" },
+                        fontWeight: 900,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.1em",
+                        borderRadius: 0,
+                        "&:hover": {
+                          backgroundColor: "#00e5ff",
+                          transform: "translate(-2px, -2px)",
+                          boxShadow: "8px 8px 0 0 #000",
+                        },
+                        transition: "all 0.2s",
+                      }}
+                    >
+                      Pay Now
+                    </Button>
+                  )}
+                </Box>
+              )}
+              {order.status === "PENDING" && isOrganizerView && (
+                <Box className="w-full py-4 bg-yellow-400 text-black font-black uppercase tracking-widest text-center border-4 border-black dark:border-white">
+                  Waiting for Payment
+                </Box>
+              )}
+              {order.status === "PAID" && (
+                <Box className="w-full py-2 md:py-3 bg-black dark:bg-white text-white dark:text-black font-black uppercase tracking-widest text-[8px] md:text-xs text-center border-4 border-black dark:border-neon-cyan shadow-neon/10">
+                  Vibe Secured
+                </Box>
+              )}
+            </Box>
           </CardContent>
         </Card>
       </Box>

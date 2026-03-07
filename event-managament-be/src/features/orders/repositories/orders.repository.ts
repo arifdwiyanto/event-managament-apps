@@ -17,6 +17,8 @@ export interface IOrdersRepositoryProps {
     pricePerUnit?: number;
     totalPrice?: number;
   }[];
+  snapToken?: string;
+  originalPrice: number;
 }
 
 export class OrdersRepository {
@@ -29,13 +31,14 @@ export class OrdersRepository {
       data: {
         invoice: data.invoice,
         totalFinalPrice: data.totalPrice,
-        totalOriginalPrice: data.totalPrice + (data.pointUsed || 0),
+        totalOriginalPrice: data.originalPrice,
         pointsUsed: data.pointUsed,
         userId: data.customerId,
         eventId: data.eventId,
         paymentMethod: data.paymentMethod,
         userCouponId: data.voucherId,
         promotionId: data.promotionId,
+        snapToken: data.snapToken,
         items: {
           create: data.items.map((item) => ({
             ticketType: { connect: { id: item.ticketTypeId } },

@@ -16,6 +16,10 @@ export interface InvoiceTemplateData {
     price: number;
     subTotal: number;
   }[];
+  promoData?: {
+    code: string;
+    amount: number;
+  };
 }
 
 export const generateInvoiceHtml = (data: InvoiceTemplateData): string => {
@@ -179,16 +183,22 @@ export const generateInvoiceHtml = (data: InvoiceTemplateData): string => {
             <span>Original Total</span>
             <span>Rp ${data.totalOriginalPrice.toLocaleString("id-ID")}</span>
           </div>
-          ${
-            data.pointsUsed > 0
-              ? `
+          ${data.promoData
+      ? `<div class="totals-row" style="color: #00e5ff;">
+              <span>Promo Applied (${data.promoData.code})</span>
+              <span>- Rp ${data.promoData.amount.toLocaleString("id-ID")}</span>
+            </div>`
+      : ""
+    }
+          ${data.pointsUsed > 0
+      ? `
           <div class="totals-row" style="color: #ee2b8c;">
             <span>Points Used</span>
             <span>- Rp ${data.pointsUsed.toLocaleString("id-ID")}</span>
           </div>
           `
-              : ""
-          }
+      : ""
+    }
           <div class="totals-row grand-total">
             <span>Grand Total</span>
             <span>Rp ${data.totalFinalPrice.toLocaleString("id-ID")}</span>

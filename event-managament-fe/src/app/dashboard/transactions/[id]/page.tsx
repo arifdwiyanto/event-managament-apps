@@ -1,7 +1,7 @@
 "use client";
 
 import OrderDetail from "@/features/orders/components/OrderDetail";
-import { useGetOrder, usePayOrder } from "@/features/orders/hooks/useOrders";
+import { useGetOrder } from "@/features/orders/hooks/useOrders";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { Typography } from "@mui/material";
 import { useParams, useRouter } from "next/navigation";
@@ -12,22 +12,6 @@ export default function OrderDetailPage() {
   const orderId = params.id as string;
 
   const { data: order, isLoading, error } = useGetOrder(orderId);
-  const payMutation = usePayOrder();
-
-  const handlePay = async () => {
-    if (!order) return;
-
-    try {
-      await payMutation.mutateAsync({
-        id: order.id,
-        payload: {
-          method: order.paymentMethod,
-        },
-      });
-    } catch (err: any) {
-      alert(err.message || "Failed to process payment");
-    }
-  };
 
   if (isLoading) {
     return (
@@ -73,8 +57,6 @@ export default function OrderDetailPage() {
 
       <OrderDetail
         order={order}
-        isPaying={payMutation.isPending}
-        onPay={handlePay}
         isOrganizerView={true}
       />
     </div>

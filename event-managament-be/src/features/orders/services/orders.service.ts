@@ -3,6 +3,7 @@ import { OrdersRepository } from "../repositories/orders.repository.js";
 import { TicketsRepository } from "../../events/repositories/tickets.repository.js";
 import { generateInvoiceHtml } from "../../../services/email/templates/invoice.template.js";
 import { EmailService } from "../../../services/email/email.service.js";
+import { snap } from "../../../config/midtrans.js";
 
 export interface IOrdersServiceProps {
   customerId: string;
@@ -122,8 +123,25 @@ export class OrdersService {
       }
 
       const invoice = `INV-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-      console.log(Date.now());
-      console.log(invoice);
+
+      let snapToken: string | undefined = undefined;
+
+      if (finalPrice > 0) {
+        const parameter = {
+          transaction_details: {
+            order_id: invoice,
+            gross_amount: finalPrice,
+          },
+        };
+
+        try {
+          const midtransResponse = await snap.createTransaction(parameter);
+          snapToken = midtransResponse.token;
+        } catch (error) {
+          console.error("Midtrans Error:", error);
+          throw new Error("Failed to generate payment link");
+        }
+      }
 
       const orderData = {
         invoice,
@@ -134,7 +152,9 @@ export class OrdersService {
         paymentMethod: data.paymentMethod,
         voucherId: data.voucherId,
         promotionId: data.promotionId,
+        snapToken,
         items: orderItems,
+        originalPrice: totalPrice,
       };
 
       return await this.ordersRepository.create(orderData, tx);
@@ -206,21 +226,36 @@ export class OrdersService {
 
     // Send Invoice Email
     if (order.user?.email) {
+      let promoData;
+      if (order.promotion) {
+        const promoAmount =
+          Number(order.totalOriginalPrice) -
+          Number(order.totalFinalPrice) -
+          order.pointsUsed;
+        if (promoAmount > 0) {
+          promoData = {
+            code: order.promotion.code,
+            amount: promoAmount,
+          };
+        }
+      }
+
       const emailHtml = generateInvoiceHtml({
         invoice: order.invoice,
         transactionDate: order.transactionDate,
         status: "PAID",
         paymentMethod: updatedOrder.paymentMethod || order.paymentMethod,
-        totalOriginalPrice: order.totalOriginalPrice,
+        totalOriginalPrice: Number(order.totalOriginalPrice),
         pointsUsed: order.pointsUsed,
-        totalFinalPrice: order.totalFinalPrice,
+        totalFinalPrice: Number(order.totalFinalPrice),
         customerName: order.user.name,
         eventName: order.event?.name || "Event",
+        promoData: promoData,
         items: order.items.map((item: any) => ({
           ticketName: item.ticketType.name,
           qty: item.quantity,
-          price: item.pricePerUnit || item.totalPrice / item.quantity,
-          subTotal: item.totalPrice,
+          price: Number(item.pricePerUnit || item.totalPrice / item.quantity),
+          subTotal: Number(item.totalPrice),
         })),
       });
 

@@ -26,6 +26,7 @@ export interface Order {
   status: "PENDING" | "PAID" | "CANCELED" | "REFUNDED";
   paymentMethod: string;
   paymentProofUrl?: string;
+  snapToken?: string;
   transactionDate: string;
   items: OrderItem[];
   user?: {
@@ -37,6 +38,10 @@ export interface Order {
     id: string;
     name: string;
     imageUrl: string | null;
+  };
+  promotion?: {
+    id: string;
+    code: string;
   };
 }
 
