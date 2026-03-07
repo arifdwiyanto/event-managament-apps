@@ -141,7 +141,7 @@ export default function CheckoutPage() {
     <div className="max-w-4xl mx-auto p-4 md:p-8">
       <Typography
         variant="h3"
-        className="font-display font-black uppercase tracking-tighter mb-8"
+        className="font-display font-black uppercase tracking-tighter mb-8 text-black dark:text-white text-4xl md:text-6xl"
       >
         Checkout
       </Typography>
@@ -149,14 +149,14 @@ export default function CheckoutPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-2 space-y-6">
           {/* Order Items */}
-          <div className="border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+          <div className="border-4 border-black dark:border-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.2)] bg-white dark:bg-[#0a0a0a]">
             <Typography
               variant="h5"
-              className="font-display font-black uppercase mb-4"
+              className="font-display font-black uppercase mb-4 text-black dark:text-white"
             >
               Order Summary
             </Typography>
-            <Divider className="border-black border-[1.5px] mb-4" />
+            <Divider className="border-black dark:border-white/20 border-[1.5px] mb-4" />
 
             <div className="space-y-4">
               {cart.items.map((item) => (
@@ -165,14 +165,14 @@ export default function CheckoutPage() {
                   className="flex justify-between items-center"
                 >
                   <div>
-                    <Typography className="font-bold text-sm uppercase">
+                    <Typography className="font-bold text-sm uppercase text-black dark:text-white">
                       {item.ticketType.event.name}
                     </Typography>
-                    <Typography className="text-xs text-gray-500 uppercase">
+                    <Typography className="text-xs text-gray-500 dark:text-gray-400 uppercase">
                       {item.ticketType.name} x {item.quantity}
                     </Typography>
                   </div>
-                  <Typography className="font-black">
+                  <Typography className="font-black text-black dark:text-white">
                     IDR{" "}
                     {(
                       Number(item.ticketType.price) * item.quantity
@@ -184,14 +184,14 @@ export default function CheckoutPage() {
           </div>
 
           {/* Payment Method */}
-          <div className="border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-white">
+          <div className="border-4 border-black dark:border-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.2)] bg-white dark:bg-[#0a0a0a]">
             <Typography
               variant="h5"
-              className="font-display font-black uppercase mb-4"
+              className="font-display font-black uppercase mb-4 text-black dark:text-white"
             >
               Payment Method
             </Typography>
-            <Divider className="border-black border-[1.5px] mb-4" />
+            <Divider className="border-black dark:border-white/20 border-[1.5px] mb-4" />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {PAYMENT_METHODS.map((method) => (
@@ -201,11 +201,11 @@ export default function CheckoutPage() {
                   className={`border-2 p-4 cursor-pointer transition-all ${
                     selectedPayment === method.id
                       ? "border-neon-purple shadow-[4px_4px_0_0_var(--neon-purple)]"
-                      : "border-gray-200 hover:border-black"
+                      : "border-gray-200 dark:border-white/10 hover:border-black dark:hover:border-white"
                   }`}
                 >
                   <Typography
-                    className={`font-black uppercase text-sm ${selectedPayment === method.id ? "text-neon-purple" : "text-black"}`}
+                    className={`font-black uppercase text-sm ${selectedPayment === method.id ? "text-neon-purple" : "text-black dark:text-gray-400"}`}
                   >
                     {method.label}
                   </Typography>
@@ -215,14 +215,14 @@ export default function CheckoutPage() {
           </div>
 
           {/* Promo Code */}
-          <div className="border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-white">
+          <div className="border-4 border-black dark:border-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.2)] bg-white dark:bg-[#0a0a0a]">
             <Typography
               variant="h5"
-              className="font-display font-black uppercase mb-4"
+              className="font-display font-black uppercase mb-4 text-black dark:text-white"
             >
               Have a Promo Code?
             </Typography>
-            <Divider className="border-black border-[1.5px] mb-4" />
+            <Divider className="border-black dark:border-white/20 border-[1.5px] mb-4" />
 
             {appliedPromo ? (
               <div className="flex items-center justify-between bg-neon-cyan/20 p-4 border-2 border-neon-cyan">
@@ -254,14 +254,14 @@ export default function CheckoutPage() {
                     value={promoCode}
                     onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
                     placeholder="ENTER CODE"
-                    className="flex-1 border-2 border-black px-4 py-3 font-bold uppercase placeholder:text-gray-400 focus:outline-none focus:border-neon-purple transition-colors"
+                    className="flex-1 border-2 border-black dark:border-white/20 bg-transparent dark:bg-black px-4 py-3 font-bold uppercase placeholder:text-gray-400 dark:text-white focus:outline-none focus:border-neon-purple transition-colors"
                   />
                   <button
                     onClick={handleApplyPromo}
                     disabled={
                       !promoCode.trim() || validatePromoMutation.isPending
                     }
-                    className="px-6 border-2 border-black bg-black text-white font-black uppercase tracking-widest hover:bg-neon-purple hover:border-neon-purple transition-colors disabled:opacity-50"
+                    className="px-6 border-2 border-black dark:border-neon-purple bg-black dark:bg-neon-purple text-white dark:text-black font-black uppercase tracking-widest hover:bg-neon-purple hover:border-neon-purple dark:hover:bg-black dark:hover:text-white dark:hover:border-white transition-colors disabled:opacity-50"
                   >
                     {validatePromoMutation.isPending ? "..." : "APPLY"}
                   </button>
@@ -278,14 +278,14 @@ export default function CheckoutPage() {
 
         {/* Total & Submit */}
         <div className="md:col-span-1">
-          <div className="border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-[#0a0a0a] text-white sticky top-24">
+          <div className="border-4 border-black dark:border-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.2)] bg-[#0a0a0a] text-white sticky top-24">
             <Typography
               variant="h5"
               className="font-display font-black uppercase mb-4 tracking-tighter"
             >
               Total
             </Typography>
-            <Divider className="border-white/20 border-[1.5px] mb-4" />
+            <Divider className="border-white/10 border-[1.5px] mb-4" />
 
             <div className="space-y-4 mb-8">
               <div className="flex justify-between items-center">
