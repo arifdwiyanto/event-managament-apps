@@ -182,7 +182,6 @@ export class OrdersService {
         eventId: isSingleEvent ? firstEventId : null,
         paymentMethod: data.paymentMethod,
         voucherId: data.voucherId,
-        promotionId: data.promotionId,
         snapToken,
         items: orderItems,
         originalPrice: totalPrice,
