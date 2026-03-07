@@ -337,7 +337,7 @@ const MainNavbar: React.FC = () => {
                   <MenuItem
                     onClick={handleClose}
                     component="a"
-                    href="/user-referral"
+                    href="/user/referral"
                   >
                     <ListItemIcon>
                       <Person fontSize="small" />
@@ -569,7 +569,7 @@ const MainNavbar: React.FC = () => {
               {isAuthenticated && (
                 <div className="w-full max-w-[280px] flex flex-col gap-1.5 mt-3 border-t-2 border-dashed border-gray-200 dark:border-gray-800 pt-4">
                   <Link
-                    href="/user-referral"
+                    href="/user/referral"
                     onClick={close}
                     className="flex items-center gap-3 px-3 py-2.5 text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-gray-300 hover:text-[#ee2b8c] dark:hover:text-[#ee2b8c] hover:bg-[#ee2b8c]/5 transition-all"
                   >

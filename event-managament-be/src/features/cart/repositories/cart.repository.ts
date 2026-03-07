@@ -10,7 +10,11 @@ export class CartRepository {
           include: {
             ticketType: {
               include: {
-                event: true
+                event: {
+                  include: {
+                    organizer: true
+                  }
+                }
               }
             }
           }
@@ -26,7 +30,11 @@ export class CartRepository {
             include: {
               ticketType: {
                 include: {
-                  event: true
+                  event: {
+                    include: {
+                      organizer: true
+                    }
+                  }
                 }
               }
             }

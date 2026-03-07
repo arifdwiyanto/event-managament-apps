@@ -14,7 +14,7 @@ function decodeJwtPayload(token: string): Record<string, unknown> | null {
 }
 
 // Routes that require authentication (any role)
-const AUTH_REQUIRED_ROUTES = ["/dashboard", "/user-referral"];
+const AUTH_REQUIRED_ROUTES = ["/dashboard", "/user/referral", "/user/checkout"];
 
 // Routes only for guests (redirect to home if authenticated)
 const GUEST_ONLY_ROUTES = ["/login", "/register"];
@@ -52,6 +52,7 @@ export const config = {
     "/dashboard/:path*",
     "/login",
     "/register",
-    "/user-referral/:path*",
+    "/user/referral/:path*",
+    "/user/checkout/:path*",
   ],
 };
