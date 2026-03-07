@@ -7,11 +7,15 @@ export interface AppliedPromo {
   id: string;
   code: string;
   discount: number;
+  eventId: string;
+  discountPercentage?: number | null;
+  discountAmount?: number | null;
 }
 
 export interface CheckoutState {
   selectedPayment: string;
-  promoCode: string;
-  appliedPromo: AppliedPromo | null;
-  promoError: string;
+  promoCodes: Record<string, string>; // eventId -> code input
+  appliedPromos: Record<string, AppliedPromo>; // eventId -> applied promo
+  promoErrors: Record<string, string>; // eventId -> error
+  pointPercentage: number; // 0, 10, 25, 50, 75, 100
 }

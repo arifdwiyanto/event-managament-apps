@@ -5,8 +5,8 @@ import { Typography, Divider } from "@mui/material";
 
 interface CheckoutTotalProps {
   total: number;
-  appliedPromoDiscount?: number;
-  appliedPromoCode?: string;
+  totalPromoDiscount: number;
+  pointDiscount: number;
   finalTotal: number;
   onPay: () => void;
   isSubmitting: boolean;
@@ -14,8 +14,8 @@ interface CheckoutTotalProps {
 
 export const CheckoutTotal: React.FC<CheckoutTotalProps> = ({
   total,
-  appliedPromoDiscount,
-  appliedPromoCode,
+  totalPromoDiscount,
+  pointDiscount,
   finalTotal,
   onPay,
   isSubmitting,
@@ -40,13 +40,24 @@ export const CheckoutTotal: React.FC<CheckoutTotalProps> = ({
           </Typography>
         </div>
 
-        {appliedPromoCode && appliedPromoDiscount !== undefined && (
+        {totalPromoDiscount > 0 && (
           <div className="flex justify-between items-center text-neon-cyan">
             <Typography className="font-bold uppercase text-sm">
-              Promo ({appliedPromoCode})
+              Event Promos
             </Typography>
             <Typography className="font-bold text-sm">
-              - IDR {appliedPromoDiscount.toLocaleString("id-ID")}
+              - IDR {totalPromoDiscount.toLocaleString("id-ID")}
+            </Typography>
+          </div>
+        )}
+
+        {pointDiscount > 0 && (
+          <div className="flex justify-between items-center text-neon-magenta">
+            <Typography className="font-bold uppercase text-sm">
+              Points Discount
+            </Typography>
+            <Typography className="font-bold text-sm">
+              - IDR {pointDiscount.toLocaleString("id-ID")}
             </Typography>
           </div>
         )}
@@ -57,7 +68,7 @@ export const CheckoutTotal: React.FC<CheckoutTotalProps> = ({
           <Typography className="font-bold uppercase text-sm text-gray-400">
             Amount to pay
           </Typography>
-          <Typography className="font-display font-black text-2xl text-neon-cyan">
+          <Typography className="font-display font-black text-2xl text-neon-cyan drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]">
             IDR {finalTotal.toLocaleString("id-ID")}
           </Typography>
         </div>

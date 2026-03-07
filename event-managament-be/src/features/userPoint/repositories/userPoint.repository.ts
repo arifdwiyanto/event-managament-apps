@@ -38,31 +38,31 @@ export class UserPointRepository {
   public usePoints = async (
     userId: string,
     amountToUse: number,
+    tx?: Prisma.TransactionClient,
   ): Promise<void> => {
-    return await prisma.$transaction(async (tx: any) => {
-      const availablePoints = await tx.point.findMany({
-        where: {
-          userId: userId,
-          expiresAt: { gt: new Date() },
-          remainingAmount: { gt: 0 },
-        },
-        orderBy: { expiresAt: "asc" },
-      });
-
-      let needed = amountToUse;
-      for (const point of availablePoints) {
-        if (needed <= 0) break;
-        const take = Math.min(needed, point.remainingAmount);
-
-        await tx.point.update({
-          where: { id: point.id },
-          data: {
-            remainingAmount: point.remainingAmount - take,
-          },
-        });
-        needed -= take;
-      }
-      if (needed > 0) throw new Error("points are not enough");
+    const client = tx || prisma;
+    const availablePoints = await client.point.findMany({
+      where: {
+        userId: userId,
+        expiresAt: { gt: new Date() },
+        remainingAmount: { gt: 0 },
+      },
+      orderBy: { expiresAt: "asc" },
     });
+
+    let needed = amountToUse;
+    for (const point of availablePoints) {
+      if (needed <= 0) break;
+      const take = Math.min(needed, point.remainingAmount);
+
+      await client.point.update({
+        where: { id: point.id },
+        data: {
+          remainingAmount: point.remainingAmount - take,
+        },
+      });
+      needed -= take;
+    }
+    if (needed > 0) throw new Error("points are not enough");
   };
 }

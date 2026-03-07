@@ -86,52 +86,58 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ open, onClose }) => {
                   <div className="h-[2px] flex-1 bg-black/10 dark:bg-white/10"></div>
                 </div>
                 
-                <div className="space-y-4">
-                  {group.items.map((item) => (
-                    <div key={item.id} className="border-4 border-black dark:border-white/10 p-3 bg-white dark:bg-[#0a0a0a] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(0,255,255,0.05)] flex gap-4 transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[6px_6px_0px_0px_rgba(0,255,255,0.1)]">
-                      <div className="relative size-20 border-2 border-black dark:border-white/20 flex-shrink-0 overflow-hidden">
-                        <img
-                          src={item.ticketType.event.imageUrl || "/placeholder.jpg"}
-                          alt={item.ticketType.event.name}
-                          className="w-full h-full object-cover grayscale-[0.2] hover:grayscale-0 transition-all duration-500"
-                        />
-                        <div className="absolute inset-0 border-[8px] border-white/10 pointer-events-none"></div>
-                      </div>
-                      <div className="flex-1 min-w-0 flex flex-col justify-between">
-                        <div>
-                          <Typography className="font-display font-black uppercase text-[13px] leading-none mb-1 text-black dark:text-white truncate">
-                            {item.ticketType.event.name}
-                          </Typography>
-                          <Typography className="text-[10px] font-black text-neon-pink dark:text-neon-pink/80 uppercase tracking-widest leading-none">
-                            {item.ticketType.name}
-                          </Typography>
-                        </div>
-                        
-                        <div className="mt-2 flex items-center justify-between">
-                          <div className="flex items-center border-[2px] border-black dark:border-white/20 bg-gray-50 dark:bg-black">
-                            <button
-                              onClick={() => updateItemQuantity(item.id, Math.max(1, item.quantity - 1))}
-                              className="px-2 py-1 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black font-black text-xs transition-colors"
-                            >
-                              -
-                            </button>
-                            <span className="px-3 py-1 border-x-[2px] border-black dark:border-white/20 font-black text-xs min-w-[32px] text-center dark:text-white">
-                              {item.quantity}
-                            </span>
-                            <button
-                              onClick={() => updateItemQuantity(item.id, item.quantity + 1)}
-                              className="px-2 py-1 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black font-black text-xs transition-colors"
-                            >
-                              +
-                            </button>
+                <div className="space-y-6">
+                  {group.eventGroups.map((eventGroup) => (
+                    <div key={eventGroup.eventId} className="space-y-2">
+                      <Typography className="font-display font-bold text-[9px] uppercase text-gray-400 tracking-wider pl-1 font-black leading-none">
+                        {eventGroup.eventName}
+                      </Typography>
+                      <div className="space-y-4">
+                        {eventGroup.items.map((item) => (
+                          <div key={item.id} className="border-4 border-black dark:border-white/10 p-3 bg-white dark:bg-[#0a0a0a] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(0,255,255,0.05)] flex gap-4 transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[6px_6px_0px_0px_rgba(0,255,255,0.1)]">
+                            <div className="relative size-20 border-2 border-black dark:border-white/20 flex-shrink-0 overflow-hidden">
+                              <img
+                                src={item.ticketType.event.imageUrl || "/placeholder.jpg"}
+                                alt={item.ticketType.event.name}
+                                className="w-full h-full object-cover grayscale-[0.2] hover:grayscale-0 transition-all duration-500"
+                              />
+                              <div className="absolute inset-0 border-[8px] border-white/10 pointer-events-none"></div>
+                            </div>
+                            <div className="flex-1 min-w-0 flex flex-col justify-between">
+                              <div>
+                                <Typography className="text-[10px] font-black text-neon-pink dark:text-neon-pink/80 uppercase tracking-widest leading-none">
+                                  {item.ticketType.name}
+                                </Typography>
+                              </div>
+                              
+                              <div className="mt-2 flex items-center justify-between">
+                                <div className="flex items-center border-[2px] border-black dark:border-white/20 bg-gray-50 dark:bg-black">
+                                  <button
+                                    onClick={() => updateItemQuantity(item.id, Math.max(1, item.quantity - 1))}
+                                    className="px-2 py-1 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black font-black text-xs transition-colors"
+                                  >
+                                    -
+                                  </button>
+                                  <span className="px-3 py-1 border-x-[2px] border-black dark:border-white/20 font-black text-xs min-w-[32px] text-center dark:text-white">
+                                    {item.quantity}
+                                  </span>
+                                  <button
+                                    onClick={() => updateItemQuantity(item.id, item.quantity + 1)}
+                                    className="px-2 py-1 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black font-black text-xs transition-colors"
+                                  >
+                                    +
+                                  </button>
+                                </div>
+                                <button 
+                                  onClick={() => removeItem(item.id)} 
+                                  className="p-1.5 text-black/40 dark:text-white/40 hover:text-neon-pink dark:hover:text-neon-pink transition-colors"
+                                >
+                                  <TrashIcon className="size-4" strokeWidth={2.5} />
+                                </button>
+                              </div>
+                            </div>
                           </div>
-                          <button 
-                            onClick={() => removeItem(item.id)} 
-                            className="p-1.5 text-black/40 dark:text-white/40 hover:text-neon-pink dark:hover:text-neon-pink transition-colors"
-                          >
-                            <TrashIcon className="size-4" strokeWidth={2.5} />
-                          </button>
-                        </div>
+                        ))}
                       </div>
                     </div>
                   ))}

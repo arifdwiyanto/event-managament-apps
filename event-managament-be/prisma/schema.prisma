@@ -235,6 +235,7 @@ model Promotion {
   organizer    Organizer        @relation(fields: [organizerId], references: [id])
   events       PromotionEvent[]
   transactions Transaction[]
+  transactionItems TransactionItem[]
 
   @@map("promotions")
 }
@@ -255,7 +256,7 @@ model Transaction {
   id                 String            @id @default(uuid())
   invoice            String            @unique
   userId             String            @map("user_id")
-  eventId            String            @map("event_id")
+  eventId            String?           @map("event_id")
   totalOriginalPrice Decimal           @map("total_original_price")
   totalFinalPrice    Decimal           @map("total_final_price")
   pointsUsed         Int               @default(0) @map("points_used")
@@ -268,7 +269,7 @@ model Transaction {
   snapToken          String?           @map("snap_token")
 
   user       User              @relation(fields: [userId], references: [id])
-  event      Event             @relation(fields: [eventId], references: [id])
+  event      Event?            @relation(fields: [eventId], references: [id])
   userCoupon UserCoupon?       @relation(fields: [userCouponId], references: [id])
   promotion  Promotion?        @relation(fields: [promotionId], references: [id])
   items      TransactionItem[]
@@ -280,12 +281,14 @@ model TransactionItem {
   id            String  @id @default(uuid())
   transactionId String  @map("transaction_id")
   ticketTypeId  String  @map("ticket_type_id")
+  promotionId   String? @map("promotion_id")
   quantity      Int
   pricePerUnit  Decimal @map("price_per_unit")
   totalPrice    Decimal @map("total_price")
 
   transaction Transaction @relation(fields: [transactionId], references: [id])
   ticketType  TicketType  @relation(fields: [ticketTypeId], references: [id])
+  promotion   Promotion?  @relation(fields: [promotionId], references: [id])
 
   @@map("transaction_items")
 }

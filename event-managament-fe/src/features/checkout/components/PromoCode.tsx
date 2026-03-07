@@ -5,16 +5,18 @@ import { Typography, Divider } from "@mui/material";
 import { AppliedPromo } from "../types/checkout.types";
 
 interface PromoCodeProps {
+  organizerId: string;
   appliedPromo: AppliedPromo | null;
   promoCode: string;
   promoError: string;
   isValidating: boolean;
-  onSetPromoCode: (code: string) => void;
-  onApply: () => void;
-  onRemove: () => void;
+  onSetPromoCode: (organizerId: string, code: string) => void;
+  onApply: (organizerId: string) => void;
+  onRemove: (organizerId: string) => void;
 }
 
 export const PromoCode: React.FC<PromoCodeProps> = ({
+  organizerId,
   appliedPromo,
   promoCode,
   promoError,
@@ -48,7 +50,7 @@ export const PromoCode: React.FC<PromoCodeProps> = ({
               - IDR {appliedPromo.discount.toLocaleString("id-ID")}
             </Typography>
             <button
-              onClick={onRemove}
+              onClick={() => onRemove(organizerId)}
               className="text-xs font-bold underline text-red-500 hover:text-red-700"
             >
               REMOVE
@@ -61,12 +63,12 @@ export const PromoCode: React.FC<PromoCodeProps> = ({
             <input
               type="text"
               value={promoCode}
-              onChange={(e) => onSetPromoCode(e.target.value.toUpperCase())}
+              onChange={(e) => onSetPromoCode(organizerId, e.target.value.toUpperCase())}
               placeholder="ENTER CODE"
               className="flex-1 border-2 border-black dark:border-white/20 bg-transparent dark:bg-black px-4 py-3 font-bold uppercase placeholder:text-gray-400 dark:text-white focus:outline-none focus:border-neon-purple transition-colors"
             />
             <button
-              onClick={onApply}
+              onClick={() => onApply(organizerId)}
               disabled={!promoCode.trim() || isValidating}
               className="px-6 border-2 border-black dark:border-neon-purple bg-black dark:bg-neon-purple text-white dark:text-black font-black uppercase tracking-widest hover:bg-neon-purple hover:border-neon-purple dark:hover:bg-black dark:hover:text-white dark:hover:border-white transition-colors disabled:opacity-50"
             >
