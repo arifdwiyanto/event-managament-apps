@@ -1,4 +1,5 @@
-import React, { useRef, useCallback, useEffect } from "react";
+import React, { useRef, useCallback, useEffect, useState } from "react";
+import { Snackbar, Alert } from "@mui/material";
 import { HistoryIcon } from "./ReferralIcons";
 import { ActivityIcon } from "./ActivityIcon";
 import { LoadingSpinner } from "./LoadingSkeleton";
@@ -21,6 +22,7 @@ const RecentActivityCard: React.FC<RecentActivityCardProps> = ({
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const displayedActivities = activities.slice(0, displayCount);
+  const [snackText, setSnackText] = useState("");
 
   const handleScroll = useCallback(() => {
     if (!scrollRef.current || isLoading || !hasMore) return;
@@ -60,8 +62,8 @@ const RecentActivityCard: React.FC<RecentActivityCardProps> = ({
             key={activity.id}
             className="flex items-center justify-between p-2 md:p-4 border-2 border-gray-200 dark:border-zinc-800 bg-white dark:bg-black hover:bg-gray-100 dark:hover:bg-zinc-900 hover:shadow-[1px_1px_0px_0px_#ccc] dark:hover:shadow-[1px_1px_0px_0px_#333333] transition-all group cursor-default"
           >
-            <div className="flex items-center gap-2 md:gap-4">
-              <div className={`size-8 md:size-12 border-2 flex items-center justify-center group-hover:rotate-12 transition-transform shadow-[1px_1px_0px_0px_rgba(0,0,0,0.1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,0.2)] ${
+            <div className="flex items-center gap-2 md:gap-4 min-w-0 flex-1 mr-2">
+              <div className={`size-8 md:size-12 shrink-0 border-2 flex items-center justify-center group-hover:rotate-12 transition-transform shadow-[1px_1px_0px_0px_rgba(0,0,0,0.1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,0.2)] ${
                 activity.type === 'point_usage'
                   ? 'bg-red-100 dark:bg-red-950 border-red-400 dark:border-red-600 text-red-500 dark:text-red-400'
                   : activity.type === 'referral'
@@ -72,9 +74,16 @@ const RecentActivityCard: React.FC<RecentActivityCardProps> = ({
               }`}>
                 <ActivityIcon type={activity.type} />
               </div>
-              <div className="min-w-0">
-                <p className="font-black text-sm md:text-lg uppercase leading-tight text-gray-900 dark:text-white truncate">{activity.title}</p>
-                <p className="text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wide truncate">{activity.description}</p>
+              <div className="min-w-0 flex-1">
+                <p className="font-black text-sm md:text-lg uppercase leading-tight text-gray-900 dark:text-white truncate">
+                  {activity.title}
+                </p>
+                <p 
+                  onClick={() => setSnackText(activity.description)}
+                  className="text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wide truncate cursor-pointer hover:text-gray-700 dark:hover:text-gray-300 active:text-[#a855f7] transition-colors"
+                >
+                  {activity.description}
+                </p>
               </div>
             </div>
             {activity.type === "point_usage" ? (
@@ -97,6 +106,22 @@ const RecentActivityCard: React.FC<RecentActivityCardProps> = ({
           <p className="text-center text-xs text-gray-500 py-2">No more activities</p>
         )}
       </div>
+
+      <Snackbar
+        open={!!snackText}
+        autoHideDuration={3000}
+        onClose={() => setSnackText("")}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setSnackText("")}
+          severity="info"
+          variant="filled"
+          sx={{ borderRadius: 0, fontWeight: 900, textTransform: "uppercase", fontSize: "0.7rem", letterSpacing: "0.05em" }}
+        >
+          {snackText}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
