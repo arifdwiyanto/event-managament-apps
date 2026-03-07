@@ -14,15 +14,19 @@ export class ReferralService {
       throw new Error("User not found");
     }
 
-    // Find the nearest expiry date from active points
+    // Calculate points stats
     const now = new Date();
     const activePoints = user.points.filter((p: any) => p.expiresAt > now && p.remainingAmount > 0);
     const nearestExpiry = activePoints.length > 0
       ? activePoints.reduce((nearest: Date, p: any) => p.expiresAt < nearest ? p.expiresAt : nearest, activePoints[0].expiresAt)
       : null;
+    const remainingPoints = activePoints.reduce((acc: number, curr: any) => acc + curr.remainingAmount, 0);
 
-    // Calculate points
-    const currentPoints = activePoints.reduce((acc: number, curr: any) => acc + curr.remainingAmount, 0);
+    // Total ever earned = sum of original 'amount' on all non-expired point records
+    const allActivePointRecords = user.points.filter((p: any) => p.expiresAt > now);
+    const totalEarned = allActivePointRecords.reduce((acc: number, curr: any) => acc + curr.amount, 0);
+    const usedAmount = totalEarned - remainingPoints;
+    const usedPercentage = totalEarned > 0 ? Math.round((usedAmount / totalEarned) * 100) : 0;
 
     // Determines Tier
     const tier = "Bronze"; // Placeholder
@@ -46,7 +50,18 @@ export class ReferralService {
             points: 0, 
             timeAgo: ref.createdAt.toISOString(),
             iconColor: "text-blue-500",
-        }))
+        })),
+        ...(user.transactions || []).map((tx: any) => ({
+            id: tx.id,
+            type: "point_usage" as const,
+            title: "Points Redeemed",
+            description: tx.event?.name
+                ? `Used ${tx.pointsUsed.toLocaleString("id-ID")} points for "${tx.event.name}"`
+                : `Used ${tx.pointsUsed.toLocaleString("id-ID")} points on order ${tx.invoice}`,
+            points: -tx.pointsUsed,
+            timeAgo: tx.transactionDate.toISOString(),
+            iconColor: "text-red-500",
+        })),
     ].sort((a: any, b: any) => new Date(b.timeAgo).getTime() - new Date(a.timeAgo).getTime());
 
 
@@ -69,9 +84,10 @@ export class ReferralService {
         tier: tier,
       },
       pointsBalance: {
-        current: currentPoints,
-        nextTier: "Silver",
-        nextTierProgress: 50,
+        current: remainingPoints,
+        totalEarned,
+        usedAmount,
+        usedPercentage,
         expiresIn: nearestExpiry ? nearestExpiry.toISOString().split('T')[0] : null,
       },
       recentActivity: recentActivity,

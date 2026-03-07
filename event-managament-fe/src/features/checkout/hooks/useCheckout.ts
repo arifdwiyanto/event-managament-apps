@@ -5,10 +5,11 @@ import { useCartStore } from "@/features/cart/store/useCartStore";
 import { useStoreLogin } from "@/features/auth/store/useAuthStore";
 import { useCreateOrder } from "@/features/orders/hooks/useOrders";
 import { useValidatePromotion } from "@/features/promotions/hooks/usePromotions";
-import { AppliedPromo } from "../types/checkout.types";
+import { AppliedPromo, AppliedCoupon } from "../types/checkout.types";
 import { PAYMENT_METHODS } from "../constants/paymentMethods";
 import { groupCartItemsByOrganizer } from "@/features/cart/utils/groupItems";
 import { useUserPoints } from "@/features/userPoint/hooks/useUserPoints";
+import { UserCoupon } from "../services/userCouponService";
 
 export const useCheckout = () => {
   const router = useRouter();
@@ -24,6 +25,7 @@ export const useCheckout = () => {
   const [appliedPromos, setAppliedPromos] = useState<Record<string, AppliedPromo>>({});
   const [promoErrors, setPromoErrors] = useState<Record<string, string>>({});
   const [pointPercentage, setPointPercentage] = useState<number>(0);
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
   const [toast, setToast] = useState({
     open: false,
     message: "",
@@ -53,6 +55,12 @@ export const useCheckout = () => {
   const totalOriginal = useMemo(() => {
     return Object.values(subtotalPerGroup).reduce((acc, val) => acc + val, 0);
   }, [subtotalPerGroup]);
+
+  // Apply promo directly from selector (no validation call needed — already validated by backend)
+  const handleApplyPromoFromSelector = useCallback((organizerId: string, promo: AppliedPromo) => {
+    setAppliedPromos((prev) => ({ ...prev, [organizerId]: promo }));
+    setToast({ open: true, message: `Promo "${promo.code}" applied!`, severity: "success" });
+  }, []);
 
   const handleApplyPromo = async (organizerId: string, eventId: string) => {
     const code = promoCodes[organizerId];
@@ -107,6 +115,15 @@ export const useCheckout = () => {
     });
   };
 
+  const handleSelectCoupon = useCallback((coupon: UserCoupon | null) => {
+    if (!coupon) {
+      setAppliedCoupon(null);
+      return;
+    }
+    setAppliedCoupon({ id: coupon.id, code: coupon.code, discountPercentage: coupon.discountPercentage });
+    setToast({ open: true, message: `Coupon "${coupon.code}" applied!`, severity: "success" });
+  }, []);
+
   const totalPromoDiscount = useMemo(() => {
     return Object.values(appliedPromos).reduce((acc, promo) => acc + promo.discount, 0);
   }, [appliedPromos]);
@@ -116,7 +133,13 @@ export const useCheckout = () => {
     return (pointBalance * pointPercentage) / 100;
   }, [pointBalance, pointPercentage]);
 
-  const finalTotal = Math.max(0, totalOriginal - totalPromoDiscount - pointDiscount);
+  const couponDiscount = useMemo(() => {
+    if (!appliedCoupon) return 0;
+    const afterPromoAndPoints = Math.max(0, totalOriginal - totalPromoDiscount - pointDiscount);
+    return (afterPromoAndPoints * appliedCoupon.discountPercentage) / 100;
+  }, [appliedCoupon, totalOriginal, totalPromoDiscount, pointDiscount]);
+
+  const finalTotal = Math.max(0, totalOriginal - totalPromoDiscount - pointDiscount - couponDiscount);
 
   const handleCreateOrder = async () => {
     if (!user || !user.id) {
@@ -130,11 +153,7 @@ export const useCheckout = () => {
     }
 
     try {
-      // Collect items with their specific promos
       const items = cart.items.map((item) => {
-        // Find if this item belongs to an organizer group with an applied promo
-        // A better way would be to group by eventId, but organizers often manage entire events.
-        // For now, mapping promo by organizerId works if one promo is applied per organizer block.
         const organizerId = item.ticketType.event?.organizerId || "";
         const promo = appliedPromos[organizerId];
         
@@ -149,6 +168,7 @@ export const useCheckout = () => {
         customerId: user.id,
         paymentMethod: selectedPayment,
         pointUsed: pointDiscount,
+        voucherId: appliedCoupon?.id,
         items,
       };
 
@@ -156,6 +176,7 @@ export const useCheckout = () => {
 
       await clearCart();
       queryClient.invalidateQueries({ queryKey: ["userPoints", "balance"] });
+      queryClient.invalidateQueries({ queryKey: ["userCoupons"] });
       setToast({ open: true, message: "Vibe Secured! Order created successfully.", severity: "success" });
       
       setTimeout(() => {
@@ -178,11 +199,15 @@ export const useCheckout = () => {
     promoErrors,
     pointPercentage,
     setPointPercentage,
+    appliedCoupon,
+    handleSelectCoupon,
     totalOriginal,
     totalPromoDiscount,
     pointDiscount,
+    couponDiscount,
     finalTotal,
     handleApplyPromo,
+    handleApplyPromoFromSelector,
     handleRemovePromo,
     handleCreateOrder,
     isSubmitting: createOrderMutation.isPending,
@@ -191,5 +216,6 @@ export const useCheckout = () => {
     handleCloseToast,
     groupedItems,
     pointBalance: pointBalance || 0,
+    subtotalPerGroup,
   };
 };

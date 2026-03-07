@@ -19,22 +19,33 @@ const TicketSelectionCard: React.FC<TicketSelectionCardProps> = ({
   const price = typeof ticket.price === 'string' ? Number(ticket.price) : ticket.price;
   const displayPrice = (price / 1000).toFixed(0);
   const isPopular = ticket.name.toLowerCase().includes("vip");
+  const quota = ticket.quota ?? 0;
+  const isSoldOut = quota <= 0;
+  const isMaxReached = quantity >= quota;
 
   return (
     <div className={`relative p-4 rounded-xl border transition-all duration-300 backdrop-blur-md ${
-      quantity > 0 
-        ? "bg-neon-cyan/10 border-neon-cyan/50 shadow-[0_0_20px_rgba(0,255,221,0.1)] dark:bg-neon-cyan/20 dark:border-neon-cyan/60" 
-        : "bg-black/5 dark:bg-[#1A1A1A]/80 border-black/5 dark:border-white/10 hover:bg-black/10 dark:hover:bg-[#2A2A2A]/80"
+      isSoldOut
+        ? "bg-gray-100 dark:bg-[#1A1A1A]/50 border-gray-200 dark:border-white/5 opacity-60"
+        : quantity > 0 
+          ? "bg-neon-cyan/10 border-neon-cyan/50 shadow-[0_0_20px_rgba(0,255,221,0.1)] dark:bg-neon-cyan/20 dark:border-neon-cyan/60" 
+          : "bg-black/5 dark:bg-[#1A1A1A]/80 border-black/5 dark:border-white/10 hover:bg-black/10 dark:hover:bg-[#2A2A2A]/80"
     }`}>
-      {isPopular && (
+      {isPopular && !isSoldOut && (
         <div className="absolute -top-2 -right-2 bg-neon-magenta text-white px-2 py-0.5 font-black text-[8px] uppercase tracking-widest rounded-full shadow-lg border border-white/20 z-10">
           Popular
+        </div>
+      )}
+
+      {isSoldOut && (
+        <div className="absolute -top-2 -right-2 bg-red-500 text-white px-2 py-0.5 font-black text-[8px] uppercase tracking-widest rounded-full shadow-lg border border-white/20 z-10">
+          Sold Out
         </div>
       )}
       
       <div className="flex justify-between items-start mb-2">
         <div className="flex-grow pr-4">
-          <h4 className="text-sm md:text-base font-black uppercase text-gray-900 dark:text-white tracking-widest leading-none mb-1">
+          <h4 className={`text-sm md:text-base font-black uppercase tracking-widest leading-none mb-1 ${isSoldOut ? "text-gray-400 dark:text-gray-600 line-through" : "text-gray-900 dark:text-white"}`}>
             {ticket.name}
           </h4>
           <p className="text-[9px] font-bold uppercase text-gray-500 dark:text-gray-400 tracking-tighter leading-tight line-clamp-1">
@@ -42,11 +53,13 @@ const TicketSelectionCard: React.FC<TicketSelectionCardProps> = ({
           </p>
         </div>
         <div className="text-right">
-          <p className="text-sm md:text-base font-black text-neon-magenta italic tracking-tighter">
+          <p className={`text-sm md:text-base font-black italic tracking-tighter ${isSoldOut ? "text-gray-400 dark:text-gray-600" : "text-neon-magenta"}`}>
             IDR {displayPrice}K
           </p>
-          <span className="text-[8px] font-black uppercase text-gray-400 dark:text-gray-500 tracking-widest">
-            {ticket.quota ? `${ticket.quota} Left` : 'Available'}
+          <span className={`text-[8px] font-black uppercase tracking-widest ${
+            isSoldOut ? "text-red-500" : quota <= 5 ? "text-yellow-500" : "text-gray-400 dark:text-gray-500"
+          }`}>
+            {isSoldOut ? "Sold Out" : `${quota} Left`}
           </span>
         </div>
       </div>
@@ -59,6 +72,11 @@ const TicketSelectionCard: React.FC<TicketSelectionCardProps> = ({
               <span className="text-[9px] font-black uppercase text-neon-cyan tracking-widest">Selected</span>
             </div>
           )}
+          {!isSoldOut && isMaxReached && quantity > 0 && (
+            <span className="text-[8px] font-black uppercase text-yellow-500 tracking-widest ml-1">
+              (Max)
+            </span>
+          )}
         </div>
 
         <div className="flex items-center bg-black/5 dark:bg-[#1A1A1A] rounded-lg border border-black/5 dark:border-white/10 overflow-hidden">
@@ -66,7 +84,7 @@ const TicketSelectionCard: React.FC<TicketSelectionCardProps> = ({
             type="button"
             onClick={onDecrease}
             className="w-7 h-7 flex items-center justify-center text-gray-900 dark:text-white font-black hover:bg-black/10 dark:hover:bg-white/10 transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
-            disabled={quantity === 0}
+            disabled={quantity === 0 || isSoldOut}
           >
             -
           </button>
@@ -76,7 +94,12 @@ const TicketSelectionCard: React.FC<TicketSelectionCardProps> = ({
           <button 
             type="button"
             onClick={onIncrease}
-            className="w-7 h-7 flex items-center justify-center text-gray-900 dark:text-white font-black hover:bg-neon-cyan hover:text-black transition-all"
+            className={`w-7 h-7 flex items-center justify-center font-black transition-all ${
+              isSoldOut || isMaxReached
+                ? "text-gray-300 dark:text-gray-600 cursor-not-allowed"
+                : "text-gray-900 dark:text-white hover:bg-neon-cyan hover:text-black"
+            }`}
+            disabled={isSoldOut || isMaxReached}
           >
             +
           </button>

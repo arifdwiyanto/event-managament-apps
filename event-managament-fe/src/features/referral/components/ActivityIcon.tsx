@@ -3,7 +3,8 @@ import {
   PersonAddIcon, 
   TicketIcon, 
   FireIcon, 
-  GiftIcon 
+  GiftIcon,
+  SavingsIcon,
 } from "./ReferralIcons";
 
 interface ActivityIconProps {
@@ -18,6 +19,10 @@ export const ActivityIcon: React.FC<ActivityIconProps> = ({ type }) => {
       return <TicketIcon />;
     case "streak":
       return <FireIcon />;
+    case "point_usage":
+      return <SavingsIcon />;
+    case "coupon":
+      return <GiftIcon />;
     default:
       return <GiftIcon />;
   }

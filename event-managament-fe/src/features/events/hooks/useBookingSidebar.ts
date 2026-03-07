@@ -7,9 +7,11 @@ export const useBookingSidebar = (event: Event) => {
   const [quantities, setQuantities] = useState<Record<string, number>>({});
 
   const handleUpdateQuantity = (ticketId: string, delta: number) => {
+    const ticket = (event.ticketTypes || []).find(t => t.id === ticketId);
+    const maxQty = ticket?.quota ?? 999;
     setQuantities((prev) => ({
       ...prev,
-      [ticketId]: Math.max(0, (prev[ticketId] || 0) + delta),
+      [ticketId]: Math.min(maxQty, Math.max(0, (prev[ticketId] || 0) + delta)),
     }));
   };
 

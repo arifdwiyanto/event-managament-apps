@@ -10,14 +10,15 @@ export interface UserProfile {
 
 export interface PointsBalance {
   current: number;
-  nextTier: string;
-  nextTierProgress: number;
+  totalEarned: number;
+  usedAmount: number;
+  usedPercentage: number;
   expiresIn: string | null;
 }
 
 export interface ActivityItem {
   id: string;
-  type: "referral" | "purchase" | "streak" | "bonus";
+  type: "referral" | "purchase" | "streak" | "bonus" | "coupon" | "point_usage";
   title: string;
   description: string;
   points: number;

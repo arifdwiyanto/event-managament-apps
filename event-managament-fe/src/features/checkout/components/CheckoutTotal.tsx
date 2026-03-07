@@ -7,6 +7,7 @@ interface CheckoutTotalProps {
   total: number;
   totalPromoDiscount: number;
   pointDiscount: number;
+  couponDiscount: number;
   finalTotal: number;
   onPay: () => void;
   isSubmitting: boolean;
@@ -16,6 +17,7 @@ export const CheckoutTotal: React.FC<CheckoutTotalProps> = ({
   total,
   totalPromoDiscount,
   pointDiscount,
+  couponDiscount,
   finalTotal,
   onPay,
   isSubmitting,
@@ -58,6 +60,17 @@ export const CheckoutTotal: React.FC<CheckoutTotalProps> = ({
             </Typography>
             <Typography className="font-bold text-sm">
               - IDR {pointDiscount.toLocaleString("id-ID")}
+            </Typography>
+          </div>
+        )}
+
+        {couponDiscount > 0 && (
+          <div className="flex justify-between items-center" style={{ color: '#FF00FF' }}>
+            <Typography className="font-bold uppercase text-sm" style={{ color: '#FF00FF' }}>
+              Referral Coupon
+            </Typography>
+            <Typography className="font-bold text-sm" style={{ color: '#FF00FF' }}>
+              - IDR {couponDiscount.toLocaleString("id-ID")}
             </Typography>
           </div>
         )}

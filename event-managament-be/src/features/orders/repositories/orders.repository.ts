@@ -4,6 +4,7 @@ import { Prisma } from "@prisma/client";
 export interface IOrdersRepositoryProps {
   invoice: string;
   totalPrice: number;
+  totalOriginalPrice: number;
   pointUsed: number;
   customerId: string;
   eventId?: string | null;
@@ -30,7 +31,7 @@ export class OrdersRepository {
       data: {
         invoice: data.invoice,
         totalFinalPrice: data.totalPrice,
-        totalOriginalPrice: data.totalPrice + (data.pointUsed || 0),
+        totalOriginalPrice: data.totalOriginalPrice,
         pointsUsed: data.pointUsed,
         userId: data.customerId,
         eventId: data.eventId,
@@ -111,6 +112,7 @@ export class OrdersRepository {
           },
         },
         promotion: true,
+        userCoupon: true,
         items: {
           include: {
             ticketType: {

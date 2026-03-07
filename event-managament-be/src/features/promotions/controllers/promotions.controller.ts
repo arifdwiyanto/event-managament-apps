@@ -114,4 +114,18 @@ export class PromotionsController {
       next(error);
     }
   };
+
+  public getForEvent = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
+    try {
+      const eventId = req.params.eventId as string;
+      const promotions = await this.promotionsService.getEventPromotions(eventId);
+      res.status(200).send(promotions);
+    } catch (error) {
+      next(error);
+    }
+  };
 }

@@ -70,6 +70,22 @@ export class PromotionsService {
     return this.promotionsRepository.delete(id);
   };
 
+  public getEventPromotions = async (eventId: string): Promise<any[]> => {
+    const promos = await this.promotionsRepository.findByEventId(eventId);
+    return promos.map((p: any) => ({
+      id: p.id,
+      name: p.name,
+      code: p.code,
+      discountAmount: p.discountAmount ? Number(p.discountAmount) : null,
+      discountPercentage: p.discountPercentage ? Number(p.discountPercentage) : null,
+      startDate: p.startDate,
+      endDate: p.endDate,
+      maxUsage: p.maxUsage,
+      usageCount: p._count?.transactions ?? 0,
+      remaining: p.maxUsage !== null ? (p.maxUsage - (p._count?.transactions ?? 0)) : null,
+    }));
+  };
+
   public validate = async (
     code: string,
     userId?: string,

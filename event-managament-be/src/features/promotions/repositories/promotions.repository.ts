@@ -81,4 +81,21 @@ export class PromotionsRepository {
       },
     });
   };
+
+  public findByEventId = async (eventId: string): Promise<any[]> => {
+    const now = new Date();
+    return await prisma.promotion.findMany({
+      where: {
+        startDate: { lte: now },
+        endDate: { gte: now },
+        events: {
+          some: { eventId },
+        },
+      },
+      include: {
+        _count: { select: { transactions: true } },
+      },
+      orderBy: { startDate: "asc" },
+    });
+  };
 }

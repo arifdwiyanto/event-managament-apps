@@ -99,10 +99,13 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         </span>
         Browse Events
       </Link>
-      <button className="bg-[#ee2b8c] dark:bg-[#FF00FF] border-2 border-black text-white px-4 md:px-8 py-2 md:py-3 font-black text-xs md:text-lg shadow-[2px_2px_0px_0px_#d61f7a] dark:shadow-[2px_2px_0px_0px_#ffffff] md:shadow-[4px_4px_0px_0px_#d61f7a] md:dark:shadow-[4px_4px_0px_0px_#ffffff] hover:bg-[#d61f7a] dark:hover:bg-[#d900d9] hover:-translate-y-1 active:shadow-none active:translate-y-0 transition-all flex items-center justify-center gap-2 uppercase tracking-wide">
+      <Link
+        href="/user/orders"
+        className="bg-[#ee2b8c] dark:bg-[#FF00FF] border-2 border-black text-white px-4 md:px-8 py-2 md:py-3 font-black text-xs md:text-lg shadow-[2px_2px_0px_0px_#d61f7a] dark:shadow-[2px_2px_0px_0px_#ffffff] md:shadow-[4px_4px_0px_0px_#d61f7a] md:dark:shadow-[4px_4px_0px_0px_#ffffff] hover:bg-[#d61f7a] dark:hover:bg-[#d900d9] hover:-translate-y-1 active:shadow-none active:translate-y-0 transition-all flex items-center justify-center gap-2 uppercase tracking-wide"
+      >
         <GiftIcon />
         Redeem Points
-      </button>
+      </Link>
     </div>
   </section>
 );

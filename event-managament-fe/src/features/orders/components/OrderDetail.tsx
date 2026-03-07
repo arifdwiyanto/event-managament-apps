@@ -142,84 +142,90 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
                     <Box sx={{ height: "2px", flex: 1, backgroundColor: "rgba(0,0,0,0.1)", dark: { backgroundColor: "rgba(255,255,255,0.1)" } }} className="bg-black/10 dark:bg-white/10" />
                   </Box>
 
-                  <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                    {group.items.map((item) => (
-                      <Box
-                        key={item.id}
-                        className="border-2 border-dashed !border-gray-300 dark:!border-neon-purple p-4"
-                        sx={{ 
-                          display: "flex", 
-                          flexDirection: { xs: "column", sm: "row" },
-                          gap: 2 
-                        }}
-                      >
-                        <Box
-                          sx={{ flex: 1, display: "flex", flexDirection: "column" }}
-                        >
-                          <Typography className="font-black uppercase text-[10px] md:text-sm mb-1 text-black dark:text-white leading-tight">
-                            {item.ticketType.event?.name || order.event?.name}
-                          </Typography>
-                          <Typography className="text-neon-purple dark:text-neon-cyan font-black uppercase text-[8px] md:text-[10px] tracking-widest">
-                            {item.ticketType.name}
-                          </Typography>
-                          <Typography className="text-gray-500 dark:text-gray-400 font-bold mt-1 md:mt-2 text-[8px] md:text-xs">
-                            Price: IDR{" "}
-                            {Number(item.ticketType.price).toLocaleString("id-ID")}
-                          </Typography>
-                        </Box>
+                  {group.eventGroups.map((eg) => (
+                    <Box key={eg.eventId} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                      {/* Event Name Header */}
+                      <Typography className="font-black uppercase text-[9px] md:text-xs tracking-widest text-gray-600 dark:text-gray-300 pl-1 border-l-4 border-neon-purple dark:border-neon-cyan ml-1">
+                        🎤 {eg.eventName}
+                      </Typography>
 
-                        <Box
-                          sx={{
-                            textAlign: { xs: "left", sm: "right" },
-                            display: "flex",
-                            flexDirection: { xs: "row", sm: "column" },
-                            justifyContent: "space-between",
-                            alignItems: { xs: "center", sm: "flex-end" },
-                            pt: { xs: 2, sm: 0 },
-                            borderTop: { xs: "1px dashed #eee", sm: "none" },
-                          }}
-                          className="dark:!border-t-neon-cyan/50 sm:dark:!border-t-0"
-                        >
-                          <Box>
-                            <Typography className="font-black text-[10px] md:text-sm text-black dark:text-white inline-block mr-2 sm:block sm:mr-0">
-                              x {item.quantity}
-                            </Typography>
-                            <Typography className="font-display font-black text-sm md:text-lg text-black dark:text-neon-cyan sm:mt-1">
-                              IDR{" "}
-                              {(
-                                Number(item.ticketType.price) * item.quantity
-                              ).toLocaleString("id-ID")}
-                            </Typography>
-                          </Box>
-                          {order.status === "PAID" && !isOrganizerView && (
-                              <Button
-                              size="small"
-                              onClick={() => setIsReviewOpen(true)}
-                              className="bg-neon-magenta text-white sm:mt-4 brutalist-button hover:shadow-neon-pink"
-                              sx={{
-                                py: 0.5,
-                                px: 1.5,
-                                fontSize: "0.6rem",
-                                fontWeight: 900,
-                                textTransform: "uppercase",
-                                letterSpacing: "0.05em",
-                                boxShadow: "3px 3px 0 0 #000",
-                                border: "2px solid black",
-                                borderRadius: 0,
-                                "&:hover": {
-                                  backgroundColor: "#ff008a",
-                                  transform: "translate(-2px, -2px)",
-                                  color: "white",
-                                },
-                              }}
+                      <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pl: 1 }}>
+                        {eg.items.map((item) => (
+                          <Box
+                            key={item.id}
+                            className="border-2 border-dashed !border-gray-300 dark:!border-neon-purple p-4"
+                            sx={{ 
+                              display: "flex", 
+                              flexDirection: { xs: "column", sm: "row" },
+                              gap: 2 
+                            }}
+                          >
+                            <Box
+                              sx={{ flex: 1, display: "flex", flexDirection: "column" }}
                             >
-                              Review Vibe
-                            </Button>
-                          )}
-                        </Box>
+                              <Typography className="text-neon-purple dark:text-neon-cyan font-black uppercase text-[8px] md:text-[10px] tracking-widest">
+                                {item.ticketType.name}
+                              </Typography>
+                              <Typography className="text-gray-500 dark:text-gray-400 font-bold mt-1 md:mt-2 text-[8px] md:text-xs">
+                                Price: IDR{" "}
+                                {Number(item.ticketType.price).toLocaleString("id-ID")}
+                              </Typography>
+                            </Box>
+
+                            <Box
+                              sx={{
+                                textAlign: { xs: "left", sm: "right" },
+                                display: "flex",
+                                flexDirection: { xs: "row", sm: "column" },
+                                justifyContent: "space-between",
+                                alignItems: { xs: "center", sm: "flex-end" },
+                                pt: { xs: 2, sm: 0 },
+                                borderTop: { xs: "1px dashed #eee", sm: "none" },
+                              }}
+                              className="dark:!border-t-neon-cyan/50 sm:dark:!border-t-0"
+                            >
+                              <Box>
+                                <Typography className="font-black text-[10px] md:text-sm text-black dark:text-white inline-block mr-2 sm:block sm:mr-0">
+                                  x {item.quantity}
+                                </Typography>
+                                <Typography className="font-display font-black text-sm md:text-lg text-black dark:text-neon-cyan sm:mt-1">
+                                  IDR{" "}
+                                  {(
+                                    Number(item.ticketType.price) * item.quantity
+                                  ).toLocaleString("id-ID")}
+                                </Typography>
+                              </Box>
+                              {order.status === "PAID" && !isOrganizerView && (
+                                  <Button
+                                  size="small"
+                                  onClick={() => setIsReviewOpen(true)}
+                                  className="bg-neon-magenta text-white sm:mt-4 brutalist-button hover:shadow-neon-pink"
+                                  sx={{
+                                    py: 0.5,
+                                    px: 1.5,
+                                    fontSize: "0.6rem",
+                                    fontWeight: 900,
+                                    textTransform: "uppercase",
+                                    letterSpacing: "0.05em",
+                                    boxShadow: "3px 3px 0 0 #000",
+                                    border: "2px solid black",
+                                    borderRadius: 0,
+                                    "&:hover": {
+                                      backgroundColor: "#ff008a",
+                                      transform: "translate(-2px, -2px)",
+                                      color: "white",
+                                    },
+                                  }}
+                                >
+                                  Review Vibe
+                                </Button>
+                              )}
+                            </Box>
+                          </Box>
+                        ))}
                       </Box>
-                    ))}
-                  </Box>
+                    </Box>
+                  ))}
                 </Box>
               ))}
             </Box>
@@ -251,6 +257,8 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
                   {order.paymentMethod.replace(/_/g, " ")}
                 </Typography>
               </Box>
+
+              {/* Original Price (before any discount) */}
               <Box display="flex" justifyContent="space-between">
                 <Typography className="text-gray-500 dark:text-gray-400 font-bold uppercase text-[8px] md:text-xs">
                   Original Total
@@ -261,6 +269,45 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
                 </Typography>
               </Box>
               
+              {/* Event Promotions (from items) — show actual IDR discount */}
+              {(() => {
+                // Calculate promo discount per promotion by comparing item original vs actual
+                const promoMap = new Map<string, { name: string; code: string; discountPercentage?: number | null; discountAmount?: number | null; totalSaved: number }>();
+                order.items.forEach((item) => {
+                  if (item.promotion) {
+                    const originalItemPrice = Number(item.pricePerUnit) * item.quantity;
+                    const actualItemPrice = Number(item.totalPrice);
+                    const saved = Math.max(0, originalItemPrice - actualItemPrice);
+                    const existing = promoMap.get(item.promotion.id);
+                    promoMap.set(item.promotion.id, {
+                      ...item.promotion,
+                      totalSaved: (existing?.totalSaved || 0) + saved,
+                    });
+                  }
+                });
+                const uniquePromos = Array.from(promoMap.values());
+                return uniquePromos.map((promo, idx) => (
+                  <Box
+                    key={idx}
+                    display="flex"
+                    justifyContent="space-between"
+                    className="text-neon-cyan"
+                  >
+                    <Typography className="font-bold uppercase text-[8px] md:text-xs">
+                      Promo: {promo.name}
+                      <span className="ml-1 font-mono text-[7px] md:text-[10px] opacity-70 lowercase">
+                        ({promo.code}
+                        {promo.discountPercentage ? ` · ${Number(promo.discountPercentage)}%` : ""})
+                      </span>
+                    </Typography>
+                    <Typography className="font-black text-[8px] md:text-xs text-neon-cyan">
+                      - IDR {promo.totalSaved.toLocaleString("id-ID")}
+                    </Typography>
+                  </Box>
+                ));
+              })()}
+
+              {/* Points Used */}
               {order.pointsUsed > 0 && (
                 <Box
                   display="flex"
@@ -276,20 +323,38 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
                 </Box>
               )}
 
-              {totalDiscount > 0 && (
-                <Box
-                  display="flex"
-                  justifyContent="space-between"
-                  className="text-neon-cyan"
-                >
-                  <Typography className="font-bold uppercase text-[8px] md:text-xs">
-                    Hype Discount
-                  </Typography>
-                  <Typography className="font-black text-[8px] md:text-xs text-neon-cyan">
-                    - IDR {totalDiscount.toLocaleString("id-ID")}
-                  </Typography>
-                </Box>
-              )}
+              {/* Referral Coupon — compute actual IDR saved */}
+              {order.userCoupon && (() => {
+                // couponDiscount = original - promoDiscount - points - final
+                const original = Number(order.totalOriginalPrice) || 0;
+                const final = Number(order.totalFinalPrice) || 0;
+                const points = Number(order.pointsUsed) || 0;
+                // Promo discount from items
+                let promoDisc = 0;
+                order.items.forEach((item) => {
+                  if (item.promotion) {
+                    promoDisc += Math.max(0, Number(item.pricePerUnit) * item.quantity - Number(item.totalPrice));
+                  }
+                });
+                const couponSaved = Math.max(0, original - promoDisc - points - final);
+                return (
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    sx={{ color: "#FF00FF" }}
+                  >
+                    <Typography className="font-bold uppercase text-[8px] md:text-xs" sx={{ color: "#FF00FF" }}>
+                      Referral Coupon
+                      <span className="ml-1 font-mono text-[7px] md:text-[10px] opacity-70 lowercase">
+                        ({order.userCoupon.code} · {Number(order.userCoupon.discountPercentage)}%)
+                      </span>
+                    </Typography>
+                    <Typography className="font-black text-[8px] md:text-xs" sx={{ color: "#FF00FF" }}>
+                      - IDR {couponSaved.toLocaleString("id-ID")}
+                    </Typography>
+                  </Box>
+                );
+              })()}
             </Box>
 
             {order.paymentProofUrl ? (

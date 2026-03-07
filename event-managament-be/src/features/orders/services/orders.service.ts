@@ -2,6 +2,7 @@
 import { OrdersRepository } from "../repositories/orders.repository.js";
 import { TicketsRepository } from "../../events/repositories/tickets.repository.js";
 import { UserPointRepository } from "../../userPoint/repositories/userPoint.repository.js";
+import { UserCouponRepository } from "../../userCoupons/repositories/voucher.repository.js";
 import { generateInvoiceHtml } from "../../../services/email/templates/invoice.template.js";
 import { EmailService } from "../../../services/email/email.service.js";
 
@@ -21,12 +22,14 @@ export class OrdersService {
   private ordersRepository: OrdersRepository;
   private ticketsRepository: TicketsRepository;
   private userPointRepository: UserPointRepository;
+  private userCouponRepository: UserCouponRepository;
   private emailService: EmailService;
 
   constructor() {
     this.ordersRepository = new OrdersRepository();
     this.ticketsRepository = new TicketsRepository();
     this.userPointRepository = new UserPointRepository();
+    this.userCouponRepository = new UserCouponRepository();
     this.emailService = new EmailService();
   }
 
@@ -127,7 +130,22 @@ export class OrdersService {
         );
       }
 
-      let finalPrice = totalPrice - totalDiscount - (data.pointUsed || 0);
+      // Apply user coupon (referral voucher) — validate and mark used
+      let couponDiscount = 0;
+      if (data.voucherId) {
+        const coupon = await tx.userCoupon.findUnique({
+          where: { id: data.voucherId },
+        });
+        if (!coupon) throw new Error("Coupon not found");
+        if (coupon.isUsed) throw new Error("Coupon has already been used");
+        if (new Date(coupon.expiresAt) < new Date()) throw new Error("Coupon has expired");
+        if (coupon.userId !== data.customerId) throw new Error("Coupon does not belong to this user");
+
+        couponDiscount = ((totalPrice - totalDiscount - (data.pointUsed || 0)) * Number(coupon.discountPercentage)) / 100;
+        await this.userCouponRepository.useCouponInTx(data.voucherId, tx);
+      }
+
+      let finalPrice = totalPrice - totalDiscount - (data.pointUsed || 0) - couponDiscount;
 
       if (finalPrice < 0) {
         finalPrice = 0;
@@ -138,6 +156,7 @@ export class OrdersService {
       const orderData = {
         invoice,
         totalPrice: finalPrice,
+        totalOriginalPrice: totalPrice,
         pointUsed: data.pointUsed || 0,
         customerId: data.customerId,
         eventId: isSingleEvent ? firstEventId : null,

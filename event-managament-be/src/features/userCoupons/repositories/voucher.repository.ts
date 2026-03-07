@@ -34,4 +34,14 @@ export class UserCouponRepository {
       data: { isUsed: true },
     });
   };
+
+  public useCouponInTx = async (
+    couponId: string,
+    tx: Prisma.TransactionClient,
+  ): Promise<any> => {
+    return await tx.userCoupon.update({
+      where: { id: couponId },
+      data: { isUsed: true },
+    });
+  };
 }

@@ -11,6 +11,21 @@ export class ReferralRepository {
         coupons: true,
         referralsSent: true,
         referralsReceived: true,
+        transactions: {
+          where: {
+            pointsUsed: { gt: 0 },
+          },
+          select: {
+            id: true,
+            invoice: true,
+            pointsUsed: true,
+            transactionDate: true,
+            event: {
+              select: { name: true },
+            },
+          },
+          orderBy: { transactionDate: "desc" },
+        },
       },
     });
   };

@@ -46,6 +46,7 @@ export class PromotionsRouter {
     );
 
     this.router.post("/validate", this.promotionsController.validateVoucher);
+    this.router.get("/events/:eventId", this.promotionsController.getForEvent);
   };
 
   public getRouter = (): Router => {
