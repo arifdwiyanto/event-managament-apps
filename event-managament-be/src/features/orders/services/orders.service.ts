@@ -36,6 +36,13 @@ export class OrdersService {
 
   public create = async (data: IOrdersServiceProps): Promise<any> => {
     return await prisma.$transaction(async (tx: any) => {
+      const userWithOrganizer = await tx.user.findUnique({
+        where: { id: data.customerId },
+        include: { organizer: true },
+      });
+
+      const userOrganizerId = userWithOrganizer?.organizer?.id;
+
       let firstEventId: string | null = null;
       let isSingleEvent = true;
       let totalPrice = 0;
@@ -50,6 +57,14 @@ export class OrdersService {
           throw new Error(`Ticket with id ${item.ticketId} not found`);
         }
 
+        const eventData = await tx.event.findUnique({
+          where: { id: ticket.eventId }
+        });
+
+        if (userOrganizerId && eventData?.organizerId === userOrganizerId) {
+          throw new Error("Organizers cannot purchase tickets for their own events");
+        }
+
         if (firstEventId === null) {
           firstEventId = ticket.eventId;
         } else if (firstEventId !== ticket.eventId) {
@@ -59,6 +74,7 @@ export class OrdersService {
         if (ticket.quota < item.qty) {
           throw new Error(`Insufficient quota for ticket id ${item.ticketId}`);
         }
+
 
         const subTotalOriginal = Number(ticket.price) * item.qty;
         let itemDiscount = 0;

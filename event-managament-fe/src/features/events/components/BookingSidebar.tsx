@@ -21,6 +21,7 @@ const BookingSidebar: React.FC<BookingSidebarProps> = ({ event }) => {
     snackbar,
     handleCloseSnackbar,
     handleAddToCart,
+    isOwnEvent,
   } = useBookingSidebarLogic(event);
 
   return (
@@ -118,19 +119,28 @@ const BookingSidebar: React.FC<BookingSidebarProps> = ({ event }) => {
         </div>
 
         <button
-          disabled={selectedTickets.length === 0 || cartLoading}
+          disabled={selectedTickets.length === 0 || cartLoading || isOwnEvent}
           onClick={handleAddToCart}
-          className="relative w-full py-4 rounded-2xl bg-neon-cyan text-black font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3 transition-all hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(0,255,221,0.4)] active:scale-[0.98] disabled:opacity-20 disabled:grayscale disabled:cursor-not-allowed group/btn overflow-hidden"
+          className={`relative w-full py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3 transition-all ${
+            isOwnEvent 
+              ? "bg-gray-500 text-white opacity-50 cursor-not-allowed grayscale" 
+              : "bg-neon-cyan text-black hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(0,255,221,0.4)] active:scale-[0.98] disabled:opacity-20 disabled:grayscale disabled:cursor-not-allowed group/btn overflow-hidden"
+          }`}
         >
-          <ShoppingCartIcon
-            className="size-5 transition-transform group-hover/btn:-translate-y-1"
-            strokeWidth={2.5}
-          />
-          {cartLoading ? "PROCESSING..." : "CONFIRM BOOKING"}
+          {isOwnEvent ? (
+            <LockClosedIcon className="size-5" />
+          ) : (
+            <ShoppingCartIcon
+              className="size-5 transition-transform group-hover/btn:-translate-y-1"
+              strokeWidth={2.5}
+            />
+          )}
+          {cartLoading ? "PROCESSING..." : isOwnEvent ? "OWN EVENT" : "CONFIRM BOOKING"}
 
           {/* Shine effect on hover */}
-          <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover/btn:animate-shine"></div>
+          {!isOwnEvent && <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover/btn:animate-shine"></div>}
         </button>
+
 
         <div className="mt-8 flex flex-col items-center gap-3">
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10">

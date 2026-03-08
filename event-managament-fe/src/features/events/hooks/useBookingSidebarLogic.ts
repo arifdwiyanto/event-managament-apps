@@ -12,7 +12,7 @@ export const useBookingSidebarLogic = (event: Event) => {
   const { quantities, handleUpdateQuantity, selectedTickets, total } =
     useBookingSidebar(event);
 
-  const { isAuthenticated } = useStoreLogin();
+  const { isAuthenticated, user } = useStoreLogin();
   const { addItem, isLoading: cartLoading } = useCartStore();
 
   // Snackbar State
@@ -26,6 +26,8 @@ export const useBookingSidebarLogic = (event: Event) => {
     setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
+  const isOwnEvent = user?.organizer?.id === event.organizerId;
+
   const handleAddToCart = async () => {
     if (!isAuthenticated) {
       setSnackbar({
@@ -34,6 +36,15 @@ export const useBookingSidebarLogic = (event: Event) => {
         severity: "error",
       });
       router.push("/login");
+      return;
+    }
+
+    if (isOwnEvent) {
+      setSnackbar({
+        open: true,
+        message: "You cannot purchase tickets for your own event",
+        severity: "error",
+      });
       return;
     }
 
@@ -65,5 +76,7 @@ export const useBookingSidebarLogic = (event: Event) => {
     snackbar,
     handleCloseSnackbar,
     handleAddToCart,
+    isOwnEvent,
   };
 };
+

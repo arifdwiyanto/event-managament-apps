@@ -3,6 +3,7 @@
 import { useMediaQuery, useTheme } from "@mui/material";
 import { useBookingSidebar } from "./useBookingSidebar";
 import { useCartStore } from "@/features/cart/store/useCartStore";
+import { useStoreLogin } from "@/features/auth/store/useAuthStore";
 import { Event } from "../types/event.types";
 
 interface UseTicketSelectionModalProps {
@@ -23,8 +24,16 @@ export const useTicketSelectionModal = ({
     useBookingSidebar(event);
 
   const { addItem, isLoading: cartLoading } = useCartStore();
+  const { user } = useStoreLogin();
+
+  const isOwnEvent = user?.organizer?.id === event.organizerId;
 
   const handleAddToCart = async () => {
+    if (isOwnEvent) {
+      onToast("You cannot purchase tickets for your own event", "error");
+      return;
+    }
+    
     try {
       await Promise.all(
         selectedTickets.map((ticket) => addItem(ticket.id, ticket.qty)),
@@ -45,5 +54,7 @@ export const useTicketSelectionModal = ({
     total,
     cartLoading,
     handleAddToCart,
+    isOwnEvent,
   };
 };
+
