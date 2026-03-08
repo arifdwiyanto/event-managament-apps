@@ -111,7 +111,7 @@ export class OrdersService {
           if (promotion.discountPercentage) {
             // Percentage discount applies per item (proportional — correct behavior)
             itemDiscount =
-              (subTotalOriginal * Number(promotion.discountPercentage)) / 100;
+              Math.round((subTotalOriginal * Number(promotion.discountPercentage)) / 100);
           } else if (promotion.discountAmount) {
             // Fixed amount discount: apply only ONCE per promotion per event
             const fixedKey = `${item.promotionId}:${ticket.eventId}`;
@@ -162,9 +162,9 @@ export class OrdersService {
           throw new Error("Coupon does not belong to this user");
 
         couponDiscount =
-          ((totalPrice - totalDiscount - (data.pointUsed || 0)) *
+          Math.round(((totalPrice - totalDiscount - (data.pointUsed || 0)) *
             Number(coupon.discountPercentage)) /
-          100;
+          100);
         await this.userCouponRepository.useCouponInTx(data.voucherId, tx);
       }
 
@@ -357,10 +357,10 @@ export class OrdersService {
         pointsUsed: order.pointsUsed,
         totalFinalPrice: Number(order.totalFinalPrice),
         customerName: order.user.name,
-        eventName: order.event?.name || "Event",
         promoData: promoData,
         items: order.items.map((item: any) => ({
           ticketName: item.ticketType.name,
+          eventName: item.ticketType.event?.name,
           qty: item.quantity,
           price: Number(item.pricePerUnit || item.totalPrice / item.quantity),
           subTotal: Number(item.totalPrice),

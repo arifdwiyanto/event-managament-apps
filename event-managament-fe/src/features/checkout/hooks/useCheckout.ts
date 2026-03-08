@@ -128,7 +128,7 @@ export const useCheckout = () => {
 
         if (promo.discountPercentage) {
           discountVal =
-            (eventSubtotal * Number(promo.discountPercentage)) / 100;
+            Math.round((eventSubtotal * Number(promo.discountPercentage)) / 100);
         } else if (promo.discountAmount) {
           discountVal = Number(promo.discountAmount);
         }
@@ -193,7 +193,7 @@ export const useCheckout = () => {
 
   const pointDiscount = useMemo(() => {
     if (!pointBalance || pointPercentage === 0) return 0;
-    return (pointBalance * pointPercentage) / 100;
+    return Math.round((pointBalance * pointPercentage) / 100);
   }, [pointBalance, pointPercentage]);
 
   const couponDiscount = useMemo(() => {
@@ -202,13 +202,13 @@ export const useCheckout = () => {
       0,
       totalOriginal - totalPromoDiscount - pointDiscount,
     );
-    return (afterPromoAndPoints * appliedCoupon.discountPercentage) / 100;
+    return Math.round((afterPromoAndPoints * appliedCoupon.discountPercentage) / 100);
   }, [appliedCoupon, totalOriginal, totalPromoDiscount, pointDiscount]);
 
-  const finalTotal = Math.max(
+  const finalTotal = Math.round(Math.max(
     0,
     totalOriginal - totalPromoDiscount - pointDiscount - couponDiscount,
-  );
+  ));
 
   const handleCreateOrder = async () => {
     if (!user || !user.id) {
