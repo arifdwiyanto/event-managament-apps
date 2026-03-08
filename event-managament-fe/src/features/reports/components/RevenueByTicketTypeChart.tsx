@@ -5,12 +5,17 @@ import { BarChart } from '@mui/x-charts/BarChart';
 import { useRevenueByTicketType } from "../hooks/useReports";
 import { useThemeStore } from "@/features/theme";
 
+import { useTheme as useMuiTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+
 type Props = { categoryId?: string; startDate?: string; endDate?: string };
 
 export const RevenueByTicketTypeChart: React.FC<Props> = ({ categoryId, startDate, endDate }) => {
   const { data: rawDataset, isLoading } = useRevenueByTicketType(categoryId, startDate, endDate);
   const { theme } = useThemeStore();
   const isDark = theme === 'dark';
+  const muiTheme = useMuiTheme();
+  const isMobile = useMediaQuery(muiTheme.breakpoints.down('sm'));
   const dataset = rawDataset || [];
 
   const axisColor = isDark ? '#e8dce2' : '#181114';
@@ -42,7 +47,7 @@ export const RevenueByTicketTypeChart: React.FC<Props> = ({ categoryId, startDat
               { dataKey: 'revenue', label: 'Revenue', color: '#ee2b8c' }
             ]}
             height={300}
-            margin={{ top: 10, bottom: 30, left: 60, right: 10 }}
+            margin={{ top: 10, bottom: 30, left: isMobile ? 35 : 60, right: 10 }}
             borderRadius={6}
             slotProps={{
               legend: { hidden: true } as any

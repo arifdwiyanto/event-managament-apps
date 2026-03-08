@@ -5,12 +5,17 @@ import { BarChart } from '@mui/x-charts/BarChart';
 import { useEventRatings } from "../hooks/useReports";
 import { useThemeStore } from "@/features/theme";
 
+import { useTheme as useMuiTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+
 type Props = { categoryId?: string; startDate?: string; endDate?: string };
 
 export const EventRatingsChart: React.FC<Props> = ({ categoryId, startDate, endDate }) => {
   const { data: rawDataset, isLoading } = useEventRatings(categoryId, startDate, endDate);
   const { theme } = useThemeStore();
   const isDark = theme === 'dark';
+  const muiTheme = useMuiTheme();
+  const isMobile = useMediaQuery(muiTheme.breakpoints.down('sm'));
   
   const dataset = useMemo(() => {
     if (!rawDataset) return [];
@@ -56,7 +61,7 @@ export const EventRatingsChart: React.FC<Props> = ({ categoryId, startDate, endD
             series={[
               { dataKey: 'rating', label: 'Avg Rating', color: '#facc15' }
             ]}
-            margin={{ top: 10, bottom: 30, left: 90, right: 10 }}
+            margin={{ top: 10, bottom: 30, left: isMobile ? 60 : 90, right: 10 }}
             borderRadius={4}
             slotProps={{
               legend: { hidden: true } as any

@@ -19,6 +19,9 @@ import {
   isSameYear
 } from "date-fns";
 
+import { useTheme as useMuiTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+
 type SalesPerformanceChartProps = {
   interval: 'day' | 'month' | 'year';
   categoryId?: string;
@@ -30,6 +33,8 @@ export const SalesPerformanceChart: React.FC<SalesPerformanceChartProps> = ({ in
   const { data: rawDataset, isLoading } = useSalesPerformance(interval, startDate, endDate, categoryId);
   const { theme } = useThemeStore();
   const isDark = theme === 'dark';
+  const muiTheme = useMuiTheme();
+  const isMobile = useMediaQuery(muiTheme.breakpoints.down('sm'));
 
   const dataset = useMemo(() => {
     // Determine range
@@ -72,7 +77,7 @@ export const SalesPerformanceChart: React.FC<SalesPerformanceChartProps> = ({ in
 
       let label = "";
       if (interval === 'day') label = format(dateObj, "EEEE");
-      else if (interval === 'month') label = format(dateObj, "MMM yyyy");
+      else if (interval === 'month') label = format(dateObj, "MMM");
       else label = format(dateObj, "yyyy");
 
       return {
@@ -110,31 +115,21 @@ export const SalesPerformanceChart: React.FC<SalesPerformanceChartProps> = ({ in
           <span className="loading loading-spinner text-primary"></span>
         </div>
       ) : (
-        <div className="h-[280px] md:h-[380px] w-full mt-2 md:mt-4">
+        <div className="h-[300px] md:h-[400px] w-full mt-2 md:mt-4">
           <BarChart
             dataset={dataset as any}
             xAxis={[{ 
               scaleType: 'band', 
               dataKey: 'label',
-              tickLabelStyle: {
-                angle: -45,
-                textAnchor: 'end',
-                fontSize: 10,
-              },
+              tickLabelInterval: () => true
             }]}
             series={[
               { dataKey: 'revenue', label: 'Revenue', color: '#ee2b8c' }
             ]}
-            margin={{ top: 10, bottom: 85, left: 45, right: 10 }}
+            margin={{ top: 20, bottom: 20, left: isMobile ? 35 : 60, right: 10 }}
             borderRadius={4}
             slotProps={{
               legend: { hidden: true } as any
-            }}
-            sx={{
-              '& .MuiChartsAxis-tickLabel': { fill: axisColor + ' !important' },
-              '& .MuiChartsAxis-line': { stroke: gridColor + ' !important' },
-              '& .MuiChartsAxis-tick': { stroke: gridColor + ' !important' },
-              '& .MuiChartsGrid-line': { stroke: gridColor + ' !important' },
             }}
           />
         </div>
