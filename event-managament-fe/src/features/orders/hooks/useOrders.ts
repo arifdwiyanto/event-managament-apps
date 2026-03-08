@@ -50,16 +50,3 @@ export const usePayOrder = () => {
     },
   });
 };
-
-export const useUploadPaymentProof = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ id, file }: { id: string; file: File }) =>
-      ordersService.uploadPaymentProof(id, file),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["orders", variables.id] });
-      queryClient.invalidateQueries({ queryKey: ["orders"] });
-    },
-  });
-};
