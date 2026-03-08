@@ -11,6 +11,7 @@ import {
   Box,
   IconButton,
 } from "@mui/material";
+import { useOrgRole } from "@/hooks/useOrgRole";
 import {
   PencilSquareIcon,
   TrashIcon,
@@ -34,6 +35,9 @@ const PromotionsTable = ({
   onDelete,
   isDeleting,
 }: PromotionsTableProps) => {
+  const role = useOrgRole();
+  const isEditable = role === "OWNER";
+
   return (
     <TableContainer
       component={Paper}
@@ -70,12 +74,14 @@ const PromotionsTable = ({
             <TableCell sx={{ fontWeight: "800", color: "text.primary" }}>
               Validity
             </TableCell>
-            <TableCell
-              align="right"
-              sx={{ fontWeight: "800", color: "text.primary" }}
-            >
-              Actions
-            </TableCell>
+            {isEditable && (
+              <TableCell
+                align="right"
+                sx={{ fontWeight: "800", color: "text.primary" }}
+              >
+                Actions
+              </TableCell>
+            )}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -159,34 +165,36 @@ const PromotionsTable = ({
                   }).format(new Date(promo.endDate))}
                 </Typography>
               </TableCell>
-              <TableCell align="right">
-                <Box
-                  sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}
-                >
-                  <IconButton
-                    onClick={() => onEdit(promo)}
-                    size="small"
-                    sx={{
-                      bgcolor: "action.hover",
-                      "&:hover": { bgcolor: "primary.main", color: "white" },
-                    }}
+              {isEditable && (
+                <TableCell align="right">
+                  <Box
+                    sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}
                   >
-                    <PencilSquareIcon className="w-4 h-4" />
-                  </IconButton>
-                  <IconButton
-                    onClick={() => onDelete(promo.id)}
-                    disabled={isDeleting}
-                    size="small"
-                    color="error"
-                    sx={{
-                      bgcolor: "action.hover",
-                      "&:hover": { bgcolor: "error.main", color: "white" },
-                    }}
-                  >
-                    <TrashIcon className="w-4 h-4" />
-                  </IconButton>
-                </Box>
-              </TableCell>
+                    <IconButton
+                      onClick={() => onEdit(promo)}
+                      size="small"
+                      sx={{
+                        bgcolor: "action.hover",
+                        "&:hover": { bgcolor: "primary.main", color: "white" },
+                      }}
+                    >
+                      <PencilSquareIcon className="w-4 h-4" />
+                    </IconButton>
+                    <IconButton
+                      onClick={() => onDelete(promo.id)}
+                      disabled={isDeleting}
+                      size="small"
+                      color="error"
+                      sx={{
+                        bgcolor: "action.hover",
+                        "&:hover": { bgcolor: "error.main", color: "white" },
+                      }}
+                    >
+                      <TrashIcon className="w-4 h-4" />
+                    </IconButton>
+                  </Box>
+                </TableCell>
+              )}
             </TableRow>
           ))}
         </TableBody>

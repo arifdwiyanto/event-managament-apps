@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { Typography, Divider } from "@mui/material";
+import { Typography } from "@mui/material";
+import LockIcon from "@mui/icons-material/Lock";
 
 interface CheckoutTotalProps {
   total: number;
@@ -22,78 +23,118 @@ export const CheckoutTotal: React.FC<CheckoutTotalProps> = ({
   onPay,
   isSubmitting,
 }) => {
-  return (
-    <div className="border-4 border-black dark:border-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.2)] bg-[#0a0a0a] text-white sticky top-24">
-      <Typography
-        variant="h5"
-        className="font-display font-black uppercase mb-4 tracking-tighter"
-      >
-        Total
-      </Typography>
-      <Divider className="border-white/10 border-[1.5px] mb-4" />
+  const hasDiscount = totalPromoDiscount > 0 || pointDiscount > 0 || couponDiscount > 0;
+  const totalSavings = totalPromoDiscount + pointDiscount + couponDiscount;
 
-      <div className="space-y-4 mb-8">
+  return (
+    <div className="sticky top-24 rounded-xl overflow-hidden border border-gray-200 dark:border-zinc-800 shadow-lg dark:shadow-[0_0_40px_rgba(168,85,247,0.08)]">
+      {/* Header */}
+      <div className="bg-gradient-to-br from-[#0a0a0a] to-[#1a1a2e] p-6 border-b border-white/5">
+        <Typography className="font-display font-black uppercase text-lg tracking-tight text-white">
+          Order Summary
+        </Typography>
+      </div>
+
+      {/* Content */}
+      <div className="bg-white dark:bg-[#111111] p-6 space-y-4">
+        {/* Subtotal */}
         <div className="flex justify-between items-center">
-          <Typography className="font-bold uppercase text-sm text-gray-400">
+          <Typography className="text-sm font-medium text-gray-500 dark:text-gray-400">
             Subtotal
           </Typography>
-          <Typography className="font-bold text-sm">
+          <Typography className="text-sm font-bold text-gray-900 dark:text-white">
             IDR {total.toLocaleString("id-ID")}
           </Typography>
         </div>
 
+        {/* Event Promos */}
         {totalPromoDiscount > 0 && (
-          <div className="flex justify-between items-center text-neon-cyan">
-            <Typography className="font-bold uppercase text-sm">
-              Event Promos
-            </Typography>
-            <Typography className="font-bold text-sm">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs">🏷️</span>
+              <Typography className="text-sm font-bold text-[#00897b] dark:text-[#00FFFF]">
+                Event Promos
+              </Typography>
+            </div>
+            <Typography className="text-sm font-bold text-[#00897b] dark:text-[#00FFFF]">
               - IDR {totalPromoDiscount.toLocaleString("id-ID")}
             </Typography>
           </div>
         )}
 
+        {/* Points Discount */}
         {pointDiscount > 0 && (
-          <div className="flex justify-between items-center text-neon-magenta">
-            <Typography className="font-bold uppercase text-sm">
-              Points Discount
-            </Typography>
-            <Typography className="font-bold text-sm">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs">💎</span>
+              <Typography className="text-sm font-bold text-neon-magenta">
+                Points
+              </Typography>
+            </div>
+            <Typography className="text-sm font-bold text-neon-magenta">
               - IDR {pointDiscount.toLocaleString("id-ID")}
             </Typography>
           </div>
         )}
 
+        {/* Coupon Discount */}
         {couponDiscount > 0 && (
-          <div className="flex justify-between items-center" style={{ color: '#FF00FF' }}>
-            <Typography className="font-bold uppercase text-sm" style={{ color: '#FF00FF' }}>
-              Referral Coupon
-            </Typography>
-            <Typography className="font-bold text-sm" style={{ color: '#FF00FF' }}>
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs">🎫</span>
+              <Typography className="text-sm font-bold" style={{ color: "#d946ef" }}>
+                Referral Coupon
+              </Typography>
+            </div>
+            <Typography className="text-sm font-bold" style={{ color: "#d946ef" }}>
               - IDR {couponDiscount.toLocaleString("id-ID")}
             </Typography>
           </div>
         )}
 
-        <Divider className="border-white/20 border-1 my-2" />
+        {/* Savings banner */}
+        {hasDiscount && (
+          <div className="rounded-lg bg-green-50 dark:bg-green-500/5 border border-green-200 dark:border-green-500/20 px-4 py-2.5">
+            <Typography className="text-xs font-black uppercase text-green-700 dark:text-green-400 text-center tracking-wider">
+              🎉 You save IDR {totalSavings.toLocaleString("id-ID")}
+            </Typography>
+          </div>
+        )}
 
-        <div className="flex justify-between items-center">
-          <Typography className="font-bold uppercase text-sm text-gray-400">
-            Amount to pay
+        {/* Divider */}
+        <div className="border-t-2 border-dashed border-gray-200 dark:border-zinc-700 my-1" />
+
+        {/* Final total */}
+        <div className="flex justify-between items-center pt-1">
+          <Typography className="text-sm font-bold uppercase text-gray-500 dark:text-gray-400">
+            Total
           </Typography>
-          <Typography className="font-display font-black text-2xl text-neon-cyan drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]">
+          <Typography className="font-display font-black text-2xl text-gray-900 dark:text-[#00FFFF] dark:drop-shadow-[0_0_12px_rgba(0,255,255,0.3)]">
             IDR {finalTotal.toLocaleString("id-ID")}
           </Typography>
         </div>
       </div>
 
-      <button
-        onClick={onPay}
-        disabled={isSubmitting}
-        className="w-full py-4 bg-neon-purple text-white font-black uppercase tracking-widest shadow-[4px_4px_0_0_#fff] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_0_#fff] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {isSubmitting ? "Processing..." : "Make Payment"}
-      </button>
+      {/* Pay button */}
+      <div className="p-6 pt-0 bg-white dark:bg-[#111111]">
+        <button
+          onClick={onPay}
+          disabled={isSubmitting}
+          className="w-full py-4 rounded-lg bg-gradient-to-r from-neon-purple to-[#7c3aed] text-white font-black uppercase tracking-widest text-sm
+            shadow-[0_4px_20px_rgba(168,85,247,0.4)]
+            hover:shadow-[0_6px_30px_rgba(168,85,247,0.6)] hover:translate-y-[-1px]
+            active:translate-y-[1px] active:shadow-[0_2px_10px_rgba(168,85,247,0.3)]
+            transition-all duration-200
+            disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none
+            flex items-center justify-center gap-2"
+        >
+          <LockIcon sx={{ fontSize: 16 }} />
+          {isSubmitting ? "Processing..." : "Make Payment"}
+        </button>
+        <p className="text-center text-[10px] text-gray-400 dark:text-gray-600 font-medium mt-3">
+          Secure payment powered by Midtrans
+        </p>
+      </div>
     </div>
   );
 };

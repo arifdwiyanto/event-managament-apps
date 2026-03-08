@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/features/cart/store/useCartStore";
@@ -10,6 +10,34 @@ import { groupCartItemsByOrganizer } from "@/features/cart/utils/groupItems";
 import { useUserPoints } from "@/features/userPoint/hooks/useUserPoints";
 import { UserCoupon } from "../services/userCouponService";
 
+const LS_KEYS = {
+  PROMOS: "checkout_appliedPromos",
+  COUPON: "checkout_appliedCoupon",
+  POINTS: "checkout_pointPercentage",
+} as const;
+
+function loadFromLS<T>(key: string, fallback: T): T {
+  if (typeof window === "undefined") return fallback;
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function saveToLS(key: string, value: unknown) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // quota exceeded — silently ignore
+  }
+}
+
+function clearCheckoutLS() {
+  Object.values(LS_KEYS).forEach((k) => localStorage.removeItem(k));
+}
+
 export const useCheckout = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -20,14 +48,22 @@ export const useCheckout = () => {
   const validatePromoMutation = useValidatePromotion();
 
   const [promoCodes, setPromoCodes] = useState<Record<string, string>>({});
+  // Keyed by eventId — one promo per event (persisted)
   const [appliedPromos, setAppliedPromos] = useState<
     Record<string, AppliedPromo>
-  >({});
+  >(() => loadFromLS(LS_KEYS.PROMOS, {}));
   const [promoErrors, setPromoErrors] = useState<Record<string, string>>({});
-  const [pointPercentage, setPointPercentage] = useState<number>(0);
-  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(
-    null,
+  const [pointPercentage, setPointPercentage] = useState<number>(
+    () => loadFromLS(LS_KEYS.POINTS, 0),
   );
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(
+    () => loadFromLS(LS_KEYS.COUPON, null),
+  );
+
+  // Sync state → localStorage
+  useEffect(() => { saveToLS(LS_KEYS.PROMOS, appliedPromos); }, [appliedPromos]);
+  useEffect(() => { saveToLS(LS_KEYS.COUPON, appliedCoupon); }, [appliedCoupon]);
+  useEffect(() => { saveToLS(LS_KEYS.POINTS, pointPercentage); }, [pointPercentage]);
   const [toast, setToast] = useState({
     open: false,
     message: "",
@@ -40,28 +76,29 @@ export const useCheckout = () => {
     return cart ? groupCartItemsByOrganizer(cart.items) : [];
   }, [cart]);
 
-  const subtotalPerGroup = useMemo(() => {
+  // Subtotal per event (for promo discount calculation)
+  const subtotalPerEvent = useMemo(() => {
     const result: Record<string, number> = {};
     groupedItems.forEach((group) => {
-      let groupTotal = 0;
       group.eventGroups.forEach((eg) => {
+        let eventTotal = 0;
         eg.items.forEach((item) => {
-          groupTotal += Number(item.ticketType.price) * item.quantity;
+          eventTotal += Number(item.ticketType.price) * item.quantity;
         });
+        result[eg.eventId] = eventTotal;
       });
-      result[group.organizerId] = groupTotal;
     });
     return result;
   }, [groupedItems]);
 
   const totalOriginal = useMemo(() => {
-    return Object.values(subtotalPerGroup).reduce((acc, val) => acc + val, 0);
-  }, [subtotalPerGroup]);
+    return Object.values(subtotalPerEvent).reduce((acc, val) => acc + val, 0);
+  }, [subtotalPerEvent]);
 
-  // Apply promo directly from selector (no validation call needed — already validated by backend)
+  // Apply promo from selector (per event)
   const handleApplyPromoFromSelector = useCallback(
-    (organizerId: string, promo: AppliedPromo) => {
-      setAppliedPromos((prev) => ({ ...prev, [organizerId]: promo }));
+    (eventId: string, promo: AppliedPromo) => {
+      setAppliedPromos((prev) => ({ ...prev, [eventId]: promo }));
       setToast({
         open: true,
         message: `Promo "${promo.code}" applied!`,
@@ -71,11 +108,11 @@ export const useCheckout = () => {
     [],
   );
 
-  const handleApplyPromo = async (organizerId: string, eventId: string) => {
-    const code = promoCodes[organizerId];
+  const handleApplyPromo = async (eventId: string) => {
+    const code = promoCodes[eventId];
     if (!code || !code.trim()) return;
 
-    setPromoErrors((prev) => ({ ...prev, [organizerId]: "" }));
+    setPromoErrors((prev) => ({ ...prev, [eventId]: "" }));
 
     try {
       const result = await validatePromoMutation.mutateAsync({
@@ -86,19 +123,19 @@ export const useCheckout = () => {
 
       if (result.valid) {
         const promo = result.promotion;
-        const groupSubtotal = subtotalPerGroup[organizerId] || 0;
+        const eventSubtotal = subtotalPerEvent[eventId] || 0;
         let discountVal = 0;
 
         if (promo.discountPercentage) {
           discountVal =
-            (groupSubtotal * Number(promo.discountPercentage)) / 100;
+            (eventSubtotal * Number(promo.discountPercentage)) / 100;
         } else if (promo.discountAmount) {
           discountVal = Number(promo.discountAmount);
         }
 
         setAppliedPromos((prev) => ({
           ...prev,
-          [organizerId]: {
+          [eventId]: {
             id: promo.id,
             code: promo.code,
             discount: discountVal,
@@ -107,7 +144,7 @@ export const useCheckout = () => {
             discountAmount: promo.discountAmount,
           },
         }));
-        setPromoCodes((prev) => ({ ...prev, [organizerId]: "" }));
+        setPromoCodes((prev) => ({ ...prev, [eventId]: "" }));
         setToast({
           open: true,
           message: "Promo code applied!",
@@ -117,15 +154,15 @@ export const useCheckout = () => {
     } catch (error: any) {
       const msg =
         error?.response?.data?.message || error.message || "Invalid promo code";
-      setPromoErrors((prev) => ({ ...prev, [organizerId]: msg }));
+      setPromoErrors((prev) => ({ ...prev, [eventId]: msg }));
       setToast({ open: true, message: msg, severity: "error" });
     }
   };
 
-  const handleRemovePromo = (organizerId: string) => {
+  const handleRemovePromo = (eventId: string) => {
     setAppliedPromos((prev) => {
       const next = { ...prev };
-      delete next[organizerId];
+      delete next[eventId];
       return next;
     });
   };
@@ -190,14 +227,13 @@ export const useCheckout = () => {
 
     try {
       const items = cart.items.map((item) => {
-        const organizerId = item.ticketType.event?.organizerId || "";
-        const promo = appliedPromos[organizerId];
+        const eventId = item.ticketType.eventId;
+        const promo = appliedPromos[eventId];
 
         return {
           ticketId: item.ticketTypeId,
           qty: item.quantity,
-          promotionId:
-            promo?.eventId === item.ticketType.eventId ? promo.id : undefined,
+          promotionId: promo ? promo.id : undefined,
         };
       });
 
@@ -212,6 +248,7 @@ export const useCheckout = () => {
       const newOrder = await createOrderMutation.mutateAsync(payload);
 
       await clearCart();
+      clearCheckoutLS();
       queryClient.invalidateQueries({ queryKey: ["userPoints", "balance"] });
       queryClient.invalidateQueries({ queryKey: ["userCoupons"] });
 
@@ -296,6 +333,6 @@ export const useCheckout = () => {
     handleCloseToast,
     groupedItems,
     pointBalance: pointBalance || 0,
-    subtotalPerGroup,
+    subtotalPerEvent,
   };
 };

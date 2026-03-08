@@ -1,4 +1,5 @@
 import { Box, Typography, Button } from "@mui/material";
+import { useOrgRole } from "@/hooks/useOrgRole";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
 interface PromotionsHeaderProps {
@@ -6,6 +7,9 @@ interface PromotionsHeaderProps {
 }
 
 const PromotionsHeader = ({ onCreateClick }: PromotionsHeaderProps) => {
+  const role = useOrgRole();
+  const isEditable = role === "OWNER";
+
   return (
     <Box
       sx={{
@@ -30,22 +34,24 @@ const PromotionsHeader = ({ onCreateClick }: PromotionsHeaderProps) => {
           Manage your discount codes and vouchers
         </Typography>
       </Box>
-      <Button
-        variant="contained"
-        onClick={onCreateClick}
-        startIcon={<PlusIcon className="w-5 h-5" />}
-        sx={{
-          bgcolor: "#ee2b8c",
-          "&:hover": { bgcolor: "#d42279" },
-          fontWeight: "bold",
-          borderRadius: 2,
-          textTransform: "none",
-          px: 3,
-          py: 1,
-        }}
-      >
-        Create Promotion
-      </Button>
+      {isEditable && (
+        <Button
+          variant="contained"
+          onClick={onCreateClick}
+          startIcon={<PlusIcon className="w-5 h-5" />}
+          sx={{
+            bgcolor: "#ee2b8c",
+            "&:hover": { bgcolor: "#d42279" },
+            fontWeight: "bold",
+            borderRadius: 2,
+            textTransform: "none",
+            px: 3,
+            py: 1,
+          }}
+        >
+          Create Promotion
+        </Button>
+      )}
     </Box>
   );
 };

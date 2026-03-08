@@ -2,6 +2,12 @@
 
 import React from "react";
 import { TicketType } from "../types/event.types";
+import { 
+  normalizeTicketPrice, 
+  getTicketDisplayPrice, 
+  checkIsPopular, 
+  getTicketStatus 
+} from "../utils/ticketUtils";
 
 interface TicketSelectionCardProps {
   ticket: TicketType;
@@ -16,12 +22,10 @@ const TicketSelectionCard: React.FC<TicketSelectionCardProps> = ({
   onIncrease, 
   onDecrease 
 }) => {
-  const price = typeof ticket.price === 'string' ? Number(ticket.price) : ticket.price;
-  const displayPrice = (price / 1000).toFixed(0);
-  const isPopular = ticket.name.toLowerCase().includes("vip");
-  const quota = ticket.quota ?? 0;
-  const isSoldOut = quota <= 0;
-  const isMaxReached = quantity >= quota;
+  const price = normalizeTicketPrice(ticket.price);
+  const displayPrice = getTicketDisplayPrice(price);
+  const isPopular = checkIsPopular(ticket.name);
+  const { quota, isSoldOut, isMaxReached } = getTicketStatus(ticket, quantity);
 
   return (
     <div className={`relative p-4 rounded-xl border transition-all duration-300 backdrop-blur-md ${

@@ -102,9 +102,11 @@ export class ReportController {
       const categoryId = req.query.categoryId as string | undefined;
       const sDate = parseDateParam(req.query.startDate);
       const eDate = parseDateParam(req.query.endDate);
+      const interval = (req.query.interval as 'day' | 'month' | 'year') || 'month';
+      
       if (!organizerId) return res.status(401).json({ success: false, message: "Unauthorized" });
 
-      const data = await this.reportService.getPromotionEffectiveness(organizerId, categoryId, sDate, eDate);
+      const data = await this.reportService.getPromotionEffectiveness(organizerId, categoryId, sDate, eDate, interval);
       res.status(200).json({ success: true, data });
     } catch (error) {
       next(error);

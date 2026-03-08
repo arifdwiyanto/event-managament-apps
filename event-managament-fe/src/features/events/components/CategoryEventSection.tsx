@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { 
@@ -18,24 +18,19 @@ import {
 } from "@heroicons/react/24/solid";
 import { CategoryIcon } from "../utils/iconMapping";
 import { getContrastColor } from "@/utils/colorUtils";
-import { useCategories } from "../hooks";
+import { useCategorySection } from "../hooks";
 
 
 const CategorySection: React.FC = () => {
-  const router = useRouter();
-  const { categories, isLoading } = useCategories(5);
-  const { categories: allCategories } = useCategories();
-  const [open, setOpen] = useState(false);
-
-  const handleOpen = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setOpen(true);
-  };
-  const handleClose = () => setOpen(false);
-
-  const handleCategoryClick = (categoryId: string) => {
-    router.push(`/events?categoryId=${categoryId}`);
-  };
+  const {
+    categories,
+    allCategories,
+    isLoading,
+    open,
+    handleOpen,
+    handleClose,
+    handleCategoryClick,
+  } = useCategorySection();
 
   if (isLoading) {
     return (

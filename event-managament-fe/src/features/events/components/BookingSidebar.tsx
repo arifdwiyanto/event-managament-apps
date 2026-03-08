@@ -4,10 +4,7 @@ import React from "react";
 import { Event } from "../types/event.types";
 import TicketSelectionCard from "./TicketSelectionCard";
 import { ShoppingCartIcon, LockClosedIcon } from "@heroicons/react/24/solid";
-import { useBookingSidebar } from "../hooks/useBookingSidebar";
-import { useCartStore } from "@/features/cart/store/useCartStore";
-import { useStoreLogin } from "@/features/auth/store/useAuthStore";
-import { useRouter } from "next/navigation";
+import { useBookingSidebarLogic } from "../hooks";
 import { Snackbar, Alert } from "@mui/material";
 
 interface BookingSidebarProps {
@@ -15,49 +12,16 @@ interface BookingSidebarProps {
 }
 
 const BookingSidebar: React.FC<BookingSidebarProps> = ({ event }) => {
-  const { quantities, handleUpdateQuantity, selectedTickets, total } =
-    useBookingSidebar(event);
-
-  const { isAuthenticated } = useStoreLogin();
-  const { addItem, isLoading: cartLoading } = useCartStore();
-  const router = useRouter();
-
-  // Snackbar State
-  const [snackbar, setSnackbar] = React.useState({
-    open: false,
-    message: "",
-    severity: "success" as "success" | "error" | "info" | "warning",
-  });
-
-  const handleAddToCart = async () => {
-    if (!isAuthenticated) {
-      setSnackbar({
-        open: true,
-        message: "Please log in to add items to cart",
-        severity: "error",
-      });
-      router.push("/login");
-      return;
-    }
-
-    try {
-      // Add all selected tickets to cart
-      await Promise.all(
-        selectedTickets.map((ticket) => addItem(ticket.id, ticket.qty)),
-      );
-      setSnackbar({
-        open: true,
-        message: "Successfully added to cart!",
-        severity: "success",
-      });
-    } catch (error) {
-      setSnackbar({
-        open: true,
-        message: "Failed to add to cart. Please try again.",
-        severity: "error",
-      });
-    }
-  };
+  const {
+    quantities,
+    handleUpdateQuantity,
+    selectedTickets,
+    total,
+    cartLoading,
+    snackbar,
+    handleCloseSnackbar,
+    handleAddToCart,
+  } = useBookingSidebarLogic(event);
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-right-10 duration-700">
@@ -113,7 +77,7 @@ const BookingSidebar: React.FC<BookingSidebarProps> = ({ event }) => {
         </div>
 
         <div className="space-y-4 mb-8">
-          {selectedTickets.map((t) => (
+          {selectedTickets.map((t: any) => (
             <div
               key={t.id}
               className="flex justify-between items-center group/item"
@@ -189,14 +153,11 @@ const BookingSidebar: React.FC<BookingSidebarProps> = ({ event }) => {
       <Snackbar
         open={snackbar.open}
         autoHideDuration={4000}
-        onClose={(_, reason) => {
-          if (reason === "clickaway") return;
-          setSnackbar((prev) => ({ ...prev, open: false }));
-        }}
+        onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
         <Alert
-          onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+          onClose={handleCloseSnackbar}
           severity={snackbar.severity}
           variant="filled"
           sx={{

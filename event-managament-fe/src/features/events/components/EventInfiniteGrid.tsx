@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
-import { useSearchParams } from "next/navigation";
+import React, { useRef } from "react";
 import EventCard from "./EventCard";
 import EventCardSkeleton from "./EventCardSkeleton";
-import { useInfiniteEvents } from "../hooks/useInfiniteEvents";
+import { useEventInfiniteGrid } from "../hooks";
+import { useInfiniteScroll } from "@/hooks";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { useEventFilters, EventFiltersReturn } from "../hooks/useEventFilters";
 
@@ -13,12 +13,7 @@ interface EventInfiniteGridProps extends EventFiltersReturn {
 }
 
 const EventInfiniteGrid: React.FC<EventInfiniteGridProps> = ({ searchValue, setSearchValue, onToast }) => {
-  const searchParams = useSearchParams();
   const observerTarget = useRef<HTMLDivElement>(null);
-
-  const categoryId = searchParams.get("categoryId") || undefined;
-  const location = searchParams.get("location") || undefined;
-  const search = searchParams.get("search") || undefined;
 
   const {
     events,
@@ -28,33 +23,14 @@ const EventInfiniteGrid: React.FC<EventInfiniteGridProps> = ({ searchValue, setS
     hasNextPage,
     fetchNextPage,
     totalResults,
-  } = useInfiniteEvents({
-    categoryId,
-    location,
-    search,
-    limit: 12,
+  } = useEventInfiniteGrid({ limit: 12 });
+
+  useInfiniteScroll({
+    observerTarget,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
   });
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-          fetchNextPage();
-        }
-      },
-      { threshold: 1.0 }
-    );
-
-    if (observerTarget.current) {
-      observer.observe(observerTarget.current);
-    }
-
-    return () => {
-      if (observerTarget.current) {
-        observer.unobserve(observerTarget.current);
-      }
-    };
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   if (error) {
     return (
@@ -109,7 +85,7 @@ const EventInfiniteGrid: React.FC<EventInfiniteGridProps> = ({ searchValue, setS
       ) : (
         <>
           <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 ">
-            {events.map((event) => (
+            {events.map((event: any) => (
               <EventCard key={event.id} event={event} onToast={onToast} />
             ))}
             {/* Infinite Pagination Skeletons */}

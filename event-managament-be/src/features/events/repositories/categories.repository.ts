@@ -11,7 +11,16 @@ export class CategoriesRepository {
         where: filters,
         skip,
         take,
-        orderBy: { name: "asc" },
+        include: {
+          _count: {
+            select: { events: true },
+          },
+        },
+        orderBy: {
+          events: {
+            _count: "desc",
+          },
+        },
       }),
       prisma.category.count({
         where: filters,

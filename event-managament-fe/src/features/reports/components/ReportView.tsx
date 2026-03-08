@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ReportHeader } from "./ReportHeader";
 import { ReportFilters } from "./ReportFilters";
 import { SalesPerformanceChart } from "./SalesPerformanceChart";
@@ -12,12 +12,28 @@ import { PromotionEffectivenessChart } from "./PromotionEffectivenessChart";
 import { TransactionStatusChart } from "./TransactionStatusChart";
 import { EventRatingsChart } from "./EventRatingsChart";
 import { RevenueByTicketTypeChart } from "./RevenueByTicketTypeChart";
+import { format, subYears } from "date-fns";
 
 export const ReportView: React.FC = () => {
   const [interval, setInterval] = useState<'day' | 'month' | 'year'>('day');
   const [categoryId, setCategoryId] = useState<string | undefined>(undefined);
   const [startDate, setStartDate] = useState<string | undefined>(undefined);
   const [endDate, setEndDate] = useState<string | undefined>(undefined);
+
+  // Auto-adjust date range based on interval
+  useEffect(() => {
+    if (interval === 'year') {
+      const start = format(subYears(new Date(), 5), 'yyyy-MM-dd');
+      const end = format(new Date(), 'yyyy-MM-dd');
+      setStartDate(start);
+      setEndDate(end);
+    } else if (interval === 'month') {
+      const start = format(new Date(new Date().getFullYear(), 0, 1), 'yyyy-MM-dd');
+      const end = format(new Date(new Date().getFullYear(), 11, 31), 'yyyy-MM-dd');
+      setStartDate(start);
+      setEndDate(end);
+    }
+  }, [interval]);
 
   return (
     <main className="flex-1 overflow-y-auto p-3 md:p-6 lg:p-8 bg-[#fcfbfc] dark:bg-[#1a0c13]">
@@ -43,7 +59,7 @@ export const ReportView: React.FC = () => {
         {/* Comparison Charts Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           <TicketSalesComparisonChart categoryId={categoryId} startDate={startDate} endDate={endDate} />
-          <PromotionEffectivenessChart categoryId={categoryId} startDate={startDate} endDate={endDate} />
+          <PromotionEffectivenessChart interval={interval} categoryId={categoryId} startDate={startDate} endDate={endDate} />
         </div>
 
         {/* Additional Metrics Row */}

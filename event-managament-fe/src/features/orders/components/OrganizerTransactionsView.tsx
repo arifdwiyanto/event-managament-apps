@@ -6,6 +6,7 @@ import { useGetOrders } from "@/features/orders/hooks/useOrders";
 import { useOrgRole } from "@/hooks/useOrgRole";
 import { Box, Tab, Tabs, Typography, Paper, Alert } from "@mui/material";
 import { useState } from "react";
+import AccessDeniedView from "@/features/dashboard/components/AccessDeniedView";
 
 export default function OrganizerTransactionsView() {
   const role = useOrgRole();
@@ -32,11 +33,11 @@ export default function OrganizerTransactionsView() {
 
   if (!canManageTransactions) {
     return (
-      <Box p={4} display="flex" justifyContent="center">
-        <Alert severity="error" variant="filled">
-          You do not have permission to view this page.
-        </Alert>
-      </Box>
+      <AccessDeniedView 
+        title={`${role} Access Restricted`}
+        message={`As a ${role?.toLowerCase()}, you do not have permission to view or manage transaction records. This section is reserved for Owners and Admins.`}
+        currentRole={role || undefined}
+      />
     );
   }
 

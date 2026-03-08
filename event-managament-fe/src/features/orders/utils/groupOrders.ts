@@ -42,3 +42,16 @@ export const groupOrderItemsByOrganizer = (items: OrderItem[]): GroupedOrderItem
     })),
   }));
 };
+
+export const getEventNames = (items: OrderItem[]): string => {
+  if (!items || items.length === 0) return "Unknown Event";
+
+  const uniqueEvents = Array.from(
+    new Set(items.map((item) => item.ticketType.event?.name).filter(Boolean)),
+  );
+
+  if (uniqueEvents.length === 0) return "Unknown Event";
+  if (uniqueEvents.length === 1) return uniqueEvents[0] as string;
+
+  return `${uniqueEvents[0]} + ${uniqueEvents.length - 1} more`;
+};

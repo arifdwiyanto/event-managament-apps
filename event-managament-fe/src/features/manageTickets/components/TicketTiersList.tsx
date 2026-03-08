@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { TicketTierData } from "../types/ticketTierData.types";
 import { Box, Button, Stack, Typography, Snackbar, Alert } from "@mui/material";
+import { useOrgRole } from "@/hooks/useOrgRole";
 import ConfirmationNumberOutlinedIcon from "@mui/icons-material/ConfirmationNumberOutlined";
 import AddIcon from "@mui/icons-material/Add";
 import TicketTierCard from "./TicketTierCard";
@@ -19,6 +20,8 @@ const TicketTiersList: React.FC<ITicketTiersListProps> = ({
   tiersData,
   onTierAdded,
 }) => {
+  const role = useOrgRole();
+  const isEditable = role === "OWNER" || role === "ADMIN";
   const [isCreating, setIsCreating] = useState(false);
   const [editingTierId, setEditingTierId] = useState<string | null>(null);
   const [toast, setToast] = useState({ open: false, message: "", severity: "success" as "success" | "error" });
@@ -57,31 +60,33 @@ const TicketTiersList: React.FC<ITicketTiersListProps> = ({
           </Typography>
         </Box>
 
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => setIsCreating(true)}
-          disabled={isCreating}
-          sx={(theme) => ({
-            bgcolor: "#ee2b8c",
-            color: "white",
-            borderRadius: 6,
-            px: { xs: 2, sm: 3 },
-            py: { xs: 0.75, sm: 1 },
-            textTransform: "none",
-            fontWeight: 800,
-            fontSize: { xs: "0.80rem", sm: "0.875rem" },
-            width: { xs: "100%", sm: "auto" },
-            "&:hover": {
-              bgcolor: "#d6197b",
-              transform: "translateY(-1px)",
-              boxShadow: "0 4px 12px rgba(238, 43, 140, 0.3)",
-            },
-            transition: "all 0.2s",
-          })}
-        >
-          Add New Tier
-        </Button>
+        {isEditable && (
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => setIsCreating(true)}
+            disabled={isCreating}
+            sx={(theme) => ({
+              bgcolor: "#ee2b8c",
+              color: "white",
+              borderRadius: 6,
+              px: { xs: 2, sm: 3 },
+              py: { xs: 0.75, sm: 1 },
+              textTransform: "none",
+              fontWeight: 800,
+              fontSize: { xs: "0.80rem", sm: "0.875rem" },
+              width: { xs: "100%", sm: "auto" },
+              "&:hover": {
+                bgcolor: "#d6197b",
+                transform: "translateY(-1px)",
+                boxShadow: "0 4px 12px rgba(238, 43, 140, 0.3)",
+              },
+              transition: "all 0.2s",
+            })}
+          >
+            Add New Tier
+          </Button>
+        )}
       </Box>
 
       {/* Create Form */}

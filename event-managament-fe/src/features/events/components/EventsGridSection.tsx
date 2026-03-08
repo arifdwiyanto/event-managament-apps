@@ -1,10 +1,9 @@
 "use client";
 
 import React from "react";
-import { useSearchParams } from "next/navigation";
+import { useEventsGrid } from "../hooks";
 import EventCard from "./EventCard";
 import EventCardSkeleton from "./EventCardSkeleton";
-import { useEvents } from "../hooks/useEvents";
 import PaginationBar from "../../home/components/PaginationBar";
 
 interface EventsGridSectionProps {
@@ -12,18 +11,7 @@ interface EventsGridSectionProps {
 }
 
 const EventsGridSection: React.FC<EventsGridSectionProps> = ({ onToast }) => {
-  const searchParams = useSearchParams();
-  const page = Number(searchParams.get("page")) || 1;
-  const categoryId = searchParams.get("categoryId") || undefined;
-  const location = searchParams.get("location") || undefined;
-  const search = searchParams.get("search") || undefined;
-
-  const { events, meta, isLoading, error } = useEvents({
-    page,
-    categoryId,
-    location,
-    search,
-  });
+  const { events, meta, isLoading, error } = useEventsGrid();
 
   if (error) {
     return (
@@ -67,7 +55,7 @@ const EventsGridSection: React.FC<EventsGridSectionProps> = ({ onToast }) => {
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 lg:gap-8">
           {isLoading
             ? [...Array(8)].map((_, i) => <EventCardSkeleton key={i} />)
-            : events.map((event) => <EventCard key={event.id} event={event} onToast={onToast} />)}
+            : events.map((event: any) => <EventCard key={event.id} event={event} onToast={onToast} />)}
         </div>
 
         {meta && meta.totalPages > 1 && (

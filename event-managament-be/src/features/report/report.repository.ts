@@ -147,24 +147,28 @@ export class ReportRepository {
   /**
    * 6. Promotion Effectiveness
    */
-  async getPromotionEffectiveness(organizerId: string, categoryId?: string, startDate?: Date, endDate?: Date) {
-    const result = await prisma.$queryRaw`
+  async getPromotionEffectiveness(organizerId: string, categoryId?: string, startDate?: Date, endDate?: Date, interval: 'day' | 'month' | 'year' = 'month') {
+    let dateTrunc = 'month';
+    if (interval === 'day') dateTrunc = 'day';
+    if (interval === 'year') dateTrunc = 'year';
+
+    const result = await prisma.$queryRawUnsafe(`
       SELECT 
-        DATE_TRUNC('week', t.transaction_date) as week,
+        DATE_TRUNC($1, t.transaction_date) as interval_date,
         SUM(ti.quantity) as total_tickets_sold,
         SUM(CASE WHEN t.promotion_id IS NOT NULL THEN ti.quantity ELSE 0 END) as promo_tickets_sold
       FROM transactions t
       JOIN events e ON t.event_id = e.id
       JOIN transaction_items ti ON t.id = ti.transaction_id
-      WHERE e.organizer_id = ${organizerId}
+      WHERE e.organizer_id = $2
         AND t.status = 'PAID'
-        ${categoryId ? Prisma.sql`AND e.category_id = ${categoryId}` : Prisma.empty}
-        ${startDate ? Prisma.sql`AND t.transaction_date >= ${startDate}` : Prisma.empty}
-        ${endDate ? Prisma.sql`AND t.transaction_date <= ${endDate}` : Prisma.empty}
-      GROUP BY DATE_TRUNC('week', t.transaction_date)
-      ORDER BY week ASC
-      LIMIT 12
-    `;
+        AND t.transaction_date >= $3
+        AND t.transaction_date <= $4
+        ${categoryId ? ` AND e.category_id = $5` : ''}
+      GROUP BY DATE_TRUNC($1, t.transaction_date)
+      ORDER BY interval_date ASC
+    `, dateTrunc, organizerId, startDate || new Date(0), endDate || new Date(), ...(categoryId ? [categoryId] : []));
+
     return result as any[];
   }
 

@@ -8,36 +8,16 @@ import {
   MapPinIcon,
   TagIcon,
 } from "@heroicons/react/24/outline";
+import { formatEventDate, formatEventTime, formatEventLocation } from "../utils";
 
 interface EventInfoSectionProps {
   event: Event;
 }
 
 const EventInfoSection: React.FC<EventInfoSectionProps> = ({ event }) => {
-  const startDate = event.startDate ? new Date(event.startDate) : null;
-
-  const displayDate = startDate
-    ? startDate
-        .toLocaleDateString("en-US", {
-          month: "long",
-          day: "numeric",
-          year: "numeric",
-        })
-        .toUpperCase()
-    : "TBA";
-
-  const displayTime = startDate
-    ? startDate
-        .toLocaleTimeString("en-US", {
-          hour: "numeric",
-          minute: "numeric",
-          hour12: true,
-        })
-        .toUpperCase()
-    : "TBA";
-
-  const displayLocation =
-    typeof event.location === "object" ? event.location.name : event.location;
+  const displayDate = formatEventDate(event.startDate);
+  const displayTime = formatEventTime(event.startDate);
+  const displayLocation = formatEventLocation(event.location);
 
   return (
     <div className="space-y-8 py-4">

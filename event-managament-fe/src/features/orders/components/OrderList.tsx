@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import { EyeIcon } from "@heroicons/react/24/outline";
 import { format } from "date-fns";
+import { getEventNames } from "../utils/groupOrders";
 
 interface IOrderListProps {
   orders: Order[];
@@ -102,7 +103,7 @@ const OrderList: React.FC<IOrderListProps> = ({
             <div className="flex justify-between items-start mb-3">
               <div>
                 <Typography className="font-display font-black uppercase text-sm !text-black dark:!text-white mb-1 line-clamp-1">
-                  {order.event?.name || "Unknown Event"}
+                  {getEventNames(order.items)}
                 </Typography>
                 <Typography className="font-bold text-[10px] uppercase text-gray-500 tracking-wider">
                   {order.invoice}
@@ -187,7 +188,7 @@ const OrderList: React.FC<IOrderListProps> = ({
                 </TableCell>
                 <TableCell className="border-b !border-black/10 dark:!border-white/10">
                   <Typography className="font-bold text-sm uppercase truncate max-w-[200px] !text-black dark:!text-white">
-                    {order.event?.name || "Unknown Event"}
+                    {getEventNames(order.items)}
                   </Typography>
                 </TableCell>
                 <TableCell className="border-b !border-black/10 dark:!border-white/10 text-sm !text-gray-600 dark:!text-gray-400 font-bold uppercase">
