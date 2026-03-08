@@ -244,7 +244,7 @@ export class OrdersService {
       };
 
       return await this.ordersRepository.create(orderData, tx);
-    });
+    }, { timeout: 15000, maxWait: 5000 });
   };
 
   public findAll = async (
