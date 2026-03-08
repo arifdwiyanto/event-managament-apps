@@ -116,31 +116,6 @@ export class OrdersController {
     }
   };
 
-  public uploadPaymentProof = async (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> => {
-    try {
-      const orderId = req.params.id as string;
-      const file = req.file;
-
-      if (!file) {
-        res.status(400).send({ message: "No payment proof file uploaded" });
-        return;
-      }
-
-      const result = await this.ordersService.updatePaymentProof(
-        orderId,
-        file.path,
-      );
-
-      res.status(200).send(result);
-    } catch (error) {
-      next(error);
-    }
-  };
-
   public handleMidtransNotification = async (
     req: Request,
     res: Response,

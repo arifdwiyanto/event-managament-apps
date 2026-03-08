@@ -35,20 +35,4 @@ export const ordersService = {
     );
     return data;
   },
-
-  uploadPaymentProof: async (id: string, file: File): Promise<Order> => {
-    const formData = new FormData();
-    formData.append("paymentProof", file);
-
-    const { data } = await apiFetch.patch<Order>(
-      `/orders/${id}/payment-proof`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      },
-    );
-    return data;
-  },
 };

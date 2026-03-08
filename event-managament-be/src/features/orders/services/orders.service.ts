@@ -167,6 +167,8 @@ export class OrdersService {
         finalPrice = 0;
       }
 
+      const roundedFinalPrice = Math.round(finalPrice);
+
       // Generate order number
       const now = new Date();
       const yy = String(now.getFullYear()).slice(-2);
@@ -177,19 +179,22 @@ export class OrdersService {
 
       let snapToken: string | undefined = undefined;
 
-      if (finalPrice > 0) {
+      if (roundedFinalPrice > 0) {
         const parameter = {
           transaction_details: {
             order_id: invoice,
-            gross_amount: finalPrice,
+            gross_amount: roundedFinalPrice,
           },
         };
 
         try {
           const midtransResponse = await snap.createTransaction(parameter);
           snapToken = midtransResponse.token;
-        } catch (error) {
-          console.error("Midtrans Error:", error);
+        } catch (error: any) {
+          console.error("Midtrans Error:", error?.response?.data || error?.message || error);
+          if (error?.response?.data?.error_messages) {
+            console.error("Midtrans Error Messages:", error.response.data.error_messages);
+          }
           throw new Error("Failed to generate payment link");
         }
       }
@@ -360,20 +365,5 @@ export class OrdersService {
     }
 
     return updatedOrder;
-  };
-
-  public updatePaymentProof = async (
-    orderId: string,
-    paymentProofUrl: string,
-  ): Promise<any> => {
-    const order = await this.ordersRepository.findById(orderId);
-
-    if (!order) {
-      throw new Error("Order not found");
-    }
-
-    return await this.ordersRepository.update(orderId, {
-      paymentProofUrl,
-    });
   };
 }

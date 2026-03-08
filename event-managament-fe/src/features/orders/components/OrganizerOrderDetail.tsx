@@ -23,10 +23,7 @@ interface IOrganizerOrderDetailProps {
   isOrganizerView?: boolean;
 }
 
-const getStatusColor = (status: string, hasProof: boolean = false) => {
-  if (status === "PENDING" && hasProof) {
-    return "info";
-  }
+const getStatusColor = (status: string) => {
   switch (status) {
     case "PAID":
       return "success";
@@ -41,10 +38,7 @@ const getStatusColor = (status: string, hasProof: boolean = false) => {
   }
 };
 
-const getStatusLabel = (status: string, hasProof: boolean = false) => {
-  if (status === "PENDING" && hasProof) {
-    return "AWAITING VALIDATION";
-  }
+const getStatusLabel = (status: string) => {
   return status;
 };
 
@@ -103,8 +97,8 @@ const OrganizerOrderDetail: React.FC<IOrganizerOrderDetailProps> = ({
             Status
           </Typography>
           <Chip
-            label={getStatusLabel(order.status, !!order.paymentProofUrl)}
-            color={getStatusColor(order.status, !!order.paymentProofUrl) as any}
+            label={getStatusLabel(order.status)}
+            color={getStatusColor(order.status) as any}
             size="small"
             sx={{ fontWeight: 600, letterSpacing: 0.5, px: 1, py: { xs: 1.5, sm: 0 }, fontSize: { xs: '0.7rem', sm: '0.8125rem' } }}
           />

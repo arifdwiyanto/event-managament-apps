@@ -10,7 +10,6 @@ import {
   Typography,
 } from "@mui/material";
 import { format } from "date-fns";
-import { useUploadPaymentProof } from "../hooks/useOrders";
 import ReviewModal from "@/features/reviews/components/ReviewModal";
 import { groupOrderItemsByOrganizer } from "../utils/groupOrders";
 
@@ -21,10 +20,7 @@ interface IOrderDetailProps {
   isOrganizerView?: boolean;
 }
 
-const getStatusColor = (status: string, hasProof: boolean = false) => {
-  if (status === "PENDING" && hasProof) {
-    return "bg-neon-cyan text-black";
-  }
+const getStatusColor = (status: string) => {
   switch (status) {
     case "PAID":
       return "bg-neon-cyan text-black";
@@ -45,8 +41,6 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
   onPay,
   isOrganizerView = false,
 }) => {
-  const uploadProofMutation = useUploadPaymentProof();
-  const [proofFile, setProofFile] = useState<File | null>(null);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
 
   // Calculate total discount from vouchers/coupons
@@ -56,16 +50,6 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
     const points = Number(order.pointsUsed) || 0;
     return Math.max(0, original - final - points);
   }, [order]);
-
-  const handleUploadProof = async () => {
-    if (!proofFile) return;
-    try {
-      await uploadProofMutation.mutateAsync({ id: order.id, file: proofFile });
-      setProofFile(null);
-    } catch (error: any) {
-      alert(error.message || "Failed to upload proof");
-    }
-  };
 
   return (
     <Box
@@ -109,11 +93,9 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
           </Typography>
           <Box
             component="span"
-            className={`px-3 md:px-4 py-1.5 font-black text-[8px] md:text-xs uppercase tracking-widest shadow-[4px_4px_0_0_rgba(0,0,0,1)] dark:shadow-[4px_4px_0_0_rgba(0,240,255,0.4)] ${getStatusColor(order.status, !!order.paymentProofUrl)}`}
+            className={`px-3 md:px-4 py-1.5 font-black text-[8px] md:text-xs uppercase tracking-widest shadow-[4px_4px_0_0_rgba(0,0,0,1)] dark:shadow-[4px_4px_0_0_rgba(0,240,255,0.4)] ${getStatusColor(order.status)}`}
           >
-            {order.status === "PENDING" && order.paymentProofUrl
-              ? "AWAITING VALIDATION"
-              : order.status}
+            {order.status}
           </Box>
         </Box>
       </Box>
@@ -445,65 +427,6 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
                 })()}
             </Box>
 
-            {order.paymentProofUrl ? (
-              <Box className="mb-6">
-                <Typography className="text-gray-500 dark:text-gray-400 font-bold uppercase text-[8px] md:text-xs mb-2 text-center">
-                  Payment Proof
-                </Typography>
-                <Box className="border-2 !border-black dark:!border-neon-cyan p-1 md:p-2 !bg-gray-50 dark:!bg-[#111] flex justify-center shadow-[4px_4px_0_0_#000] dark:shadow-[4px_4px_0_0_#00f0ff]">
-                  <img
-                    src={order.paymentProofUrl}
-                    alt="Payment Proof"
-                    className="w-full h-auto max-h-64 object-contain filter grayscale hover:grayscale-0 transition-all duration-500"
-                  />
-                </Box>
-              </Box>
-            ) : (
-              order.status === "PENDING" &&
-              !isOrganizerView && (
-                <Box className="mb-6 border-4 border-dashed !border-black dark:!border-neon-purple p-3 md:p-4 bg-neon-purple/5 dark:!bg-[#111]">
-                  <Typography className="font-display font-black uppercase text-[10px] md:text-xs mb-3 text-black dark:!text-neon-cyan text-center tracking-widest">
-                    Upload Proof
-                  </Typography>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      if (e.target.files?.[0]) {
-                        setProofFile(e.target.files[0]);
-                      }
-                    }}
-                    className="w-full mb-4 text-[8px] md:text-[10px] font-bold p-1 md:p-2 file:mr-2 md:file:mr-4 file:py-1 file:px-2 md:file:py-1.5 md:file:px-3 file:border-2 file:!border-black dark:file:!border-neon-cyan file:font-black file:!bg-neon-cyan dark:file:!bg-[#111] file:!text-black dark:file:!text-neon-cyan hover:file:!bg-black hover:dark:file:!bg-neon-cyan hover:file:!text-neon-cyan hover:dark:file:!text-black transition-colors !text-black dark:!text-white"
-                  />
-                  <Button
-                    fullWidth
-                    disabled={!proofFile || uploadProofMutation.isPending}
-                    onClick={handleUploadProof}
-                    className="border-2 !border-black dark:!border-neon-cyan bg-black text-white dark:bg-[#111] dark:!text-neon-cyan brutalist-button"
-                    sx={{
-                      py: 1,
-                      fontSize: { xs: "0.6rem", md: "0.875rem" },
-                      fontWeight: 900,
-                      textTransform: "uppercase",
-                      letterSpacing: "0.1em",
-                      borderRadius: 0,
-                      "&:hover": {
-                        transform: "translate(-2px, -2px)",
-                        boxShadow: "4px 4px 0 0 #00F0FF",
-                      },
-                      "&.Mui-disabled": {
-                        opacity: 0.5,
-                      },
-                    }}
-                  >
-                    {uploadProofMutation.isPending
-                      ? "Hacking..."
-                      : "Submit Vibe"}
-                  </Button>
-                </Box>
-              )
-            )}
-
             <Divider className="!border-black dark:!border-neon-magenta border-t-2 border-dashed mb-6" />
 
             <Box
@@ -544,20 +467,7 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
                 {isPaying ? "Writing to DB..." : "Confirm Vibe"}
               </Button>
             )}
-            {order.status === "PENDING" &&
-              !isOrganizerView &&
-              order.paymentProofUrl && (
-                <Box className="w-full py-2 md:py-3 bg-neon-cyan/20 dark:bg-neon-cyan/10 text-neon-cyan font-black uppercase tracking-widest text-[8px] md:text-xs text-center border-2 border-neon-cyan shadow-neon/20">
-                  Awaiting Validation
-                </Box>
-              )}
-            {order.status === "PENDING" &&
-              !isOrganizerView &&
-              !order.paymentProofUrl && (
-                <Box className="w-full py-2 md:py-3 bg-neon-magenta/20 dark:bg-neon-magenta/10 text-neon-magenta font-black uppercase tracking-widest text-[8px] md:text-xs text-center border-2 border-neon-magenta shadow-neon-pink/20">
-                  Proof Needed
-                </Box>
-              )}
+            
             {order.status === "PAID" && (
               <Box className="w-full py-2 md:py-3 bg-black dark:bg-white text-white dark:text-black font-black uppercase tracking-widest text-[8px] md:text-xs text-center border-4 border-black dark:border-neon-cyan shadow-neon/10">
                 Vibe Secured
