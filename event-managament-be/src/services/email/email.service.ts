@@ -27,7 +27,7 @@ export class EmailService {
       }
 
       const info = await this.transporter.sendMail({
-        from: `"Event Management" <${process.env.NODEMAILER_USER}>`,
+        from: `"Hype Event Platform" <${process.env.NODEMAILER_USER}>`,
         to,
         subject,
         html,
