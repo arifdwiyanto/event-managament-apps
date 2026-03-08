@@ -19,6 +19,7 @@ import {
 } from "@mui/material";
 import { format } from "date-fns";
 import { EyeIcon } from "@heroicons/react/24/outline";
+import { getEventNames } from "../utils/groupOrders";
 
 interface IOrganizerOrderListProps {
   orders: Order[];
@@ -115,7 +116,7 @@ const OrganizerOrderList: React.FC<IOrganizerOrderListProps> = ({
               </TableCell>
               <TableCell>
                 <Typography variant="body2" noWrap sx={{ maxWidth: 250 }}>
-                  {order.event?.name || "Unknown Event"}
+                  {getEventNames(order.items)}
                 </Typography>
               </TableCell>
               <TableCell>

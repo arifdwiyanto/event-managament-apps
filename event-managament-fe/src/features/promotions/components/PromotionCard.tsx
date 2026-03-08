@@ -5,6 +5,7 @@ import {
   Chip,
   IconButton,
 } from "@mui/material";
+import { useOrgRole } from "@/hooks/useOrgRole";
 import {
   PencilSquareIcon,
   TrashIcon,
@@ -30,6 +31,9 @@ const PromotionCard = ({
   onDelete,
   isDeleting,
 }: PromotionCardProps) => {
+  const role = useOrgRole();
+  const isEditable = role === "OWNER";
+
   return (
     <Paper
       elevation={0}
@@ -69,24 +73,26 @@ const PromotionCard = ({
             }}
           />
         </Box>
-        <Box sx={{ display: "flex", gap: 1 }}>
-          <IconButton
-            onClick={() => onEdit(promo)}
-            size="small"
-            sx={{ bgcolor: "action.hover" }}
-          >
-            <PencilSquareIcon className="w-4 h-4" />
-          </IconButton>
-          <IconButton
-            onClick={() => onDelete(promo.id)}
-            disabled={isDeleting}
-            size="small"
-            color="error"
-            sx={{ bgcolor: "action.hover" }}
-          >
-            <TrashIcon className="w-4 h-4" />
-          </IconButton>
-        </Box>
+        {isEditable && (
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <IconButton
+              onClick={() => onEdit(promo)}
+              size="small"
+              sx={{ bgcolor: "action.hover" }}
+            >
+              <PencilSquareIcon className="w-4 h-4" />
+            </IconButton>
+            <IconButton
+              onClick={() => onDelete(promo.id)}
+              disabled={isDeleting}
+              size="small"
+              color="error"
+              sx={{ bgcolor: "action.hover" }}
+            >
+              <TrashIcon className="w-4 h-4" />
+            </IconButton>
+          </Box>
+        )}
       </Box>
 
       <Box

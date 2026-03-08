@@ -5,6 +5,19 @@ import { BarChart } from '@mui/x-charts/BarChart';
 import { useSalesPerformance } from "../hooks/useReports";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { useThemeStore } from "@/features/theme";
+import { 
+  format, 
+  parseISO, 
+  eachDayOfInterval, 
+  eachMonthOfInterval, 
+  eachYearOfInterval, 
+  subDays, 
+  subMonths, 
+  subYears,
+  isSameDay,
+  isSameMonth,
+  isSameYear
+} from "date-fns";
 
 type SalesPerformanceChartProps = {
   interval: 'day' | 'month' | 'year';
@@ -18,7 +31,57 @@ export const SalesPerformanceChart: React.FC<SalesPerformanceChartProps> = ({ in
   const { theme } = useThemeStore();
   const isDark = theme === 'dark';
 
-  const dataset = rawDataset || [];
+  const dataset = useMemo(() => {
+    // Determine range
+    const now = new Date();
+    let start = startDate ? parseISO(startDate) : null;
+    let end = endDate ? parseISO(endDate) : null;
+
+    if (!start || !end) {
+      if (interval === 'day') {
+        start = subDays(now, 6);
+        end = now;
+      } else if (interval === 'month') {
+        start = new Date(now.getFullYear(), 0, 1);
+        end = new Date(now.getFullYear(), 11, 31);
+      } else {
+        start = subYears(now, 4);
+        end = now;
+      }
+    }
+
+    // Generate sequence
+    let sequence: Date[] = [];
+    try {
+      if (interval === 'day') sequence = eachDayOfInterval({ start, end });
+      else if (interval === 'month') sequence = eachMonthOfInterval({ start, end });
+      else sequence = eachYearOfInterval({ start, end });
+    } catch (e) {
+      console.error("Interval error:", e);
+      return [];
+    }
+
+    // Merge with raw data
+    return sequence.map(dateObj => {
+      const match = rawDataset?.find((item: any) => {
+        const itemDate = parseISO(item.date);
+        if (interval === 'day') return isSameDay(itemDate, dateObj);
+        if (interval === 'month') return isSameMonth(itemDate, dateObj);
+        return isSameYear(itemDate, dateObj);
+      });
+
+      let label = "";
+      if (interval === 'day') label = format(dateObj, "EEEE");
+      else if (interval === 'month') label = format(dateObj, "MMM yyyy");
+      else label = format(dateObj, "yyyy");
+
+      return {
+        date: format(dateObj, 'yyyy-MM-dd'),
+        revenue: match ? Number(match.revenue) : 0,
+        label
+      };
+    });
+  }, [rawDataset, interval, startDate, endDate]);
 
   const totalRevenue = useMemo(() => {
     return dataset.reduce((sum: number, item: any) => sum + item.revenue, 0);
@@ -46,19 +109,23 @@ export const SalesPerformanceChart: React.FC<SalesPerformanceChartProps> = ({ in
         <div className="h-[320px] w-full mt-4 flex items-center justify-center">
           <span className="loading loading-spinner text-primary"></span>
         </div>
-      ) : dataset.length === 0 ? (
-        <div className="h-[320px] w-full mt-4 flex items-center justify-center text-[#896175]">
-          No sales data available for this period.
-        </div>
       ) : (
-        <div className="h-[220px] md:h-[320px] w-full mt-2 md:mt-4">
+        <div className="h-[280px] md:h-[380px] w-full mt-2 md:mt-4">
           <BarChart
             dataset={dataset as any}
-            xAxis={[{ scaleType: 'band', dataKey: 'date' }]}
+            xAxis={[{ 
+              scaleType: 'band', 
+              dataKey: 'label',
+              tickLabelStyle: {
+                angle: -45,
+                textAnchor: 'end',
+                fontSize: 10,
+              },
+            }]}
             series={[
               { dataKey: 'revenue', label: 'Revenue', color: '#ee2b8c' }
             ]}
-            margin={{ top: 10, bottom: 30, left: 40, right: 10 }}
+            margin={{ top: 10, bottom: 85, left: 45, right: 10 }}
             borderRadius={4}
             slotProps={{
               legend: { hidden: true } as any

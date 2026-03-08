@@ -257,6 +257,40 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
                           </Box>
                         ))}
                       </Box>
+
+                      {/* Per-event promo discount — shown below event items */}
+                      {(() => {
+                        let eventPromoSaved = 0;
+                        let promoCode = "";
+                        let promoPercent: number | null = null;
+                        eg.items.forEach((item) => {
+                          if (item.promotion) {
+                            const orig = Number(item.pricePerUnit) * item.quantity;
+                            const actual = Number(item.totalPrice);
+                            eventPromoSaved += Math.max(0, orig - actual);
+                            if (!promoCode) {
+                              promoCode = item.promotion.code;
+                              promoPercent = item.promotion.discountPercentage ? Number(item.promotion.discountPercentage) : null;
+                            }
+                          }
+                        });
+                        if (eventPromoSaved <= 0) return null;
+                        return (
+                          <Box
+                            className="mt-2 ml-1 px-3 py-2 border-l-4 border-neon-cyan bg-neon-cyan/5 dark:bg-neon-cyan/10"
+                            display="flex"
+                            justifyContent="space-between"
+                            alignItems="center"
+                          >
+                            <Typography className="font-bold uppercase text-[8px] md:text-[10px] tracking-wider text-neon-cyan">
+                              🏷️ {promoCode}{promoPercent ? ` · ${promoPercent}%` : ""}
+                            </Typography>
+                            <Typography className="font-black text-[8px] md:text-xs text-neon-cyan">
+                              - IDR {eventPromoSaved.toLocaleString("id-ID")}
+                            </Typography>
+                          </Box>
+                        );
+                      })()}
                     </Box>
                   ))}
                 </Box>
@@ -305,61 +339,34 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
               {/* Original Price (before any discount) */}
               <Box display="flex" justifyContent="space-between">
                 <Typography className="text-gray-500 dark:text-gray-400 font-bold uppercase text-[8px] md:text-xs">
-                  Original Total
+                  Sub Total
                 </Typography>
                 <Typography className="font-black text-[8px] md:text-xs text-black dark:text-white">
                   IDR {Number(order.totalOriginalPrice).toLocaleString("id-ID")}
                 </Typography>
               </Box>
 
-              {/* Event Promotions (from items) — show actual IDR discount */}
+              {/* Event Promos — total discount only */}
               {(() => {
-                // Calculate promo discount per promotion by comparing item original vs actual
-                const promoMap = new Map<
-                  string,
-                  {
-                    name: string;
-                    code: string;
-                    discountPercentage?: number | null;
-                    discountAmount?: number | null;
-                    totalSaved: number;
-                  }
-                >();
+                let totalPromoSaved = 0;
                 order.items.forEach((item) => {
                   if (item.promotion) {
-                    const originalItemPrice =
-                      Number(item.pricePerUnit) * item.quantity;
-                    const actualItemPrice = Number(item.totalPrice);
-                    const saved = Math.max(
-                      0,
-                      originalItemPrice - actualItemPrice,
-                    );
-                    const existing = promoMap.get(item.promotion.id);
-                    promoMap.set(item.promotion.id, {
-                      ...item.promotion,
-                      totalSaved: (existing?.totalSaved || 0) + saved,
-                    });
+                    const orig = Number(item.pricePerUnit) * item.quantity;
+                    const actual = Number(item.totalPrice);
+                    totalPromoSaved += Math.max(0, orig - actual);
                   }
                 });
-                const uniquePromos = Array.from(promoMap.values());
-                return uniquePromos.map((promo, idx) => (
-                  <Box
-                    key={idx}
-                    display="flex"
-                    justifyContent="space-between"
-                    className="text-neon-cyan"
-                  >
+                if (totalPromoSaved <= 0) return null;
+                return (
+                  <Box display="flex" justifyContent="space-between" className="text-neon-cyan">
                     <Typography className="font-bold uppercase text-[8px] md:text-xs">
-                      Discount: {promo.code}{" "}
-                      {promo.discountPercentage
-                        ? ` · ${Number(promo.discountPercentage)}%`
-                        : ""}
+                      🏷️ Event Promos
                     </Typography>
-                    <Typography className="font-black text-[8px] md:text-xs text-neon-cyan shadow-neon-cyan">
-                      - IDR {promo.totalSaved.toLocaleString("id-ID")}
+                    <Typography className="font-black text-[8px] md:text-xs text-neon-cyan">
+                      - IDR {totalPromoSaved.toLocaleString("id-ID")}
                     </Typography>
                   </Box>
-                ));
+                );
               })()}
 
               {/* Points Used */}
@@ -431,11 +438,11 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
 
             <Box
               display="flex"
-              flexDirection="column"
-              alignItems="flex-end"
+              justifyContent="space-between"
+              alignItems="center"
               mb={4}
             >
-              <Typography className="font-black uppercase text-[8px] md:text-xs text-gray-500 dark:text-gray-400 mb-1">
+              <Typography className="font-black uppercase text-[8px] md:text-xs text-black dark:text-white">
                 Grand Total
               </Typography>
               <Typography className="font-display font-black text-base md:text-3xl text-neon-purple dark:text-neon-cyan tracking-tighter drop-shadow-[0_0_10px_rgba(0,240,255,0.2)]">
@@ -465,6 +472,38 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
                 }}
               >
                 {isPaying ? "Writing to DB..." : "Confirm Vibe"}
+              </Button>
+            )}
+
+            {/* Continue Payment for user — reopen Midtrans popup */}
+            {order.status === "PENDING" && !isOrganizerView && order.snapToken && (
+              <Button
+                fullWidth
+                onClick={() => {
+                  (window as any).snap.pay(order.snapToken, {
+                    onSuccess: () => window.location.reload(),
+                    onPending: () => window.location.reload(),
+                    onError: () => window.location.reload(),
+                    onClose: () => {},
+                  });
+                }}
+                className="border-2 border-black dark:border-neon-purple bg-neon-purple text-white brutalist-button shadow-[6px_6px_0_0_#000] dark:shadow-[6px_6px_0_0_rgba(168,85,247,0.5)]"
+                sx={{
+                  py: { xs: 1.5, md: 2 },
+                  fontSize: { xs: "0.7rem", md: "0.875rem" },
+                  fontWeight: 900,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.1em",
+                  borderRadius: 0,
+                  "&:hover": {
+                    backgroundColor: "#9333ea",
+                    transform: "translate(-2px, -2px)",
+                    boxShadow: "8px 8px 0 0 #000",
+                  },
+                  transition: "all 0.2s",
+                }}
+              >
+                🔒 Continue Payment
               </Button>
             )}
             

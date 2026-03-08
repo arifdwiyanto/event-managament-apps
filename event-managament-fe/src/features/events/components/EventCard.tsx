@@ -9,10 +9,7 @@ import {
   MapPinIcon, 
   ShoppingCartIcon
 } from "@heroicons/react/24/outline";
-import { useEventCard } from "../hooks/useEventCard";
-import { useCartStore } from "@/features/cart/store/useCartStore";
-import { useStoreLogin } from "@/features/auth/store/useAuthStore";
-import { useRouter } from "next/navigation";
+import { useEventCardActions, useEventCard } from "../hooks";
 import TicketSelectionModal from "./TicketSelectionModal";
 
 interface EventCardProps {
@@ -35,23 +32,13 @@ const EventCard: React.FC<EventCardProps> = ({ event, onToast }) => {
     imageSrc,
   } = useEventCard(event);
 
-  const { isAuthenticated } = useStoreLogin();
-  const { addItem, isLoading: cartLoading } = useCartStore();
-  const router = useRouter();
-
-  // Local feedback state
-  const [localLoading, setLocalLoading] = React.useState(false);
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
-
-  const handleAddToCart = async () => {
-    if (!isAuthenticated) {
-      if (onToast) onToast("Please log in to add items to cart", "error");
-      setTimeout(() => router.push("/login"), 1500);
-      return;
-    }
-
-    setIsModalOpen(true);
-  };
+  const {
+    cartLoading,
+    localLoading,
+    isModalOpen,
+    handleAddToCart,
+    handleCloseModal,
+  } = useEventCardActions({ onToast });
 
   return (
     <div
@@ -141,7 +128,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onToast }) => {
       {/* Ticket Selection Modal */}
       <TicketSelectionModal 
         open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={handleCloseModal}
         event={event}
         onToast={onToast || (() => {})}
       />

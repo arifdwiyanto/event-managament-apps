@@ -41,6 +41,8 @@ export class OrdersService {
       let totalPrice = 0;
       let totalDiscount = 0;
       const orderItems: any[] = [];
+      // Track which fixed-amount promos have already been applied per event
+      const appliedFixedPromos = new Set<string>();
 
       for (let item of data.items) {
         const ticket = await this.ticketsRepository.findById(item.ticketId, tx);
@@ -107,10 +109,16 @@ export class OrdersService {
           }
 
           if (promotion.discountPercentage) {
+            // Percentage discount applies per item (proportional — correct behavior)
             itemDiscount =
               (subTotalOriginal * Number(promotion.discountPercentage)) / 100;
           } else if (promotion.discountAmount) {
-            itemDiscount = Number(promotion.discountAmount);
+            // Fixed amount discount: apply only ONCE per promotion per event
+            const fixedKey = `${item.promotionId}:${ticket.eventId}`;
+            if (!appliedFixedPromos.has(fixedKey)) {
+              itemDiscount = Number(promotion.discountAmount);
+              appliedFixedPromos.add(fixedKey);
+            }
           }
         }
 
@@ -174,7 +182,7 @@ export class OrdersService {
       const yy = String(now.getFullYear()).slice(-2);
       const mm = String(now.getMonth() + 1).padStart(2, "0");
       const dd = String(now.getDate()).padStart(2, "0");
-      const randomNum = String(Math.floor(100000 + Math.random() * 900000))
+      const randomNum = String(Math.floor(100000 + Math.random() * 900000));
       const invoice = `${yy}${mm}${dd}${randomNum}`;
 
       let snapToken: string | undefined = undefined;
@@ -191,9 +199,15 @@ export class OrdersService {
           const midtransResponse = await snap.createTransaction(parameter);
           snapToken = midtransResponse.token;
         } catch (error: any) {
-          console.error("Midtrans Error:", error?.response?.data || error?.message || error);
+          console.error(
+            "Midtrans Error:",
+            error?.response?.data || error?.message || error,
+          );
           if (error?.response?.data?.error_messages) {
-            console.error("Midtrans Error Messages:", error.response.data.error_messages);
+            console.error(
+              "Midtrans Error Messages:",
+              error.response.data.error_messages,
+            );
           }
           throw new Error("Failed to generate payment link");
         }

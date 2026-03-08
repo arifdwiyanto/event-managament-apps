@@ -8,6 +8,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
+import { useOrgRole } from "@/hooks/useOrgRole";
 import TuneIcon from "@mui/icons-material/Tune";
 import React from "react";
 import { TicketTierData } from "../types/ticketTierData.types";
@@ -19,6 +20,8 @@ interface ITicketTierCardProps {
 
 const TicketTierCard: React.FC<ITicketTierCardProps> = ({ tier, onEdit }) => {
   const theme = useTheme();
+  const role = useOrgRole();
+  const isEditable = role === "OWNER" || role === "ADMIN";
   const isDark = theme.palette.mode === "dark";
 
   let statusBg = isDark ? "rgba(46, 125, 50, 0.2)" : "#e8f5e9";
@@ -151,28 +154,32 @@ const TicketTierCard: React.FC<ITicketTierCardProps> = ({ tier, onEdit }) => {
         </Box>
 
         {/* Settings Action */}
-        <IconButton
-          size="small"
-          onClick={onEdit}
-          sx={{ color: "text.secondary", display: { xs: "none", sm: "flex" } }}
-        >
-          <TuneIcon fontSize="small" />
-        </IconButton>
+        {isEditable && (
+          <IconButton
+            size="small"
+            onClick={onEdit}
+            sx={{ color: "text.secondary", display: { xs: "none", sm: "flex" } }}
+          >
+            <TuneIcon fontSize="small" />
+          </IconButton>
+        )}
       </Box>
 
       {/* Mobile Settings Action */}
-      <Box
-        sx={{
-          display: { xs: "flex", sm: "none" },
-          width: "100%",
-          justifyContent: "flex-end",
-          mt: 0,
-        }}
-      >
-        <IconButton size="small" onClick={onEdit} sx={{ color: "text.secondary", p: 0.5 }}>
-          <TuneIcon fontSize="small" />
-        </IconButton>
-      </Box>
+      {isEditable && (
+        <Box
+          sx={{
+            display: { xs: "flex", sm: "none" },
+            width: "100%",
+            justifyContent: "flex-end",
+            mt: 0,
+          }}
+        >
+          <IconButton size="small" onClick={onEdit} sx={{ color: "text.secondary", p: 0.5 }}>
+            <TuneIcon fontSize="small" />
+          </IconButton>
+        </Box>
+      )}
     </Paper>
   );
 };

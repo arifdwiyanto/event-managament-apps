@@ -7,11 +7,13 @@ import {
   ChartBarIcon,
   TicketIcon,
   EyeIcon,
+  LockClosedIcon,
 } from "@heroicons/react/24/outline";
 
 import { ManageEventItem } from "../types/manageEvent.types";
 import Link from "next/link";
 import { Tooltip } from "@mui/material";
+import { useOrgRole } from "@/hooks/useOrgRole";
 
 interface ManageEventCardProps {
   event: ManageEventItem;
@@ -45,6 +47,8 @@ const statusConfig = {
 };
 
 const ManageEventCard: React.FC<ManageEventCardProps> = ({ event }) => {
+  const role = useOrgRole();
+  const isEditable = role === "OWNER" || role === "ADMIN";
   const status = statusConfig[event.status] ?? statusConfig.active;
 
   const progressPercentage =
@@ -146,30 +150,31 @@ const ManageEventCard: React.FC<ManageEventCardProps> = ({ event }) => {
             {event.status === "completed" ? (
               <button
                 disabled
-                className="ml-auto flex items-center justify-center gap-2 px-4 py-2 w-full sm:w-auto bg-gray-50 dark:bg-white/5 text-gray-400 rounded-full text-sm font-bold cursor-not-allowed"
+                className="ml-auto flex items-center justify-center gap-2 px-4 py-2.5 w-full sm:w-auto bg-gray-50 dark:bg-white/5 text-gray-400 rounded-full text-xs font-bold cursor-not-allowed border border-gray-200 dark:border-white/10"
               >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                  ></path>
-                </svg>
+                <LockClosedIcon className="w-4 h-4" />
                 Archived
               </button>
-            ) : (
+            ) : isEditable || role === "MARKETING" ? (
               <Link href={`/dashboard/events/${event.id}/tickets`} passHref className="ml-auto w-full sm:w-auto">
                 <button className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-foreground text-background dark:bg-white dark:text-black rounded-full text-xs font-bold hover:bg-neon-pink hover:text-white dark:hover:bg-neon-pink transition-colors">
-                  <TicketIcon className="w-5 h-5 flex-shrink-0" />
-                  Manage Tickets
+                  {isEditable ? (
+                    <>
+                      <TicketIcon className="w-5 h-5 flex-shrink-0" />
+                      Manage Tickets
+                    </>
+                  ) : (
+                    <>
+                      <EyeIcon className="w-5 h-5 flex-shrink-0" />
+                      View Tickets
+                    </>
+                  )}
                 </button>
               </Link>
+            ) : (
+              <div className="ml-auto px-4 py-2.5 bg-gray-50 dark:bg-white/5 text-gray-400 rounded-full text-[10px] font-black uppercase tracking-widest border border-gray-200 dark:border-white/10">
+                View Only
+              </div>
             )}
           </div>
         </div>

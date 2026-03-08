@@ -22,7 +22,11 @@ export class CategoriesService {
     );
 
     return {
-      data,
+      data: data.map((category: any) => ({
+        ...category,
+        eventCount: category._count?.events || 0,
+        _count: undefined,
+      })),
       meta: {
         page,
         limit,

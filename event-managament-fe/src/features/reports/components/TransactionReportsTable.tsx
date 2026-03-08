@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { Bars3BottomLeftIcon } from "@heroicons/react/24/outline";
 import { useTransactionReports } from "../hooks/useReports";
 import { formatCurrency } from "@/utils/formatCurrency";
@@ -100,9 +101,9 @@ export const TransactionReportsTable: React.FC<Props> = ({ categoryId, startDate
       </div>
       
       <div className="p-4 border-t border-[#f4f0f2] dark:border-[#3a1d2e] flex items-center justify-center">
-        <button className="text-sm font-bold text-primary hover:underline">
+        <Link href="/dashboard/transactions" className="text-sm font-bold text-primary hover:underline">
           View All Transactions
-        </button>
+        </Link>
       </div>
     </div>
   );

@@ -35,8 +35,8 @@ export class ReportService {
     return res.data || [];
   }
 
-  static async getPromotionEffectiveness(categoryId?: string, startDate?: string, endDate?: string) {
-    const res = await ReportRepository.getPromotionEffectiveness(categoryId, startDate, endDate);
+  static async getPromotionEffectiveness(categoryId?: string, startDate?: string, endDate?: string, interval: 'day' | 'month' | 'year' = 'month') {
+    const res = await ReportRepository.getPromotionEffectiveness(categoryId, startDate, endDate, interval);
     if (!res.success) throw new Error(res.message || "Failed to fetch promotion effectiveness");
     return res.data || [];
   }

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTicketSelectionModal } from "../hooks";
 import { 
   Dialog, 
   DialogTitle, 
@@ -8,15 +9,11 @@ import {
   DialogActions, 
   IconButton,
   Typography,
-  Box,
-  useMediaQuery,
-  useTheme
+  Box
 } from "@mui/material";
 import { XMarkIcon, ShoppingCartIcon } from "@heroicons/react/24/outline";
 import { Event } from "../types/event.types";
-import { useBookingSidebar } from "../hooks/useBookingSidebar";
 import TicketSelectionCard from "./TicketSelectionCard";
-import { useCartStore } from "@/features/cart/store/useCartStore";
 
 interface TicketSelectionModalProps {
   open: boolean;
@@ -31,29 +28,16 @@ const TicketSelectionModal: React.FC<TicketSelectionModalProps> = ({
   event,
   onToast 
 }) => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
   const {
+    theme,
+    isMobile,
     quantities,
     handleUpdateQuantity,
     selectedTickets,
     total,
-  } = useBookingSidebar(event);
-
-  const { addItem, isLoading: cartLoading } = useCartStore();
-
-  const handleAddToCart = async () => {
-    try {
-      await Promise.all(
-        selectedTickets.map(ticket => addItem(ticket.id, ticket.qty))
-      );
-      onToast("Successfully added to cart!", "success");
-      onClose();
-    } catch (error) {
-      onToast("Failed to add to cart. Please try again.", "error");
-    }
-  };
+    cartLoading,
+    handleAddToCart,
+  } = useTicketSelectionModal({ event, onClose, onToast });
 
   return (
     <Dialog 

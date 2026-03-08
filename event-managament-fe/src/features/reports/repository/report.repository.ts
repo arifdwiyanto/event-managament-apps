@@ -34,8 +34,8 @@ export const getSalesByCategory = async (categoryId?: string, startDate?: string
   return response.data;
 };
 
-export const getTransactionReports = async (page: number = 1, limit: number = 10, categoryId?: string, startDate?: string, endDate?: string) => {
-  const qs = buildParams({ page, limit, categoryId, startDate, endDate });
+export const getTransactionReports = async (page: number = 1, limit: number = 10, categoryId?: string, startDate?: string, endDate?: string, interval?: 'day' | 'month' | 'year') => {
+  const qs = buildParams({ page, limit, categoryId, startDate, endDate, interval });
   const response = await apiFetch.get<PaginatedResponse<TransactionReportData>>(`/reports/transactions?${qs}`);
   return response.data;
 };
@@ -52,8 +52,8 @@ export const getCapacityVsSales = async (categoryId?: string, startDate?: string
   return response.data;
 };
 
-export const getPromotionEffectiveness = async (categoryId?: string, startDate?: string, endDate?: string) => {
-  const qs = buildParams({ categoryId, startDate, endDate });
+export const getPromotionEffectiveness = async (categoryId?: string, startDate?: string, endDate?: string, interval: 'day' | 'month' | 'year' = 'month') => {
+  const qs = buildParams({ categoryId, startDate, endDate, interval });
   const response = await apiFetch.get<ReportApiResponse<PromotionEffectivenessData[]>>(`/reports/promotion-effectiveness?${qs}`);
   return response.data;
 };

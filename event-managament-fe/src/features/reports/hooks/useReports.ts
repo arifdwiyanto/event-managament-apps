@@ -41,10 +41,10 @@ export const useCapacityVsSales = (categoryId?: string, startDate?: string, endD
   });
 };
 
-export const usePromotionEffectiveness = (categoryId?: string, startDate?: string, endDate?: string) => {
+export const usePromotionEffectiveness = (categoryId?: string, startDate?: string, endDate?: string, interval: 'day' | 'month' | 'year' = 'month') => {
   return useQuery({
-    queryKey: ['reports', 'promotion-effectiveness', categoryId, startDate, endDate],
-    queryFn: () => ReportService.getPromotionEffectiveness(categoryId, startDate, endDate),
+    queryKey: ['reports', 'promotion-effectiveness', categoryId, startDate, endDate, interval],
+    queryFn: () => ReportService.getPromotionEffectiveness(categoryId, startDate, endDate, interval),
     staleTime: 5 * 60 * 1000,
   });
 };

@@ -11,26 +11,22 @@ import {
   SparklesIcon,
 } from "@heroicons/react/24/outline";
 import { motion, AnimatePresence } from "framer-motion";
-import { useThemeStore } from "@/features/theme/stores/themeStore";
-import { useEventFilters } from "../hooks/useEventFilters";
+import { useEventExplorer } from "../hooks";
 import { Snackbar, Alert } from "@mui/material";
 
 const EventExplorerPageView: React.FC = () => {
-  const filters = useEventFilters();
-  const [isFilterOpen, setIsFilterOpen] = React.useState(false);
-  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-  const { resolvedTheme, toggleTheme } = useThemeStore();
-
-  // Single Toast State
-  const [toast, setToast] = React.useState({
-    open: false,
-    message: "",
-    severity: "success" as "success" | "error",
-  });
-
-  const handleShowToast = (message: string, severity: "success" | "error") => {
-    setToast({ open: true, message, severity });
-  };
+  const {
+    filters,
+    isFilterOpen,
+    isMenuOpen,
+    resolvedTheme,
+    toggleTheme,
+    toast,
+    handleShowToast,
+    handleCloseToast,
+    setIsFilterOpen,
+    setIsMenuOpen,
+  } = useEventExplorer();
 
   const actions = [
     {
@@ -184,11 +180,11 @@ const EventExplorerPageView: React.FC = () => {
       <Snackbar
         open={toast.open}
         autoHideDuration={4000}
-        onClose={() => setToast((prev) => ({ ...prev, open: false }))}
+        onClose={handleCloseToast}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
         <Alert
-          onClose={() => setToast((prev) => ({ ...prev, open: false }))}
+          onClose={handleCloseToast}
           severity={toast.severity}
           variant="filled"
           sx={{

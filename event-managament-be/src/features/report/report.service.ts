@@ -51,11 +51,11 @@ export class ReportService {
     }));
   }
 
-  async getPromotionEffectiveness(organizerId: string, categoryId?: string, startDate?: Date, endDate?: Date) {
-    const rawData = await this.reportRepository.getPromotionEffectiveness(organizerId, categoryId, startDate, endDate);
+  async getPromotionEffectiveness(organizerId: string, categoryId?: string, startDate?: Date, endDate?: Date, interval: 'day' | 'month' | 'year' = 'month') {
+    const rawData = await this.reportRepository.getPromotionEffectiveness(organizerId, categoryId, startDate, endDate, interval);
     
     return rawData.map((row: any) => ({
-      week: row.week.toISOString().split('T')[0],
+      date: row.interval_date.toISOString().split('T')[0],
       totalSales: Number(row.total_tickets_sold || 0),
       promoSales: Number(row.promo_tickets_sold || 0)
     }));

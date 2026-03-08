@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useOrganizerNotificationBell } from "../hooks/useOrganizerNotificationBell";
+import { useThemeStore } from "@/features/theme/stores/themeStore";
 // MUI
 import IconButton from "@mui/material/IconButton";
 import Badge from "@mui/material/Badge";
@@ -27,12 +28,14 @@ const OrganizerNotificationBell: React.FC = () => {
     handleMarkAsRead,
     handleMarkAllAsRead
   } = useOrganizerNotificationBell();
+  const { resolvedTheme } = useThemeStore();
+  const isDark = resolvedTheme === "dark";
 
   return (
     <>
       <button 
         onClick={handleClick}
-        className="relative text-[#5f4351] hover:text-[#ee2b8c] transition-colors p-1 outline-none"
+        className="relative text-[#5f4351] dark:text-[#d1c4cb] hover:text-[#ee2b8c] dark:hover:text-[#ee2b8c] transition-colors p-1 outline-none"
       >
         <BellIcon className="w-5 h-5 md:w-6 md:h-6" />
         {unreadCount > 0 && (
@@ -53,22 +56,19 @@ const OrganizerNotificationBell: React.FC = () => {
             maxHeight: 480,
             overflow: "auto",
             borderRadius: "16px",
-            border: "1px solid #f4f0f2",
-            boxShadow: "0 10px 40px rgba(0,0,0,0.08)",
+            border: `1px solid ${isDark ? "#3a1d2e" : "#f4f0f2"}`,
+            boxShadow: isDark ? "0 10px 40px rgba(0,0,0,0.4)" : "0 10px 40px rgba(0,0,0,0.08)",
             mt: 1.5,
-            bgcolor: "white",
-            "& .dark": {
-              bgcolor: "#221019",
-              border: "1px solid #3a1d2e",
-              color: "white"
-            }
+            bgcolor: isDark ? "#221019" : "white",
+            backgroundImage: "none",
+            color: isDark ? "white" : "inherit"
           }
         }}
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
         <Box sx={{ p: 2, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#181114", ".dark &": { color: "white" } }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 700, color: isDark ? "white" : "#181114" }}>
             Notifications
           </Typography>
           {unreadCount > 0 && (
@@ -86,7 +86,7 @@ const OrganizerNotificationBell: React.FC = () => {
             </Typography>
           )}
         </Box>
-        <Divider sx={{ borderColor: "#f4f0f2", ".dark &": { borderColor: "#3a1d2e" } }} />
+        <Divider sx={{ borderColor: isDark ? "#3a1d2e" : "#f4f0f2" }} />
         
         {loading && notifications.length === 0 ? (
           <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
@@ -94,7 +94,7 @@ const OrganizerNotificationBell: React.FC = () => {
           </Box>
         ) : notifications.length === 0 ? (
           <Box sx={{ p: 4, textAlign: "center" }}>
-            <Typography variant="body2" color="text.secondary" sx={{ fontStyle: "italic" }}>
+            <Typography variant="body2" color={isDark ? "grey.500" : "text.secondary"} sx={{ fontStyle: "italic" }}>
               No notifications yet
             </Typography>
           </Box>
@@ -110,21 +110,21 @@ const OrganizerNotificationBell: React.FC = () => {
                 flexDirection: "column",
                 alignItems: "flex-start",
                 gap: 0.5,
-                bgcolor: un.isRead ? "transparent" : "#ee2b8c0a",
+                bgcolor: un.isRead ? "transparent" : (isDark ? "rgba(238, 43, 140, 0.1)" : "#ee2b8c0a"),
                 borderLeft: un.isRead ? "3px solid transparent" : "3px solid #ee2b8c",
                 py: 1.5,
                 px: 2,
                 whiteSpace: "normal",
-                "&:hover": { bgcolor: "#f8f6f7", ".dark &": { bgcolor: "#2a1621" } }
+                "&:hover": { bgcolor: isDark ? "#2a1621" : "#f8f6f7" }
               }}
             >
-              <Typography variant="body2" sx={{ fontWeight: un.isRead ? 500 : 700, fontSize: "13px", color: "#181114", ".dark &": { color: "white" } }}>
+              <Typography variant="body2" sx={{ fontWeight: un.isRead ? 500 : 700, fontSize: "13px", color: isDark ? "white" : "#181114" }}>
                 {un.notification.title}
               </Typography>
-              <Typography variant="caption" sx={{ fontSize: "12px", lineHeight: 1.4, color: "#5f4351", ".dark &": { color: "#d1c4cb" } }}>
+              <Typography variant="caption" sx={{ fontSize: "12px", lineHeight: 1.4, color: isDark ? "#d1c4cb" : "#5f4351" }}>
                 {un.notification.message}
               </Typography>
-              <Typography variant="caption" sx={{ fontSize: "10px", mt: 0.5, color: "#896175", fontWeight: 500 }}>
+              <Typography variant="caption" sx={{ fontSize: "10px", mt: 0.5, color: isDark ? "#896175" : "#896175", fontWeight: 500 }}>
                 {timeAgo(un.createdAt)}
               </Typography>
             </MenuItem>
