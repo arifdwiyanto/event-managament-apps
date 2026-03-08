@@ -91,7 +91,7 @@ const OrganizerOrderList: React.FC<IOrganizerOrderListProps> = ({
       <Table sx={{ minWidth: 650 }} aria-label="organizer transactions table">
         <TableHead sx={{ backgroundColor: "rgba(0, 0, 0, 0.02)" }}>
           <TableRow>
-            <TableCell sx={{ fontWeight: 600 }}>Invoice</TableCell>
+            <TableCell sx={{ fontWeight: 600 }}>Order Number</TableCell>
             <TableCell sx={{ fontWeight: 600 }}>Event</TableCell>
             <TableCell sx={{ fontWeight: 600 }}>Date</TableCell>
             <TableCell sx={{ fontWeight: 600 }}>Total Final Price</TableCell>

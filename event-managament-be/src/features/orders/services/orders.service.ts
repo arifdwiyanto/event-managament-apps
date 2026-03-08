@@ -167,7 +167,13 @@ export class OrdersService {
         finalPrice = 0;
       }
 
-      const invoice = `INV-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+      // Generate order number
+      const now = new Date();
+      const yy = String(now.getFullYear()).slice(-2);
+      const mm = String(now.getMonth() + 1).padStart(2, "0");
+      const dd = String(now.getDate()).padStart(2, "0");
+      const randomNum = String(Math.floor(100000 + Math.random() * 900000))
+      const invoice = `${yy}${mm}${dd}${randomNum}`;
 
       let snapToken: string | undefined = undefined;
 

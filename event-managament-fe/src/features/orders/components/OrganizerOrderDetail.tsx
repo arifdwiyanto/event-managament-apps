@@ -75,7 +75,7 @@ const OrganizerOrderDetail: React.FC<IOrganizerOrderDetailProps> = ({
       <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, justifyContent: "space-between", alignItems: { xs: "flex-start", md: "center" }, gap: { xs: 1.5, md: 2 }, mb: { xs: 0.5, md: 1 } }}>
         <Box sx={{ width: "100%", overflow: "hidden" }}>
           <Typography variant="h5" fontWeight={700} gutterBottom sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'flex-start', sm: 'center' }, gap: { xs: 0.5, sm: 1 }, fontSize: { xs: '1.25rem', md: '1.5rem' } }}>
-            <span>Invoice:</span>
+            <span>Order Number:</span>
             <Tooltip title={order.invoice} placement="top-start" enterTouchDelay={0}>
               <Typography 
                 component="span" 
@@ -203,53 +203,6 @@ const OrganizerOrderDetail: React.FC<IOrganizerOrderDetailProps> = ({
                 Rp {Number(order.totalFinalPrice).toLocaleString("id-ID")}
               </Typography>
             </Box>
-          </Box>
-
-          {/* Payment Proof Section */}
-          <Box sx={{ mb: { xs: 3, sm: 4 } }}>
-            <Typography variant="subtitle2" fontWeight={600} mb={1.5} sx={{ fontSize: { xs: '0.85rem', sm: '0.875rem' } }}>
-              Customer Payment Proof
-            </Typography>
-            
-            {order.paymentProofUrl ? (
-              <Box
-                sx={{
-                  border: "1px solid",
-                  borderColor: "divider",
-                  borderRadius: 2,
-                  p: 1,
-                  display: "flex",
-                  justifyContent: "center",
-                  bgcolor: "background.default",
-                }}
-              >
-                <img
-                  src={order.paymentProofUrl}
-                  alt="Payment Proof"
-                  style={{
-                    width: "100%",
-                    maxHeight: 400,
-                    objectFit: "contain",
-                    borderRadius: 4,
-                  }}
-                />
-              </Box>
-            ) : (
-              <Box
-                sx={{
-                  border: "1px dashed",
-                  borderColor: "divider",
-                  borderRadius: 2,
-                  p: { xs: 3, sm: 4 },
-                  textAlign: "center",
-                  bgcolor: "background.default",
-                }}
-              >
-                <Typography variant="body2" color="text.secondary">
-                  No payment proof uploaded by the customer yet.
-                </Typography>
-              </Box>
-            )}
           </Box>
 
           {/* Action Buttons */}

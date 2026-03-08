@@ -85,7 +85,7 @@ const OrderDetail: React.FC<IOrderDetailProps> = ({
       >
         <Box>
           <Typography className="font-display font-black uppercase tracking-tighter text-base md:text-3xl text-black dark:text-white mb-1 md:mb-2">
-            Invoice:{" "}
+            Order Number:{" "}
             <Box
               component="span"
               className="text-neon-magenta select-all drop-shadow-[0_0_5px_rgba(255,0,229,0.3)]"

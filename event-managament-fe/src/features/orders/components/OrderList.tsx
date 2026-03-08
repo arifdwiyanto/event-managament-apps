@@ -155,7 +155,7 @@ const OrderList: React.FC<IOrderListProps> = ({
           <TableHead>
             <TableRow className="!bg-black dark:!bg-[#111] border-b-4 !border-black dark:!border-neon-cyan">
               <TableCell className="!text-white dark:!text-neon-cyan font-display font-black uppercase text-sm tracking-widest border-0 py-4">
-                Invoice
+                Order Number
               </TableCell>
               <TableCell className="!text-white dark:!text-neon-cyan font-display font-black uppercase text-sm tracking-widest border-0 py-4">
                 Event
